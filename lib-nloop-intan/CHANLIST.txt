@@ -1,0 +1,16 @@
+Lists of signal channels grouped by bank are saved in a "channel list"
+structure. This structure has field names that are bank identifiers, with
+each field containing an array of channel numbers.
+
+Intan on-chip amplifiers have banks named "A" through "H" with channels 0-127.
+
+FIXME - Chip auxiliary analog inputs not yet supported.
+
+The Intan recording and stimulation controller auxiliary I/O ports have banks
+named "AIN", "DIN", and "DOUT". "AIN" has channels 1-8 and "DIN" and "DOUT"
+have channels 1-16.
+
+FIXME - Controller analog outputs not yet supported (not saved?). These are
+always duplicates of amplifier channels, so the data can still be accessed.
+
+FIXME - Not including a time series field. Time series is a special case.
