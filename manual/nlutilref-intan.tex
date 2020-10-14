@@ -1,0 +1,134 @@
+% Automatically generated documentation.
+\chapter{``nlIntan'' Functions}
+\label{sect-intan}
+
+\section{nlIntan\_getAmpChannelFilename.m}
+
+\begin{verbatim}
+% function fname = nlIntan_getAmpChannelFilename(indir, bankid, channum)
+%
+% This returns the data file name for the specified Intan amplifier channel.
+% This file doesn't necessarily exist; this just constructs the name.
+%
+% "indir" is the directory containing Intan data.
+% "bankid" is the bank label for the desired channel.
+% "channum" is the in-bank channel number for the desired channel.
+%
+% "fname" is the name of the file that should contain the channel's data.
+% This is an empty character array if an error occurred.
+\end{verbatim}
+
+\section{nlIntan\_getTimeFilename.m}
+
+\begin{verbatim}
+% function fname = nlIntan_getTimeFilename(indir)
+%
+% This returns the name of the file containing Intan signal timestamps.
+% The file doesn't necessarily exist; this just constructs the filename.
+% NOTE - Intan saves the sample indices, not an actual time values.
+%
+% "indir" is the directory to search.
+%
+% "fname" is the name of the file that should contain sample time indices.
+\end{verbatim}
+
+\section{nlIntan\_helper\_probeChannels.m}
+
+\begin{verbatim}
+% function [ chandetect chanfiles ] = ...
+%   nlIntan_helper_probeChannels(chantest, banklist, chanrange, fnamefunc)
+%
+% This checks for the existence of data files from specified I/O banks, and
+% and probes for channels and banks if asked to do so.
+%
+% "chantest" is a structure with field names that are bank identifiers
+%   ('A', 'B', 'DIN', etc), with each field containing an array of channel
+%   numbers to test. See "CHANLIST.txt" for details.
+%   An empty structure means "auto-detect all banks". An empty channel array
+%   means "auto-detect all channels for this bank".
+% "bankids" is a cell array containing a list of bank IDs that are
+%   potentially probed.
+% "chanrange" is an array of channel numbers that are potentially probed.
+% "fnamefunc" points to a function that constructs a filename when passed
+%   a bank ID and a channel number as arguments.
+%
+% "chandetect" is a structure with the same format as "chantest", enumerating
+%   the banks and channels from which data was read. Fields in "chantest"
+%   that are not "potentially probed" bank identifiers are copied as-is.
+% "chanfiles" is an array of structures containing the following fields:
+%    "bank"  - Bank identifier (field name).
+%    "chan"  - Channel number.
+%    "fname" - Name of the file containing this bank/channel's data.
+\end{verbatim}
+
+\section{nlIntan\_probeAmpChannels.m}
+
+\begin{verbatim}
+% function [ chandetect ampdetect chanfiles ] = ...
+%   nlIntan_probeAmpChannels(indir, chantest)
+%
+% This checks for the existence of data files from specified amplifier
+% channels, and probes for channels and amplifiers if asked to do so.
+%
+% "indir" is the directory to search.
+% "chantest" is a structure with field names that are amplifier identifiers
+%   ('A', 'B', etc), with each field containing an array of channel numbers
+%   to fetch. An empty structure means "auto-detect all amplifiers". An
+%   empty array in a channel field means "auto-detect all channels".
+%
+% "chandetect" is a structure with the same format as "chantest", enumerating
+%   the amplifiers and channels from which data was read. Fields in "chantest"
+%   that are not amplifier identifiers (per CHANLIST.txt) are copied as-is.
+% "ampdetect" is a cell array of field names, containing only detected
+%   amplifier IDs.
+% "chanfiles" is an array of structures containing the following fields:
+%   "bank"  - Amplifier identifier string.
+%   "chan"  - Channel number.
+%   "fname" - Name of the file containing this bank/channel's data.
+\end{verbatim}
+
+\section{nlIntan\_readAmpChannels.m}
+
+\begin{verbatim}
+% function [is_ok chandetect ampdetect timedata chandata] = ...
+%   nlUtil_readIntanAmpChannels(indir, chanlist)
+%
+% This attempts to read individual Intan amplifier channel data files from
+% the specified directory. The time series is also read.
+%
+% "indir" is the directory to search.
+% "chanlist" is a structure with field names that are amplifier identifiers
+%   ('A', 'B', etc), with each field containing an array of channel numbers
+%   to fetch. An empty structure means "auto-detect all amplifiers". An
+%   empty array in a channel field means "auto-detect all channels".
+%
+% "is_ok" is true if data was read and false otherwise.
+% "chandetect" is a structure with the same format as "chanlist", enumerating
+%   the amplifiers and channels from which data was read.
+% "timedata" contains the time series (in samples, not seconds).
+% "chandata" is an array of structures containing the following fields:
+%   "bank" - Amplifier identifier string.
+%   "chan" - Channel number.
+%   "fname" - Filename
+%   "data" - Sample data series.
+\end{verbatim}
+
+\section{nlIntan\_readMetadata.m}
+
+\begin{verbatim}
+% function [ is_ok metadata ] = nlUtil_readIntanMetadata(fname)
+%
+% This attempts to read selected parts of the specified Intan metadata file.
+% If successful, "is_ok" is set to "true" and "metadata" is a structure with
+% the following fields:
+%
+% "devtype"  - "RHS" for a recording controller, "RHD" for stimulation.
+% "samprate" - Sampling rate in Hz.
+%
+% On failure, "is_ok" is set to "false" and "metadata" is an empty structure.
+%
+% FIXME - Ignoring most of the metadata. Use Intan's functions if you need
+% all of it.
+\end{verbatim}
+
+% This is the end of the file.

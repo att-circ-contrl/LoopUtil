@@ -1,0 +1,187 @@
+% Automatically generated documentation.
+\chapter{``nlProc'' Functions}
+\label{sect-proc}
+
+\section{nlProc\_calcSkewPercentile.m}
+
+\begin{verbatim}
+% function [ seriesmedian seriesiqr seriesskew rawpercentiles ] = ...
+%   nlProc_calcSkewPercentile(dataseries, tailpercent)
+%
+% This computes the median and the (tailpercent, 100%-tailpercent) tail
+% percentiles for the specified series, and evaluates skew by comparing the
+% midsummary (average of the tail values) with the median. The result is
+% normalized (a skew of +/- 1 is a displacement by +/- the interquartile
+% range).
+%
+% "dataseries" is the sample sequence to process.
+% "tailpercent" is an array of tail values to test.
+%
+% "seriesmedian" is the series median value.
+% "seriesiqr" is the series interquartile range.
+% "seriesskew" is an array of normalized skew values corresponding to the
+%   tail percentages.
+% "rawpercentiles" is an array with the actual percentile values used for
+%   skew calculations. It contains percentile values corresponding to
+%   [ (tailpercent) (median) (100 - tailpercent) (25%) (75%) ].
+\end{verbatim}
+
+\section{nlProc\_calcSpectrumSkew.m}
+
+\begin{verbatim}
+% function [ spectfreqs spectmedian spectiqr spectskew ] = ...
+%   nlProc_calcSpectrumSkew( dataseries, samprate, ...
+%   freqrange, freqperdecade, wintime, winsteps, tailpercent)
+%
+% This computes a persistence spectrum for the specified series, and finds
+% the median, interquartile range, and the normalized skew for each frequency
+% bin. "Skew" is defined per nlProc_calcSkewPercentile().
+%
+% "dataseries" is the data series to process.
+% "samprate" is the sampling rate of the data series.
+% "freqrange" [ fmin fmax ] specifies the frequency band to evaluate.
+% "freqperdecade" is the number of frequency bins per decade.
+% "wintime" is the window duration in seconds to compute the time-windowed
+%   Fourier transform with.
+% "winsteps" is the number of overlapping steps taken when advancing the time
+%   window. The window advances by wintime/winsteps seconds per step.
+% "tailpercent" is an array of percentile values that define the tails for
+%   skew calculation, per nlProc_calcSkewPercentile().
+%
+% "spectfreqs" is an array of bin center frequencies.
+% "spectmedian" is an array of per-frequency median power values.
+% "spectiqr" is an array of per-frequency power interquartile ranges.
+% "spectskew" is a cell array, with one cell per "tailpercent" value. Each
+%   cell contains an array of per-frequency skew values.
+\end{verbatim}
+
+\section{nlProc\_fillNaN.m}
+
+\begin{verbatim}
+% function newseries = nlProc_fillNaN( oldseries )
+%
+% This interpolates NaN segments within the series using linear interpolation,
+% and then fills in NaNs at the end of the series by replicating samples.
+% This makes the derivative discontinuous when filling endpoints but prevents
+% large excursions from curve fit extrapolation.
+%
+% "oldseries" is the series containing NaN segments.
+%
+% "newseries" is the interpolated series without NaN segments.
+\end{verbatim}
+
+\section{nlProc\_filterSignal.m}
+
+\begin{verbatim}
+% function [ lfpseries spikeseries ] = nlProc_filterSignal( oldseries, ...
+%   samprate, lfprate, lowpassfreq, powerfreq, dcfreq )
+%
+% This applies several filters:
+% - A DC removal filter.
+% - A notch filter to remove power line noise.
+% - A low-pass filter to isolate the local field potential signal.
+% The full-rate LFP series is subtracted from the original series to produce
+% a high-pass-filtered "spike" series, and a downsampled LFP series is
+% also returned.
+%
+% "oldseries" is the original wideband signal.
+% "samprate" is the sampling rate of the wideband signal.
+% "lfprate" is the desired sampling rate of the LFP signal. This should
+%   cleanly divide "samprate" (samprate = k * lfprate for some integer k).
+% "lowpassfreq" is the edge of the pass-band for the LFP signal. This is
+%   lower than the filter's corner frequency; it's the 0.2 dB frequency.
+% "powerfreq" is an array of values specifying the center frequencies of the
+%   power line notch filter. This is typically 60 Hz or 50 Hz (a single
+%   value), but may contain multiple values to filter harmonics. An empty
+%   array disables this filter.
+% "dcfreq" is the edge of the pass-band for the high-pass DC removal filter.
+%   Set to 0 to disable this filter. This is higher than the corner frequency;
+%   it's the 0.2 dB frequency (ripple is flat above it).
+%
+% "lfpseries" is the downsampled low-pass-filtered signal.
+% "spikeseries" is the full-rate high-pass-filtered signal.
+%
+% Filters used are IIR, called with "filtfilt" to remove time offset by
+% running the filter forwards and backwards in time. The power line filter
+% takes about 1/2 second to fully stabilize, and the low-pass LFP filter takes
+% about 1/2 period to 1 period to fully stabilize. Edge effects may occur
+% within this distance of the start and end of the signal.
+% The DC rejection filter also takes at least 1 period to stabilize. Since
+% it's applied in both directions, and won't perturb the pass-band, it should
+% be well-behaved over the entire signal.
+%
+% The LFP sampling rate should be at least 10 times "lowpassfreq" to avoid
+% aliasing during downsampling. The DC rejection filter pass frequency
+% should be no lower than half the lowest frequency of interest, to
+% minimize edge effects.
+\end{verbatim}
+
+\section{nlProc\_removeArtifactsSigma.m}
+
+\begin{verbatim}
+% function newseries = nlProc_removeArtifactsSigma( oldseries, ...
+%   ampthresh, derivthresh, ampthreshfall, derivthreshfall, ...
+%   trimbefore, trimafter, smoothsamps, dcsamps )
+%
+% This identifies artifacts as excursions in the signal's amplitude or
+% derivative, and replaces affected regions with NaN. Excursion thresholds
+% are expressed in terms of the standard deviation of the signal or its
+% derivative.
+%
+% "oldseries" is the series to process.
+% "ampthresh" is the threshold for flagging amplitude excursion artifacts.
+% "derivthresh" is the threshold for flagging derivative excursion artifacts.
+% "ampthreshfall" is the turn-off threshold for amplitude artifacts.
+% "derivthreshfall" is the turn-off threshold for derivative artifacts.
+% "trimbefore" is the number of samples to squash ahead of the artifact.
+% "trimafter" is the number of samples to squash after the artifact.
+% "smoothsamps" is the size of the smoothing window to apply before taking
+%   the derivative, or 0 for no smoothing.
+% "dcsamps" is the size of the window for computing local DC average removal
+%   ahead of computing signal statistics.
+%
+% Regions where the amplitude or derivative exceeds the threshold are flagged
+% as artifacts. These regions are widened to encompass the region where the
+% amplitude or derivative exceeds the "fall" threshold, and then padded by
+% the specified number of samples. This is intended to correctly handle
+% square-pulse artifacts and fast-step-slow-decay artifacts.
+\end{verbatim}
+
+\section{nlProc\_removeTimeRanges.m}
+
+\begin{verbatim}
+% function newseries = ...
+%   nlProc_removeTimeRanges( oldseries, samprate, trimtimes )
+%
+% This NaNs out specified regions of the input signal.
+%
+% "oldseries" is the series to process.
+% "samprate" is the sampling rate of the input signal.
+% "trimtimes" is a cell array containing time spans to NaN out. Time spans
+%   have the form "[ time1 time2 ]", where times are in seconds. Negative
+%   times are relative to the end of the signal, positive times are relative
+%   to the start of the signal (both start at 0 seconds). Use a very small
+%   negative value for "-0".
+%
+% "newseries" is a modified version of the input series with the specified
+%   time ranges set to NaN.
+\end{verbatim}
+
+\section{nlProc\_trimEndpoints.m}
+
+\begin{verbatim}
+% function newseries = ...
+%   nlProc_trimEndpints( oldseries, samprate, trimstart, trimend )
+%
+% This crops the specified durations from the start and end of the supplied
+% signal.
+%
+% "oldseries" is the series to process.
+% "samprate" is the sampling rate of the input signal.
+% "trimstart" is the number of seconds to remove from the beginning.
+% "trimend" is the number of seconds to remove from the end.
+%
+% "newseries" is a truncated version of the input signal.
+\end{verbatim}
+
+% This is the end of the file.

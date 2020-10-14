@@ -1,0 +1,132 @@
+% Automatically generated documentation.
+\chapter{``nlPlot'' Functions}
+\label{sect-plot}
+
+\section{nlPlot\_axesPlotExcursions.m}
+
+\begin{verbatim}
+% function nlPlot_axesPlotExcursions( thisax, ...
+%   spectfreqs, spectmedian, spectiqr, spectskew, percentlist, ...
+%   want_relative, figtitle )
+%
+% This plots LFP power excursions, either as relative power excess alone or
+% against the median power spectrum. See nlChan_applySpectSkewCalc() for
+% details of skew calculation and array contents.
+% The plot is rendered to the specifed set of figure axes.
+%
+% "thisax" is the "axes" object to render to.
+% "spectfreqs" is an array of frequency bin center frequencies.
+% "spectmedian" is an array of per-frequency median power values.
+% "spectiqr" is an array of per-frequency power interquartile ranges.
+% "spectskew" is a cell array, with one cell per "percentlist" value. Each
+%   cell contains an array of per-frequency skew values.
+% "percentlist" is an array of percentile values that define the tails for
+%   skew calculations, per nlProc_calcSkewPercentile().
+% "want_relative" is true to plot relative power excess alone, and false to
+%   plot against the median power spectrum.
+% "figtitle" is the title to use for the figure, or '' for no title.
+\end{verbatim}
+
+\section{nlPlot\_axesPlotPersist.m}
+
+\begin{verbatim}
+% function nlPlot_plotPersist( thisax, ...
+%   persistvals, persistfreqs, persistpowers, want_log, figtitle )
+%
+% This plots a pre-tabulated persistence spectrum. See "pspectrum()" for
+% details of input array structure.
+%
+% "thisax" is the "axes" object to render to.
+% "thisfig" is the figure to render to (this may be a UI component).
+% "persistvals" is the matrix of persistence spectrum fraction values.
+% "persistfreqs" is the list of frequencies used for binning.
+% "persistpowers" is the list of power magnitudes used for binning.
+% "want_log" is true if the frequency axis should be plotted on a log scale
+%   (it's computed on a linear scale).
+% "figtitle" is the title to use for the figure, or '' for no title.
+\end{verbatim}
+
+\section{nlPlot\_axesPlotSpikeHist.m}
+
+\begin{verbatim}
+% function nlPlot_plotSpikeHist( thisax, ...
+%   bincounts, binedges, percentamps, percentpers, figtitle )
+%
+% This plots a pre-tabulated histogram of normalized spike waveform
+% amplitude. For channels with real spikes, tails are asymmetrical.
+%
+% "thisax" is the "axes" object to render to.
+% "bincounts" is an array containing bin count values, per histogram().
+% "binedges" is an array containing the histogram bin edges, per histogram().
+% "percentamps" is an array of normalized amplitudes corresponding to desired
+%   tail percentiles to highlight. Entries 1..N are tail percentile amplitudes,
+%   entry N+1 is the median, and entries N+2..2N+1 are (100%-tail) amplitudes.
+% "percentpers" is an array naming desired tail percentiles to highlight.
+% "figtitle" is the title to use for the figure, or '' for no title.
+\end{verbatim}
+
+\section{nlPlot\_plotExcursions.m}
+
+\begin{verbatim}
+% function nlPlot_plotExcursions( thisfig, oname, ...
+%   spectfreqs, spectmedian, spectiqr, spectskew, percentlist, ...
+%   want_relative, figtitle )
+%
+% This plots LFP power excursions, either as relative power excess alone or
+% against the median power spectrum. See nlChan_applySpectSkewCalc() for
+% details of skew calculation and array contents.
+%
+% "thisfig" is the figure to render to (this may be a UI component).
+% "oname" is the filename to save to, or '' to not save.
+% "spectfreqs" is an array of frequency bin center frequencies.
+% "spectmedian" is an array of per-frequency median power values.
+% "spectiqr" is an array of per-frequency power interquartile ranges.
+% "spectskew" is a cell array, with one cell per "percentlist" value. Each
+%   cell contains an array of per-frequency skew values.
+% "percentlist" is an array of percentile values that define the tails for
+%   skew calculations, per nlProc_calcSkewPercentile().
+% "want_relative" is true to plot relative power excess alone, and false to
+%   plot against the median power spectrum.
+% "figtitle" is the title to use for the figure, or '' for no title.
+\end{verbatim}
+
+\section{nlPlot\_plotPersist.m}
+
+\begin{verbatim}
+% function nlPlot_plotPersist( thisfig, oname, ...
+%   persistvals, persistfreqs, persistpowers, want_log, figtitle )
+%
+% This plots a pre-tabulated persistence spectrum. See "pspectrum()" for
+% details of input array structure.
+%
+% "thisfig" is the figure to render to (this may be a UI component).
+% "oname" is the filename to save to, or '' to not save.
+% "persistvals" is the matrix of persistence spectrum fraction values.
+% "persistfreqs" is the list of frequencies used for binning.
+% "persistpowers" is the list of power magnitudes used for binning.
+% "want_log" is true if the frequency axis should be plotted on a log scale
+%   (it's computed on a linear scale).
+% "figtitle" is the title to use for the figure, or '' for no title.
+\end{verbatim}
+
+\section{nlPlot\_plotSpikeHist.m}
+
+\begin{verbatim}
+% function nlPlot_plotSpikeHist( thisfig, oname, ...
+%   bincounts, binedges, percentamps, percentpers, figtitle )
+%
+% This plots a pre-tabulated histogram of normalized spike waveform
+% amplitude. For channels with real spikes, tails are asymmetrical.
+%
+% "thisfig" is the figure to render to (this may be a UI component).
+% "oname" is the filename to save to, or '' to not save.
+% "bincounts" is an array containing bin count values, per histogram().
+% "binedges" is an array containing the histogram bin edges, per histogram().
+% "percentamps" is an array of normalized amplitudes corresponding to desired
+%   tail percentiles to highlight. Entries 1..N are tail percentile amplitudes,
+%   entry N+1 is the median, and entries N+2..2N+1 are (100%-tail) amplitudes.
+% "percentpers" is an array naming desired tail percentiles to highlight.
+% "figtitle" is the title to use for the figure, or '' for no title.
+\end{verbatim}
+
+% This is the end of the file.

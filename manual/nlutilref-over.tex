@@ -1,0 +1,40 @@
+% Neuroloop utilities - Library reference - Overview
+% Written by Christopher Thomas.
+
+\chapter{Overview}
+\label{sect-over}
+
+The NeuroLoop utility library functions are divided into several categories:
+
+\begin{itemize}
+
+\item \textbf{``Processing''} functions (ch. \ref{sect-proc}) perform
+operations on data series such as filtering, artifact rejection, statistical
+calculations, and so forth.
+
+\item \textbf{``Utility''} functions (ch. \ref{sect-util}) perform
+miscellaneous operations that are not covered by the other categories.
+
+\item \textbf{``Plotting''} functions (ch. \ref{sect-plot}) render plots
+of various types to files, figures, or axes. These are included as an aid
+to rapid prototyping, and are used by the GUI scripts. The output is
+generally not publication-ready.
+
+\item \textbf{``Intan''} functions (ch. \ref{sect-intan}) facilitate the use
+of datasets stored in Intan's format. Only a subset of the feature set is
+presently supported.
+
+\item \textbf{``Channel Tool''} functions (ch. \ref{sect-chan}) perform
+operations used by the ``Channel Tool'' utility. The intention is that all
+operations that are not tied to GUI implementation are packaged as library
+functions for reuse outside of that application.
+
+\end{itemize}
+
+Several types of structure and several types of function handle are used by
+the library functions. These are described in Chapter \ref{sect-notes}.
+
+\fixme{Most of these aren't documented yet!}
+
+%
+% This is the end of the file.
