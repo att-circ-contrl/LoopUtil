@@ -26,7 +26,11 @@ nlPlot_axesPlotPersist(). This may be a palette-fighting issue.
 * (channel tool) Burst band selection label needs "Hz" after frequency range.
 
 * (channel tool) Empty plot is white the first time but invisible after
-  subsequent updates before plotting.
+subsequent updates before plotting.
+
+* (channel tool) Auto-refresh when entering the burst channel sorting dialog.
+Perhaps do so after adjusting, rather than having to click "refresh". Perhaps
+also auto-select the first channel in the list.
 
 
 ## Deferred to version 2:
