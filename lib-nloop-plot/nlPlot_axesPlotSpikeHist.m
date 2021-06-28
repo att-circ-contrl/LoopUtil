@@ -16,14 +16,12 @@ function nlPlot_axesPlotSpikeHist( thisax, ...
 % "percentpers" is an array naming desired tail percentiles to highlight.
 % "figtitle" is the title to use for the figure, or '' for no title.
 
-colbrn = [ 0.8 0.4 0.7 ];
-colyel = [ 0.9 0.7 0.1 ];
-colgrn = [ 0.5 0.7 0.2 ];
-colcyn = [ 0.3 0.7 0.9 ];
-colmag = [ 0.5 0.2 0.5 ];
-colred = [ 0.6 0.1 0.2 ];
 
-collut = { colbrn, colyel, colgrn, colcyn, colmag, colred };
+% Get a color lookup table for percentile bars.
+% FIXME - We're cheating: the default histogram color is distinct from all
+% colors in the LUT as presently defined.
+
+collut = nlPlot_getColorLUTPeriodic();
 
 
 %

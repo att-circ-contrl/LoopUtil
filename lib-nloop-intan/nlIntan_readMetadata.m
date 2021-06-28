@@ -1,6 +1,6 @@
-function [ is_ok metadata ] = nlUtil_readIntanMetadata(fname)
+function [ is_ok metadata ] = nlIntan_readMetadata(fname)
 
-% function [ is_ok metadata ] = nlUtil_readIntanMetadata(fname)
+% function [ is_ok metadata ] = nlIntan_readMetadata(fname)
 %
 % This attempts to read selected parts of the specified Intan metadata file.
 % If successful, "is_ok" is set to "true" and "metadata" is a structure with

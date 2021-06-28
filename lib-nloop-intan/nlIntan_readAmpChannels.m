@@ -1,8 +1,8 @@
 function [is_ok chandetect ampdetect timedata chandata] = ...
-  nlUtil_readIntanAmpChannels(indir, chanlist)
+  nlIntan_readAmpChannels(indir, chanlist)
 
 % function [is_ok chandetect ampdetect timedata chandata] = ...
-%   nlUtil_readIntanAmpChannels(indir, chanlist)
+%   nlIntan_readAmpChannels(indir, chanlist)
 %
 % This attempts to read individual Intan amplifier channel data files from
 % the specified directory. The time series is also read.
@@ -20,7 +20,7 @@ function [is_ok chandetect ampdetect timedata chandata] = ...
 % "chandata" is an array of structures containing the following fields:
 %   "bank" - Amplifier identifier string.
 %   "chan" - Channel number.
-%   "fname" - Filename
+%   "fname" - Filename.
 %   "data" - Sample data series.
 
 is_ok = true;
