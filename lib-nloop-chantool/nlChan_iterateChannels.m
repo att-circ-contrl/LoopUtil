@@ -44,7 +44,7 @@ for fidx = 1:length(chanfiles)
   % FIXME - Diagnostics.
   disp(sprintf('-- Reading "%s"...', thisrec.fname));
 
-  [ is_ok thisdata ] = nlUtil_readBinaryFile(thisrec.fname, 'int16');
+  [ is_ok thisdata ] = nlIO_readBinaryFile(thisrec.fname, 'int16');
 
 
   % If we have a reference, read it.
@@ -63,7 +63,7 @@ for fidx = 1:length(chanfiles)
           reffile = thisref;
           if isfile(reffile)
 
-            [ is_ok refdata ] = nlUtil_readBinaryFile(reffile, 'int16');
+            [ is_ok refdata ] = nlIO_readBinaryFile(reffile, 'int16');
 
             if is_ok
               % Artifact rejection also handles trimming.

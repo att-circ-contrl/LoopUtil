@@ -29,7 +29,7 @@ newdata = wavedata;
 % Trim the waveform.
 
 if (0 < tuningparams.trimstart) || (0 < tuningparams.trimend)
-  newdata = nlProc_trimEndpoints( newdata, samprate, ...
+  newdata = nlProc_trimEndpointsTime( newdata, samprate, ...
     tuningparams.trimstart, tuningparams.trimend );
 end
 

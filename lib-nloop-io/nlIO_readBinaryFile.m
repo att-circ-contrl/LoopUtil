@@ -1,6 +1,6 @@
-function [is_ok sampdata] = nlUtil_readBinaryFile(fname, dtype)
+function [is_ok sampdata] = nlIO_readBinaryFile(fname, dtype)
 
-% function [is_ok sampdata] = nlUtil_readBinaryFile(fname, dtype)
+% function [is_ok sampdata] = nlIO_readBinaryFile(fname, dtype)
 %
 % This attempts to read a packed array of the specified data type from the
 % specified file.

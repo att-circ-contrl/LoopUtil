@@ -36,7 +36,7 @@ chandata = [];
 % NOTE - These are returned in native format, not scaled.
 
 [ is_ok timedata ] = ...
-  nlUtil_readBinaryFile(strcat(indir, '/time.dat'), 'int32');
+  nlIO_readBinaryFile(strcat(indir, '/time.dat'), 'int32');
 
 for fidx = 1:length(chanfiles)
   if is_ok
@@ -44,7 +44,7 @@ for fidx = 1:length(chanfiles)
     thisrec = chanfiles(fidx);
 
     if isfile(thisrec.fname)
-      [is_ok thisdata] = nlUtil_readBinaryFile(thisrec.fname, 'int16');
+      [is_ok thisdata] = nlIO_readBinaryFile(thisrec.fname, 'int16');
 
       if is_ok
         thisrec.data = thisdata;
