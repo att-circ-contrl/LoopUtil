@@ -1,0 +1,38 @@
+An impedance model is a list of category definitions for clustering impedance
+values. This is stored as a structure indexed by category label, with each
+field containing a structure that defines that category's cluster.
+
+
+A "box" cluster accepts all data points within a given range of magnitudes
+and phase angles.
+A "box" cluster definition structure has the following fields:
+
+"type" is 'box'.
+"magrange" [min max] is the range of accepted impedance magnitudes. This is
+  typically the logarithm of the actual magnitude.
+"phaserange" [min max] is the range of accepted impedance phase angles, in
+  radians. A pair of angles defines two arcs - one larger than pi radians,
+  and one smaller. The smaller arc is taken to be the accepted range.
+
+
+An "orthogauss" cluster definition is a bivariate normal distribution with
+principal axes parallel to the magnitude and phase axes. The category label
+of a sample is the category whose probability density function is highest
+for that sample, out to some maximum range (typically 3 sigma).
+An "orthogauss" cluster definition structure has the following fields:
+
+"type" is 'orthogauss'.
+"magmean" is the magnitude distribution's mean.
+"magdev" is the magnitude distribution's standard deviation.
+"phasemean" is the phase distribution's circular mean (mean direction).
+"phasedev" is the standard deviation of (phase - phase mean). This is
+  assumed to be much smaller than 2pi (not needing circular statistics).
+
+
+FIXME - There's a planned "gauss" model that has proper multivariate
+Gaussian distributions with covariance matrices, but impedance data rarely
+actually needs that, so it's deferred.
+
+
+
+This is the end of the file.

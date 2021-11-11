@@ -32,6 +32,12 @@ subsequent updates before plotting.
 Perhaps do so after adjusting, rather than having to click "refresh". Perhaps
 also auto-select the first channel in the list.
 
+* (impedance) Move "simple" clustering into ZMODELS instead of it being a
+special case. Pass an arbitrary model structure to readAndBinImpedance().
+
+* (impedance) Fold metadata like "order to test clusters" and "maximum
+distance to be in a cluster" into ZMODELS.
+
 
 ## Deferred to version 2:
 

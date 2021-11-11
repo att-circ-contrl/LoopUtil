@@ -9,6 +9,9 @@ function ztable = nlIO_readAndBinImpedance( fnamelist, ...
 % with type labels based on user-specified criteria (typical types are
 % high-impedance, low-impedance, grounded, and floating).
 %
+% For automated clustering, supply an empty cell array for "testorder"
+% (the contents of "bindefs" are ignored in this situation).
+%
 % When multiple measurements for a given channel ID label are present,
 % the magnitude is averaged using the geometric mean (to tolerate large
 % differences in magnitude) and the phase angle is averaged using
@@ -20,6 +23,8 @@ function ztable = nlIO_readAndBinImpedance( fnamelist, ...
 % NOTE - Phase is wrapped to +/- 180 deg (+/- pi radians).
 %
 % NOTE - This needs Matlab R2019b or later for 'PreserveVariableNames'.
+% It'll still work in older versions but will alter column names to be
+% Matlab-safe (use matlab.lang.makeValidName() to duplicate this).
 %
 % "fnamelist" is a cell array containing the names of files to read. These
 %   are expected to be CSV files.
@@ -30,7 +35,7 @@ function ztable = nlIO_readAndBinImpedance( fnamelist, ...
 % "bindefs" is a category definition structure per "nlProc_binTableDataSimple".
 % "testorder" is the order in which to test category definitions. The first
 %   label is the default label, and the _last_ label with a successful test
-%   is applied.
+%   is applied. If this is empty, it forces automatic cluster detection.
 %
 % "ztable" is a table containing the following columns:
 %   "label" is a copy of the "chancolumn" input column.
@@ -40,6 +45,11 @@ function ztable = nlIO_readAndBinImpedance( fnamelist, ...
 
 
 ztable = table();
+
+
+% Figure out if we want automated binning.
+% NOTE - Force auto-clustering even with non-empty bindefs!
+want_auto_cluster = isempty(testorder);
 
 
 % First pass: Read and aggregate the input file data.
@@ -63,7 +73,13 @@ for fidx = 1:length(fnamelist)
     thismagcol = [];
     thisphasecol = [];
 
-    thistab = readtable(thisfile, 'PreserveVariableNames', true);
+    if verLessThan('matlab', '9.7')
+      % Before R2019b. Can't preserve variable names.
+      thistab = readtable(thisfile);
+    else
+      % R2019b or later.
+      thistab = readtable(thisfile, 'PreserveVariableNames', true);
+    end
     colnames = thistab.Properties.VariableNames;
 
     if ismember(chancolumn, colnames)
@@ -113,7 +129,7 @@ for fidx = 1:length(fnamelist)
 end
 
 
-% Second pass: Average the aggregate data and store it as a table.
+% Second pass: Average the aggregate data.
 
 newlabelcol = {};
 newmagcol = [];
@@ -166,18 +182,53 @@ for lidx = 1:length(newlabelcol)
   newphasecol(lidx,1) = thisphase;
 end
 
-% Assemble the table.
-
-ztable = table( newlabelcol, newmagcol, newphasecol, ...
-  'VariableNames', {'label', 'magnitude', 'phase'} );
-
 
 
 %
-% Third pass: Apply category tests.
+% Third pass: Apply category labels.
 
-% Wrap the simple binning function.
-ztable = nlProc_binTableDataSimple( ztable, bindefs, testorder, 'type' );
+newtypecol = cell(size(newlabelcol));
+newtypecol(:) = {'bogus'};
+
+if want_auto_cluster
+  % Use "orthogauss" with sensible parameters.
+
+  zmodels = nlProc_autoClusterImpedance( newmagcol, newphasecol, phaseunits );
+
+  % Explicitly test to make sure we got a model.
+  % If there were no clusters, the auto-clustering function doesn't produce
+  % models.
+  orthomodel = struct();
+  if isfield(zmodels, 'orthogauss')
+    orthomodel = zmodels.('orthogauss');
+  end
+
+  % Remember that the model uses log10 magnitude and radian phase.
+  maglog = log10(newmagcol);
+  phaserad = newphasecol;
+  if isdegrees
+    phaserad = phaserad * pi / 180;
+  end
+
+  newtypecol = nlProc_impedanceClassifyOrthoGauss( ...
+    maglog, phaserad, orthomodel, 3.0, 'outlier' );
+else
+  % User-defined clusters.
+  % Wrap the simple binning function.
+
+  scratchtab = table( newmagcol, newphasecol, ...
+    'VariableNames', {'magnitude', 'phase'} );
+  scratchtab = ...
+    nlProc_binTableDataSimple( scratchtab, bindefs, testorder, 'type' );
+  newtypecol = scratchtab.('type');
+end
+
+
+%
+% Final pass: Assemble the table.
+
+ztable = table( newlabelcol, newmagcol, newphasecol, newtypecol, ...
+  'VariableNames', {'label', 'magnitude', 'phase', 'type'} );
 
 
 

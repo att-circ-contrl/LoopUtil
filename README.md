@@ -40,10 +40,12 @@ The following directories contain library code:
 Library functions specific to the `nloop_chantool` script.
 * lib-nloop-intan --
 Library functions for manipulating data saved in Intan's format.
+* lib-nloop-io --
+Library functions for loading and saving data that aren't vendor-specific.
 * lib-nloop-plot --
 Helper functions for plotting. These are not publication-quality.
 * lib-nloop-proc --
-Library functions for performing signal analysis.
+Library functions for performing signal processing.
 * lib-nloop-util --
 Helper functions that don't fall into the other categories.
 
