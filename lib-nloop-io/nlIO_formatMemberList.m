@@ -11,9 +11,9 @@ function memberstring = ...
 %
 % The candidate list is assumed to already be sorted in a sensible order.
 %
-% "candidates" is a vector or cell array containing member labels.
-% "format" is a "sprintf" conversion format for turning a candidate label
-%   into appropriate human-readable output.
+% "candidates" is a vector or cell array containing member IDs or labels.
+% "format" is a "sprintf" conversion format for turning a candidate ID or
+%   label into appropriate human-readable output.
 % "memberflags" is a logical vector of the same size as "candidates" that is
 %   "true" for candidates that are to be reported and "false" otherwise.
 %

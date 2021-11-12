@@ -20,6 +20,7 @@ REFBITS=\
 REFAUTO=\
 	$(REFBASE)-chantool.tex		\
 	$(REFBASE)-intan.tex		\
+	$(REFBASE)-io.tex		\
 	$(REFBASE)-plot.tex		\
 	$(REFBASE)-proc.tex		\
 	$(REFBASE)-util.tex		\
@@ -60,6 +61,9 @@ refauto-bits:
 	./copy-code.pl --outfile=$(REFBASE)-intan.tex --matlabdoc \
 		"--chapter=\`\`nlIntan'' Functions" --label=sect-intan \
 		../lib-nloop-intan/*.m
+	./copy-code.pl --outfile=$(REFBASE)-io.tex --matlabdoc \
+		"--chapter=\`\`nlIO'' Functions" --label=sect-io \
+		../lib-nloop-io/*.m
 	./copy-code.pl --outfile=$(REFBASE)-plot.tex --matlabdoc \
 		"--chapter=\`\`nlPlot'' Functions" --label=sect-plot \
 		../lib-nloop-plot/*.m
@@ -71,7 +75,7 @@ refauto-bits:
 		../lib-nloop-util/*.m
 	./copy-code.pl --outfile=$(REFBASE)-notes.tex --verbatim \
 		"--chapter=Special Structures and Function Handles" \
-		--label=sect-notes ../lib-nloop*/*txt
+		--label=sect-notes ../lib-*/*txt
 
 $(REFNAME).pdf: $(REFBITS) refauto-bits
 	pdflatex $(REFNAME).tex
