@@ -1,0 +1,40 @@
+A processing function handle is called to perform signal processing when
+iterating across input channels. The intention is to allow user-defined
+signal processing while never having to load more than one input channel
+into RAM at any given time.
+
+
+A processing function has the form:
+
+resultval = procfunc(metadata, folderid, bankid, chanid, wavedata, timedata)
+
+"metadata" is a project metadata structure, per FOLDERMETA.txt.
+"folderid" is a character array with the user-defined folder label of the
+  signal being processed.
+"bankid" is a character array with the device-defined bank label of the
+  signal being processed.
+"chanid" is a scalar containing the channel number of the signal being
+  processed.
+"wavedata" is a vector containing signal samples being processed. Data values
+  are in microvolts.
+"timedata" is a vector containing timestamps of the signal samples being
+  processed. These are typically integer sample indices.
+
+"resultval" is a user-defined object representing the results of processing
+  one signal. For top-level processing, this is typically a structure
+  containing feature information extracted from the signal waveform. For
+  preprocessing, this is typically a filtered copy of the waveform itself.
+
+
+A typical processing function definition would be as follows. This example
+wraps a helper function that is passed additional arguments set at the time
+the processing function is defined.
+
+tuning_parameters = (stuff);
+other_parameters = (stuff);
+procfunc = @(metadata, folderid, bankid, chanid, wavedata, timedata) ...
+  helper_do_processing( metadata, folderid, bankid, chanid, ...
+    wavedata, timedata, tuning_parameters, other_parameters );
+
+
+This is the end of the file.

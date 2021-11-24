@@ -1,0 +1,11 @@
+Intan on-chip amplifiers have banks named "A" through "H" with channels 0-127.
+
+FIXME - Chip auxiliary analog inputs not yet supported.
+
+The Intan recording and stimulation controller auxiliary I/O ports have banks
+named "AIN", "DIN", and "DOUT". "AIN" has channels 1-8 and "DIN" and "DOUT"
+have channels 1-16.
+
+FIXME - Controller analog outputs not yet supported (not saved?).
+
+The time series is stored as its own special file for non-monolithic data.

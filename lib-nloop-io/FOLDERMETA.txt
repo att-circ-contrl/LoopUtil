@@ -1,0 +1,72 @@
+Metadata for data repository folders, ephys devices, signal banks within
+ephys devices, and channels within signal banks are stored in a hierarchicial
+set of structures. User-defined metadata may also be added to these
+structures.
+
+
+
+A "project metadata structure" is a structure containing top-level metadata
+and metadata for each of the data folders used by the project. Folders
+typically correspond to data captured by one specific piece of equipment or
+using one specific software tool.
+
+"folders" is a structure with one field per folder, indexed by user-assigned
+  folder label, containing folder metadata structures.
+
+User-defined metadata fields may also be added.
+
+
+
+A "folder metadata structure" is a structure containing folder-level metadata
+and metadata for each of the signal banks provided by the ephys device or
+ephys software suite that created the folder. Signal banks may correspond to
+hardware banks (such as specific headstages or groups of I/O channels) or to
+virtual banks defined by the ephys software; the metadata representation is
+the same.
+
+The folder metadata structure has the following fields:
+
+"path" is the filesystem path of this data folder.
+"devicetype" is a label assigned by the LoopUtil library identifying the
+  type of device that produced the data (i.e. identifying the helper functions
+  needed to read that data).
+"banks" is a structure with one field per signal bank, indexed by signal bank
+  label, containing signal bank metadata structures.
+"nativemeta" (optional) is an object containing device-specific metadata in
+  its original form. This is typically, but not necessarily, a structure.
+
+Other metadata fields specific to a given device type may also be present.
+User-defined metadata fields may also be added.
+
+In the event that one physical folder contains data from multiple ephys
+devices, multiple folder metadata structures are produced. These will have
+the same "path" value but different folder labels.
+
+
+
+A "signal bank metadata structure" is a structure describing multiple
+channels that are grouped within one real or virtual "bank" by an ephys
+device or ephys software suite (for example, one headstage's analog recording
+channels). The following fields are present:
+
+"channels" is a vector containing (integer-valued) channel indices for which
+  data is present. These are not guaranteed to be sorted or to be contiguous
+  (sparse and unsorted channels are okay).
+"samprate" is the data sampling rate in samples per second.
+"banktype" is a label assigned by the LoopUtil library identifying the type
+  of signal contained within this bank (e.g. 'analog', 'ttl', 'integer', or
+  or other special types).
+"handle" is an opaque object used by the LoopUtil library to manage file
+  I/O state. It typically contains file format details, file descriptors for
+  open files, and state flags.
+"nativemeta" (optional) is an object containing bank-specific metadata in
+  the original device-supplied format. This is typically, but not
+  necessarily, a structure.
+
+Other metadata fields specific to a given bank type may also be present,
+although this is typically stored in the "handle" object instead.
+User-defined metadata fields may also be added.
+
+
+
+This is the end of the file.

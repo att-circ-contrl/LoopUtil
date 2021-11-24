@@ -1,0 +1,37 @@
+Intan-specific folder metadata format is as follows. This is intended as a
+reference for maintaining code; nothing outside of this set of functions
+should need to look at Intan-specific metadata.
+
+The sole exception is knowing what to look for in the "devicetype" field.
+
+
+
+In "folder metadata":
+
+- "devicetype" is "intanrec" or "intanstim".
+- "nativemeta" is the output of nlIntan_readMetadata().
+- Banks are named "ampA".."ampH", "auxA".."auxH", "Ain", "Din", and "Dout".
+
+NOTE - Analog output from the controller does not seem to be saved.
+
+
+
+In "signal bank metadata":
+
+- "banktype" is "ttl" for "Din" and "Dout" and "analog" for other banks.
+- "handle" is a structure with the following fields:
+
+  - "format" is "onefileperchan", "neuroscope", or "monolithic".
+
+  For "onefileperchan":
+  - "chanfilechans" is a vector containing channel indices in the same order
+    as "chanfilenames".
+  - "chanfilenames" is a vector containing channel data filenames in the
+    same order as 'chanfilechans".
+  - "timefile" is the file to read sample indices from.
+
+  FIXME - "neuroscope" and "monolithic" NYI.
+
+
+
+This is the end of the file.

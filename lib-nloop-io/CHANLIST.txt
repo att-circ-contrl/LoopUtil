@@ -1,0 +1,38 @@
+Channel lists are used for several purposes. They may be used to specify a
+set of channels, or they may be used to store per-channel information such
+as reference selection or physical source channel in a channel map.
+
+
+
+A "project-level channel list" is a structure with one field per folder,
+indexed by user-assigned folder label. Each folder's field contains a
+"folder-level channel list".
+
+
+
+A "folder-level channel list" is a structure with one field per bank, indexed
+by bank label. Each bank's field contains a "bank-level channel list".
+
+
+
+A "bank-level channel list" is a structure with the following fields:
+
+- "chanlist" is a vector containing integer-valued channel indices.
+
+For reference selection:
+- "reflabel" is a character array containing the user-specified name of the
+  reference to use, when re-referencing. An empty name means "don't
+  re-reference".
+  (References are typically defined as channel lists stored elsewhere.)
+
+For channel mapping:
+- "foldersrc" is a cell array containing the folder labels of the source
+  channels for each channel in "chanlist".
+- "banksrc" is a cell array containing the bank labels of the source
+  channels for each channel in "chanlist".
+- "chansrc" is a vector containing channel indices of the source channels
+  for each channel in "chanlist".
+
+
+
+This is the end of the file.
