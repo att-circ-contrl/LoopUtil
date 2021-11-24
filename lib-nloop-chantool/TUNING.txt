@@ -1,0 +1,73 @@
+Tuning parameter structures are used by several processing functions. These
+structures are defined as follows.
+
+
+An "artifact rejection tuning parameter" structure is used by
+nlChan_applyArtifactReject(), and a default version is provided by
+nlChan(getArtifactDefaults(). It has the following fields:
+
+- "trimstart" is the number of seconds to remove at the start of the signal.
+- "trimend" is the number of seconds to remove at the end of the signal.
+- "ampthresh" is the high threshold for amplitude-based artifact detection.
+- "amphalo" is the low threshold for amplitude-based artifact detection.
+- "diffthresh" is the high threshold for derivative-based artifact detection.
+- "diffhalo" is the low threshold for derivative-based artifact detection.
+- "timehalosecs" is the additional time in seconds to squash around artifacts.
+- "smoothsecs" is the time window size to use for smoothing the derivative.
+- "dcsecs" is the time window size to use for DC removal.
+
+See documentation for nlProc_removeArtifactsSigma() for further details of
+the artifact rejection algorithm.
+
+
+
+A "filter tuning parameter" structure is used by nlChan_applyFiltering(), and
+a default version is provided by nlChan_getFilterDefaults(). It has the
+following fields:
+
+- "lfprate" is the sampling rate to use when generating the low-pass-filtered
+  signal (LFP signal).
+- "lfpcorner" is the sampling rate to use when splitting the signal into
+  a low-pass-filtered signal (LFP signal) and high-pass-filtered signal
+  (spike signal).
+- "powerfreq" is a scalar or vector containing power line notch filter values
+  to apply. This is typically the power line frequency and its harmonics.
+- "dcfreq" is the corner frequency to use for the DC removal filter.
+
+See documentation for nlProc_filterSignal() for further details of signal
+filtering.
+
+
+
+A "percentile tuning parameter" structure is used by nlChan_processChannel()
+and by the "Channel Analysis Tool". It has the following fields:
+
+- "burstrange" is a vector containing percentile values to use when looking
+  for burst activity. This should be sorted in ascending order.
+- "burstselectidx" is the index of the entry in "burstrange" to default to.
+- "spikerange" is a vector containing percentile values to use when looking
+  for spike activity. This should be sorted in ascending order.
+- "spikeselectidx" is the index of the entry in "spikerange" to default to.
+
+See documentation for nlProc_calcSkewPercentile() and documentation for
+nlProc_calcSpectrumSkew() for further details of outlier identification for
+activity detection.
+
+
+
+A "spectrum tuning parameter" structure is used by nlChan_processChannel().
+It has the following fields:
+
+- "freqlow" is the minimum frequency to tabulate information for.
+- "freqhigh" is the maximum frequency to tabulate information for.
+- "freqsperdecade" specifies the spacing of frequency bins.
+- "winsecs" is the time window size to use, in seconds.
+- "winsteps" is the number of overlapping steps taken when advancing the
+  time window. It advances "winsecs/winsteps" seconds per step.
+
+See documentation for nlProc_calcSpectrumSkew() for further details of
+outlier identification in time-frequency spectrograms.
+
+
+
+This is the end of the file.

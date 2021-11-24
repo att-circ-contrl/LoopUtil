@@ -34,7 +34,7 @@ function resultstats = nlChan_processChannel( wavedata, samprate, ...
 % Filtering and downsampling.
 
 [ lfpseries spikeseries ] = ...
-  nlChan_applyFiltering( wavedata, samprate, tuningfilt);
+  nlChan_applyFiltering( wavedata, samprate, tuningfilt );
 
 lfprate = tuningfilt.lfprate;
 

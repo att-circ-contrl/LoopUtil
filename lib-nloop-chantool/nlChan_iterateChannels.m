@@ -2,7 +2,7 @@ function outdata = ...
   nlChan_iterateChannels(chanfiles, bankrefs, samprate, tuningart, procfunc)
 
 % function outdata = ...
-%   nlChan_iterateChannels(chanfiles, bankrefs, samprate, refparams, procfunc)
+%   nlChan_iterateChannels(chanfiles, bankrefs, samprate, tuningart, procfunc)
 %
 % This iterates through a list of channel records, loading and preprocessing
 % each channel and then calling a processing function with the channel

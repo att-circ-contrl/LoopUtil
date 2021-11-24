@@ -57,7 +57,7 @@ if ~isempty(metafile)
       'banks', struct(), 'nativemeta', nativemeta );
 
     % FIXME - Blithely assume timestamps exist.
-    timefile = [ indir, 'time.dat' ];
+    timefile = [ indir, '/', 'time.dat' ];
 
 
     %
@@ -89,6 +89,7 @@ if ~isempty(metafile)
 
 
     % Amplifier channels are "amp-A-000.dat" .. "amp-H-127.dat".
+
     [ chanlist chanbanks chanfiles ] = ...
       helper_getChannelFiles(indir, dirfiles, 'amp-(\w+)-(\d+)\.dat');
 
@@ -103,7 +104,8 @@ if ~isempty(metafile)
         filesubset = chanfiles(selectmask);
 
         thishandle = struct( 'format', 'onefileperchan', ...
-          'chanfilechans', chansubset, 'chanfilenames', { filesubset} );
+          'chanfilechans', chansubset, 'chanfilenames', { filesubset }, ...
+          'timefile', timefile );
         foldermeta.banks.(banklabel) = struct( ...
           'channels', chansubset, 'samprate', samprate, ...
           'banktype', 'analog', 'handle', thishandle );
@@ -112,6 +114,7 @@ if ~isempty(metafile)
 
 
     % Headstage auxiliary channels are "amp-A-AUX1.dat" .. "amp-H-AUX6.dat".
+
     [ chanlist chanbanks chanfiles ] = ...
       helper_getChannelFiles(indir, dirfiles, 'amp-(\w+)-AUX(\d+)\.dat');
 
@@ -126,7 +129,8 @@ if ~isempty(metafile)
         filesubset = chanfiles(selectmask);
 
         thishandle = struct( 'format', 'onefileperchan', ...
-          'chanfilechans', chansubset, 'chanfilenames', { filesubset} );
+          'chanfilechans', chansubset, 'chanfilenames', { filesubset }, ...
+          'timefile', timefile );
         foldermeta.banks.(banklabel) = struct( ...
           'channels', chansubset, 'samprate', samprate, ...
           'banktype', 'analog', 'handle', thishandle );
@@ -135,6 +139,7 @@ if ~isempty(metafile)
 
 
     % Controller analog inputs are "board-ADC-00.dat" .. "board-ADC-15.dat".
+
     [ chanlist chanbanks chanfiles ] = ...
       helper_getChannelFiles(indir, dirfiles, 'board-(ADC)-(\d+)\.dat');
 
@@ -151,7 +156,8 @@ if ~isempty(metafile)
         filesubset = chanfiles(selectmask);
 
         thishandle = struct( 'format', 'onefileperchan', ...
-          'chanfilechans', chansubset, 'chanfilenames', { filesubset} );
+          'chanfilechans', chansubset, 'chanfilenames', { filesubset }, ...
+          'timefile', timefile );
         foldermeta.banks.(banklabel) = struct( ...
           'channels', chansubset, 'samprate', samprate, ...
           'banktype', 'analog', 'handle', thishandle );
@@ -160,6 +166,7 @@ if ~isempty(metafile)
 
 
     % Controller digital inputs are "board-DIN-00.dat" .. "board-DIN-15.dat".
+
     [ chanlist chanbanks chanfiles ] = ...
       helper_getChannelFiles(indir, dirfiles, 'board-(DIN)-(\d+)\.dat');
 
@@ -176,7 +183,8 @@ if ~isempty(metafile)
         filesubset = chanfiles(selectmask);
 
         thishandle = struct( 'format', 'onefileperchan', ...
-          'chanfilechans', chansubset, 'chanfilenames', { filesubset} );
+          'chanfilechans', chansubset, 'chanfilenames', { filesubset }, ...
+          'timefile', timefile );
         foldermeta.banks.(banklabel) = struct( ...
           'channels', chansubset, 'samprate', samprate, ...
           'banktype', 'ttl', 'handle', thishandle );
@@ -185,6 +193,7 @@ if ~isempty(metafile)
 
 
     % Digital outputs are "board-DOUT-00.dat" .. "board-DOUT-15.dat".
+
     [ chanlist chanbanks chanfiles ] = ...
       helper_getChannelFiles(indir, dirfiles, 'board-(DOUT)-(\d+)\.dat');
 
@@ -201,7 +210,8 @@ if ~isempty(metafile)
         filesubset = chanfiles(selectmask);
 
         thishandle = struct( 'format', 'onefileperchan', ...
-          'chanfilechans', chansubset, 'chanfilenames', { filesubset} );
+          'chanfilechans', chansubset, 'chanfilenames', { filesubset }, ...
+          'timefile', timefile );
         foldermeta.banks.(banklabel) = struct( ...
           'channels', chansubset, 'samprate', samprate, ...
           'banktype', 'ttl', 'handle', thishandle );
