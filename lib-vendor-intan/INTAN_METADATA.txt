@@ -1,0 +1,119 @@
+An Intan metadata structure is a structure containing header information
+supplied by RHD and RHS files, in a format consistent with that provided by
+"read_Intan_RHD2000_file.m" and "read_Intan_RHS2000_file.m".
+
+The metadata structure has the following fields:
+
+"filename" is the file that was read (including path).
+"path" is the folder path containing data files.
+"devtype" is 'RHD' or 'RHS'.
+"version_major" is the major version number of the data file.
+"version_minor" is the minor version number of the data file.
+"num_samples_per_data_block" is the number of samples per data block, for
+  monolithic data.
+"frequency_parameters" is a structure with the following fields:
+  "amplifier_sample_rate" is the ephys channel sampling rate.
+  "aux_input_sample_rate" is the sampling rate of the on-chip auxiliary
+    analog inputs.
+  "supply_voltage_sample_rate" is the sampling rate of the chip supply
+    voltage measurement.
+  "board_adc_sample_rate" is the sampling rate of the RHD controller's
+    BNC analog inputs.
+  "board_dig_in_sample_rate" is the sampling rate of the RHD controller's
+    TTL inputs.
+  "desired_dsp_cutoff_frequency" is the user-specified cutoff for the
+    on-chip first-order digital high-pass filter.
+  "actual_dsp_cutoff_frequency" is the implemented cutoff for the
+    on-chip first-order digital high-pass filter.
+  "dsp_enabled" is nonzero if the on-chip digital filter is active.
+  "desired_lower_bandwidth" is the user-specified lower bandwidth for
+    the ephys amplifiers. This is a first-order high-pass filter.
+  "actual_lower_bandwidth" is the implemented lower bandwidth for the
+    ephys amplifiers. This is a first-order high-pass filter.
+  "desired_lower_settle_bandwidth" (RHS-only) is the user-specified lower
+    bandwidth for the ephys amplifiers when recovering from stimulation.
+  "actual_lower_settle_bandwidth" (RHS-only) is the implemented lower
+    bandwidth for the ephys amplifiers when recovering from stimulation.
+  "desired_upper_bandwidth" is the user-specified upper bandwidth for
+    the ephys amplifiers. This is a third-order low-pass filter.
+  "actual_upper_bandwidth" is the implemented upper bandwidth for the
+    ephys amplifiers. This is a third-order low-pass filter.
+  "notch_filter_frequency" is the center frequency of the power line
+    frequency rejection filter, or 0 for no notch filtering. This is
+    a software-implemented biquad filter.
+  "desired_impedance_test_frequency" is the user-specified frequency
+    used for measuring channel impedance.
+  "actual_impedance_test_frequency" is the implemented frequency used
+    for measuring channel impedance.
+"stim_parameters" (RHS only) is a structure with the following fields:
+  "stim_step_size" is the current scale used for stimulation. FIXME - Units?
+  "charge_recovery_current_limit" is the current driven when restoring the
+    specified voltage during charge recovery. FIXME - Units?
+  "charge_recovery_target_voltage" is the voltage to settle stimulation
+    channels to after stimulation, if performing charge recovery.
+    FIXME - Units?
+  "amp_settle_mode" indicates whether fast-settling is to be performed after
+    stimulation, and whether bandwidth-switched or traditional settling is
+    to be used. FIXME - Encoding?
+  "charge_recovery_mode" indicates whether or not charge recovery is to be
+    performed after stimulation, and whether current-limited recovery or
+    resistive recovery is to be used. FIXME - Encoding?
+"notes" is a structure with the following fields:
+  "note1" is a character array containing the first notes string.
+  "note2" is a character array containing the second notes string.
+  "note3" is a character array containing the third notes string.
+"num_temp_sensor_channels" is the number of temperature sensor channels.
+"dc_amp_data_saved" is FIXME - Info goes here.
+"board_mode" indicates board configuration. This mostly affects BNC
+  analog input scale. Mode 0 is 50.354 uV/LSB, mode 1 is 152.59 uV/LSB,
+  and mode 13 is 312.5 uV/LSB.
+"reference_channel" is a character array containing the name of the
+  channel used for re-referencing the input, or an empty string.
+"amplifier_channels" is a structure array with zero or more entries
+  containing ephys channel metadata.
+"spike_triggers" is a structure array with the same number of entries
+  as "amplifier_channels", containing spike scope trigger settings for
+  each ephys channel.
+"aux_input_channels" is a structure array with zero or more entries
+  containing ephys chip auxiliary analog input channel metadata.
+"supply_voltage_channels" is a structure array with zero or more entries
+  containing ephys chip supply voltage monitor channel metadata.
+"board_adc_channels" is a structure array with zero or more entries
+  containing controller BNC analog input channel metadata.
+"board_dig_in_channels" is a structure array with zero or more entries
+  containing controller TTL input channel metadata.
+"board_dig_out_channels" is a structure array with zero or more entries
+  containing controller TTL output channel metadata.
+"num_data_blocks" is the number of blocks of monolithic data stored. This is
+  zero for NeuroScope or per-channel data.
+"header_bytes" is the number of bytes to skip before reading the first
+  block of monolithic data.
+"bytes_per_block" is the number of bytes per monolithic data block.
+
+
+Channel metadata structures contain the following fields:
+
+"native_channel_name" is the device-specific channel name.
+"custom_channel_name" is a user-defined channel name.
+"native_order" is the device-assigned channel number.
+"custom_order" is a user-assigned channel number.
+"board_stream" is FIXME - Info goes here.
+"chip_channel" is the on-chip channel number.
+"port_name" is FIXME - Info goes here.
+"port_prefix" is FIXME - Info goes here.
+"port_number" is FIXME - Info goes here.
+"electrode_impedance_magnitude", if applicable, is the measured
+  impedance magnitude of this channel. FIXME - Units?
+"electrode_impedance_phase", if applicable, is the measured impedance
+  phase angle of this channel. FIXME - Units?
+
+
+Spike scope trigger setting structures contain the following fields:
+
+"voltage_trigger_mode" is FIXME - Info goes here.
+"voltage_threshold" is FIXME - Info goes here.
+"digital_trigger_channel" is FIXME - Info goes here.
+"digital_edge_polarity" is FIXME - Info goes here.
+
+
+This is the end of the file.
