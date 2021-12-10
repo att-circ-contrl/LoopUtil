@@ -46,29 +46,39 @@ The metadata structure has the following fields:
   "actual_impedance_test_frequency" is the implemented frequency used
     for measuring channel impedance.
 "stim_parameters" (RHS only) is a structure with the following fields:
-  "stim_step_size" is the current scale used for stimulation. FIXME - Units?
+  "stim_step_size" is the current scale used for stimulation (amps/LSB).
   "charge_recovery_current_limit" is the current driven when restoring the
-    specified voltage during charge recovery. FIXME - Units?
+    specified voltage during charge recovery (in amperes).
   "charge_recovery_target_voltage" is the voltage to settle stimulation
-    channels to after stimulation, if performing charge recovery.
-    FIXME - Units?
-  "amp_settle_mode" indicates whether fast-settling is to be performed after
-    stimulation, and whether bandwidth-switched or traditional settling is
-    to be used. FIXME - Encoding?
-  "charge_recovery_mode" indicates whether or not charge recovery is to be
-    performed after stimulation, and whether current-limited recovery or
-    resistive recovery is to be used. FIXME - Encoding?
+    channels to after stimulation, if performing charge recovery (in volts).
+  "amp_settle_mode" indicates which method was used for fast-settling
+    after stimulation. 0 uses bandwidth-switching (recommended) and 1 resets
+    the on-chip amplifiers.
+  "charge_recovery_mode" indicates which method of charge recovery was used.
+    0 uses current-limited charge recovery and 1 uses a resistive switch.
 "notes" is a structure with the following fields:
   "note1" is a character array containing the first notes string.
   "note2" is a character array containing the second notes string.
   "note3" is a character array containing the third notes string.
 "num_temp_sensor_channels" is the number of temperature sensor channels.
-"dc_amp_data_saved" is FIXME - Info goes here.
+"dc_amp_data_saved" is nonzero if low-gain DC-coupled amplifier signals were
+  saved for each channel (suitable for monitoring stimulation artifacts).
 "board_mode" indicates board configuration. This mostly affects BNC
   analog input scale. Mode 0 is 50.354 uV/LSB, mode 1 is 152.59 uV/LSB,
-  and mode 13 is 312.5 uV/LSB.
+  and mode 13 is 312.5 uV/LSB. These correspond to ranges of 0..3.3V,
+  +/-5V, and +/-10.24V.
+"voltage_parameters" is a structure with the following fields:
+  "amplifier_scale" is the ephys voltage scale in V/LSB.
+  "aux_scale" is the chip auxiliary input scale in V/LSB.
+  "dcamp_scale" is the RHS low-gain amplifier scale in V/LSB.
+  "dcamp_zerolevel" is the RHS low-gain amplifier output with 0V input.
+  "board_analog_scale" is the BNC analog input and output scale in V/LSB.
+  "board_analog_zerolevel" is the BNC analog I/O value with a 0V signal level.
+  "supply_scale" is the RHD supply voltage scale in V/LSB.
+  "temperature_scale" is the RHD temperature sensor scale in degC/LSB.
 "reference_channel" is a character array containing the name of the
-  channel used for re-referencing the input, or an empty string.
+  channel used for re-referencing the input, or an empty string if no
+  re-referencing was performed.
 "amplifier_channels" is a structure array with zero or more entries
   containing ephys channel metadata.
 "spike_triggers" is a structure array with the same number of entries
@@ -93,27 +103,27 @@ The metadata structure has the following fields:
 
 Channel metadata structures contain the following fields:
 
-"native_channel_name" is the device-specific channel name.
-"custom_channel_name" is a user-defined channel name.
+"native_channel_name" is the device-specific channel name (e.g. 'A-015').
+"custom_channel_name" is a user-defined channel name (e.g. 'Probe 15').
 "native_order" is the device-assigned channel number.
 "custom_order" is a user-assigned channel number.
-"board_stream" is FIXME - Info goes here.
+"board_stream" is the device-assigned internal data stream number.
 "chip_channel" is the on-chip channel number.
-"port_name" is FIXME - Info goes here.
-"port_prefix" is FIXME - Info goes here.
-"port_number" is FIXME - Info goes here.
+"port_name" is a human-readable name for this channel's port (e.g. 'Port A').
+"port_prefix" is a device-assigned label for this channel's port (e.g. 'A').
+"port_number" is a device-assigned port index (ports are numbered 1..N).
 "electrode_impedance_magnitude", if applicable, is the measured
-  impedance magnitude of this channel. FIXME - Units?
+  impedance magnitude of this channel (in ohms).
 "electrode_impedance_phase", if applicable, is the measured impedance
-  phase angle of this channel. FIXME - Units?
+  phase angle of this channel (in degrees).
 
 
 Spike scope trigger setting structures contain the following fields:
 
-"voltage_trigger_mode" is FIXME - Info goes here.
-"voltage_threshold" is FIXME - Info goes here.
-"digital_trigger_channel" is FIXME - Info goes here.
-"digital_edge_polarity" is FIXME - Info goes here.
+"voltage_trigger_mode" is 0 for TTL triggered and 1 for threshold-triggered.
+"voltage_threshold" is the trigger threshold in uV.
+"digital_trigger_channel" is the TTL trigger input number (0-15).
+"digital_edge_polarity" is 0 for falling-edge triggered and 1 for rising-edge.
 
 
 This is the end of the file.

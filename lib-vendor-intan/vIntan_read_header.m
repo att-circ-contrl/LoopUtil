@@ -15,6 +15,9 @@ function metadata = vIntan_read_header( fname )
 
 % NOTE - Derived from Intan's 2021 Feb 8 code (version 3.0).
 
+% NOTE - Intan files are saved as little-endian, and Matlab defaults to
+% little-endian, so we don't need to explicitly write endian-safe code.
+
 
 % Initialize.
 metadata = struct();
@@ -32,7 +35,7 @@ if isfile(fname)
   file_is_open = true;
 
   % Get various file metadata.
-  finfo = dir(filename);
+  finfo = dir(fname);
   filesize = finfo.bytes;
   filepath = finfo.folder;
 
@@ -45,6 +48,7 @@ if isfile(fname)
     isok = true;
     is_stim = true;
   end
+
 end
 
 
@@ -229,6 +233,32 @@ if isok
 
 
   %
+  % Save voltage scale metadata for more transparent reference.
+
+  voltage_parameters = struct( ...
+    'amplifier_scale', 0.195 * 1e-6, ...
+    'aux_scale', 37.4 * 1e-6, ...
+    'dcamp_scale', 19.23 * 1e-3, ...
+    'dcamp_zerolevel', 512, ...
+    'board_analog_scale', 0.3125 * 1e-3, ...
+    'board_analog_zerolevel', 32768, ...
+    'supply_scale', 74.8 * 1e-6, ...
+    'temperature_scale', 0.01 );
+
+  % Default board mode (13) has analog range +/- 10.24V.
+  if 0 == board_mode
+    % Range is 0..3.3V.
+    voltage_parameters.board_analog_scale = 50.354 * 1e-6;
+    voltage_parameters.board_analog_zerolevel = 0;
+  elseif 1 == board_mode
+    % Range is +/- 5V.
+    voltage_parameters.board_analog_scale = 0.15259 * 1e-3;
+  end
+
+  metadata.voltage_parameters = voltage_parameters;
+
+
+  %
   % Create data structure templates and initialize data structures for
   % configuration information about the various banks' channels.
 
@@ -384,7 +414,7 @@ if isok
 
   metadata.amplifier_channels = amplifier_channels;
   metadata.spike_triggers = spike_triggers;
-  metadata.aux_input_channels aux_input_channels;
+  metadata.aux_input_channels = aux_input_channels;
   metadata.supply_voltage_channels = supply_voltage_channels;
   metadata.board_adc_channels = board_adc_channels;
   metadata.board_dac_channels = board_dac_channels;
@@ -403,7 +433,8 @@ if isok
 
   % Each data block contains num_samples_per_data_block amplifier samples.
   if is_stim
-    % RHS: Amplifier inputs, stimulation drive output, and optionally DC info.
+    % RHS: Amplified inputs, stimulation drive output, and optionally
+    % low-gain DC-coupled amplified inputs (to monitor stimulation artifacts).
     if (dc_amp_data_saved ~= 0)
       bytes_per_block = bytes_per_block + ...
         num_samples_per_data_block * (2 + 2 + 2) * num_amplifier_channels;

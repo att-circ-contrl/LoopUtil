@@ -8,29 +8,41 @@ The sole exception is knowing what to look for in the "devicetype" field.
 
 In "folder metadata":
 
-- "devicetype" is "intanrec" or "intanstim".
+- "devicetype" is 'intan'.
 - "nativemeta" is the output of nlIntan_readMetadata().
-- Banks are named "ampA".."ampH", "auxA".."auxH", "Ain", "Din", and "Dout".
-
-NOTE - Analog output from the controller does not seem to be saved.
+- Banks that may exist are as follows:
+  - "ampA".."ampH" contain ephys channel signals.
+  - "auxA".."auxH" contain on-chip aux analog input signals.
+  - "dcA".."dcH" contain low-gain DC-coupled ephys channel signals.
+  - "Ain" and "Aout" contain BNC analog inputs and outputs, respectiely.
+  - "Din" and "Dout" contain TTL inputs and outputs, respectively.
+  - "stimA".."stimH" contain stimulation drive currents.
+  - "flagsA".."flagsH" contain encoded stimulation-related flags.
+  - "vddA".."vddH" contain voltage supply signals.
 
 
 
 In "signal bank metadata":
 
-- "banktype" is "ttl" for "Din" and "Dout" and "analog" for other banks.
+- "banktype" is 'boolean' for "Din" and "Dout", 'flagvector' for
+  "flagsA".."flagsH", and 'analog' for other banks.
 - "handle" is a structure with the following fields:
 
-  - "format" is "onefileperchan", "neuroscope", or "monolithic".
+  - "format" is 'onefileperchan', 'neuroscope', or 'monolithic'.
+  - "special" is '', 'stimflags' or 'stimcurrent'.
+
+  For "monolithic":
+    FIXME - Monolithic NYI.
+
+  For "neuroscope":
+    FIXME - Neuroscope NYI.
 
   For "onefileperchan":
   - "chanfilechans" is a vector containing channel indices in the same order
     as "chanfilenames".
   - "chanfilenames" is a vector containing channel data filenames in the
-    same order as 'chanfilechans".
+    same order as "chanfilechans".
   - "timefile" is the file to read sample indices from.
-
-  FIXME - "neuroscope" and "monolithic" NYI.
 
 
 

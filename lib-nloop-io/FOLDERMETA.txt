@@ -54,8 +54,19 @@ channels). The following fields are present:
   (sparse and unsorted channels are okay).
 "samprate" is the data sampling rate in samples per second.
 "banktype" is a label assigned by the LoopUtil library identifying the type
-  of signal contained within this bank (e.g. 'analog', 'ttl', 'integer', or
-  or other special types).
+  of signal contained within this bank (e.g. 'analog', 'boolean', 'integer',
+  'flagvector', or other special types).
+"flagdefs" (optional) is present for banks of type 'flagvector'. It is a
+  structure indexed by flag label containing the integer bit-mask values
+  that correspond to each flag in the vector.
+"nativetimetype" is the Matlab type name of the underlying "native" timestamp
+  format. This is typically a sample count stored as a large integer type.
+"nativedatatype" is the Matlab type name of the underlying "native" signal
+  data.
+"nativezerolevel" is the "native" data value corresponding to a signal value
+  of zero. This is typically used with unsigned integer native data types.
+"nativescale" is a multiplier used to convert "native" data values to
+  floating-point data values in suitable units (volts, amperes, etc).
 "handle" is an opaque object used by the LoopUtil library to manage file
   I/O state. It typically contains file format details, file descriptors for
   open files, and state flags.

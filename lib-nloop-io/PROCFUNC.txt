@@ -6,7 +6,8 @@ into RAM at any given time.
 
 A processing function has the form:
 
-resultval = procfunc(metadata, folderid, bankid, chanid, wavedata, timedata)
+resultval = procfunc( metadata, folderid, bankid, chanid, ...
+  wavedata, timedata, wavenative, timenative )
 
 "metadata" is a project metadata structure, per FOLDERMETA.txt.
 "folderid" is a character array with the user-defined folder label of the
@@ -16,9 +17,14 @@ resultval = procfunc(metadata, folderid, bankid, chanid, wavedata, timedata)
 "chanid" is a scalar containing the channel number of the signal being
   processed.
 "wavedata" is a vector containing signal samples being processed. Data values
-  are in microvolts.
+  are floating-point values (typically volts).
 "timedata" is a vector containing timestamps of the signal samples being
-  processed. These are typically integer sample indices.
+  processed. These are floating-point values (typically seconds).
+"wavenative" is a vector containing signal samples being processed in "native"
+  format (typically 16-bit signed or unsigned integers). Data scale is
+  equipment-dependent (per FOLDERMETA.txt).
+"timenative" is a vector containing timestamps of the signal samples in
+  "native" format (typically 32- or 64-bit signed integer sample counts).
 
 "resultval" is a user-defined object representing the results of processing
   one signal. For top-level processing, this is typically a structure
@@ -32,7 +38,8 @@ the processing function is defined.
 
 tuning_parameters = (stuff);
 other_parameters = (stuff);
-procfunc = @(metadata, folderid, bankid, chanid, wavedata, timedata) ...
+procfunc = @( metadata, folderid, bankid, chanid, ...
+  wavedata, timedata, wavenative, timenative ) ...
   helper_do_processing( metadata, folderid, bankid, chanid, ...
     wavedata, timedata, tuning_parameters, other_parameters );
 

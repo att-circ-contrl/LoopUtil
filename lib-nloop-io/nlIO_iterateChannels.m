@@ -42,13 +42,10 @@ for fidx = 1:length(folderlist)
     thisfolderchans = chanlist.(thisflabel);
     thisdevice = thisfoldermeta.devicetype;
 
-    % Make a folder-specific wrapped version of the processing function.
-    wrappedfunc = @(bankid, chanid, wavedata, timedata) ...
-      procfunc(metadata, thisflabel, bankid, chanid, wavedata, timedata);
-
-    if strcmp(thisdevice, 'intanrec') || strcmp(thisdevice, 'intanstim')
+    if strcmp(thisdevice, 'intan')
       resultvals.(thisflabel) = nlIntan_iterateFolderChannels( ...
-        thisfoldermeta, thisfolderchans, memchans, wrappedfunc );
+        thisfoldermeta, thisfolderchans, memchans, procfunc, ...
+        metadata, thisflabel );
     else
       % FIXME - Diagnostics.
       disp(sprintf( '###  Not sure how to iterate a "%s" folder.', ...

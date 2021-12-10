@@ -1,8 +1,8 @@
 function folderresults = nlIntan_iterateFolderChannels( ...
-  foldermetadata, folderchanlist, memchans, procfunc )
+  foldermetadata, folderchanlist, memchans, procfunc, procmeta, procfid )
 
 % function folderresults = nlIntan_iterateFolderChannels( ...
-%   foldermetadata, folderchanlist, memchans, procfunc )
+%   foldermetadata, folderchanlist, memchans, procfunc, procmeta, procfid )
 %
 % This processes a folder containing Intan-format data, iterating through
 % a list of channels, loading each channel's waveform data in sequence and
@@ -20,14 +20,14 @@ function folderresults = nlIntan_iterateFolderChannels( ...
 % "memchans" is the maximum number of channels that may be loaded into
 %   memory at the same time.
 % "procfunc" is a function handle used to transform channel waveform data
-%   into "result" data, per PROCFUNC.txt. NOTE - "metadata" and "folderid"
-%   arguments are not passed to this function; the caller should handle that
-%   via an anonymous wrapper.
+%   into "result" data, per PROCFUNC.txt.
+% "procmeta" is the object to pass as the "metadata" argument of "procfunc".
+% "procfid" is the  label to pass as the "folderid" argument of "procfunc".
 %
-% "resultvals" is a folder-level channel list structure that has bank-level
-%   channel lists augmented with a "resultlist" field, per CHANLIST.txt.
-%   The "resultlist" field is a cell array containing per-channel output
-%   from "procfunc".
+% "folderresults" is a folder-level channel list structure that has
+%   bank-level channel lists augmented with a "resultlist" field, per
+%   CHANLIST.txt. The "resultlist" field is a cell array containing
+%   per-channel output from "procfunc".
 
 
 % Initialize output.
@@ -43,6 +43,7 @@ for bidx = 1:length(banklist)
   thisbanklabel = banklist{bidx};
 
   if isfield(foldermetadata.banks, thisbanklabel)
+
     % Initialize output.
     chanfoundlist = [];
     chanresultlist = {};
@@ -51,10 +52,14 @@ for bidx = 1:length(banklist)
     thisbankmeta = foldermetadata.banks.(thisbanklabel);
     thisbankchans = folderchanlist.(thisbanklabel).chanlist;
 
-    thisdtype = thisbankmeta.banktype;
-    thishandle = thisbankmeta.handle;
+    thissigtype = thisbankmeta.banktype;
+    thiszerolevel = thisbankmeta.nativezerolevel;
+    thisscale = thisbankmeta.nativescale;
 
+    thishandle = thisbankmeta.handle;
     thisformat = thishandle.format;
+    thisspecial = thishandle.special;
+
 
     % How we iterate this depends on how it's stored.
     if strcmp(thisformat, 'onefileperchan')
@@ -67,10 +72,14 @@ for bidx = 1:length(banklist)
       chanfilenames = thishandle.chanfilenames;
 
       timefile = thishandle.timefile;
-      [ is_ok timedata ] = nlIO_readBinaryFile( timefile, 'int32' );
+      [ is_ok timenative ] = ...
+        nlIO_readBinaryFile( timefile, thisbankmeta.nativetimetype );
       if ~is_ok
         disp(sprintf( '###  Unable to read from "%s".', timefile ));
       else
+        % Convert time to cooked format from native format.
+        timecooked = double(timenative) / thisbankmeta.samprate;
+
         % Iterate requested channels, reading and processing the ones
         % that exist. Silently ignore ones that don't exist.
 
@@ -82,26 +91,53 @@ for bidx = 1:length(banklist)
           if ~isempty(thisfname)
 
             thisfname = thisfname{1};
-            [ is_ok wavedata ] = nlIO_readBinaryFile( thisfname, 'int16' );
+            [ is_ok datanative ] = ...
+              nlIO_readBinaryFile( thisfname, thisbankmeta.nativedatatype );
             if ~is_ok
               disp(sprintf( '###  Unable to read from "%s".', thisfname ));
             else
-              % The input samples for this format are always int16, even
-              % for TTL data.
-              if strcmp('analog', thisbankmeta.banktype)
-                % Convert to microvolts, using Intan's fixed scale factor.
-                wavedata = wavedata * 0.195;
-              elseif strcmp('ttl', thisbankmeta.banktype)
-                % Convert to boolean (logical) values.
-                wavedata = (wavedata > 0.5);
-              else
-                % This signal has an unknown data type.
-                % FIXME - Silently leave the signal data as we found it.
+
+              % We've just read in an array of int16 or uint16.
+              % How we process this depends on what our type is and on
+              % whether we have a special case to handle.
+
+
+              % First, handle special case preprocessing.
+              % Both of these are for stimulation current (encoded uint16).
+
+              if strcmp('stimcurrent', thisspecial)
+                % Manually decode 9-bit signed non-complement values to int16.
+                % Remember that Matlab calls the LSB bit 1, not bit 0.
+                wantnegative = (bitget(datanative, 9) > 0);
+                datanative = int16(bitand(datanative,0x00ff));
+                datanative(wantnegative) = -datanative(wantnegative);
+              elseif strcmp('stimflags', thisspecial)
+                % Mask off the 9-bit signed value, keeping the flag bits.
+                datanative = bitand(datanative, 0xfe00);
               end
 
-              % NOTE - The caller handles passing "metadata" and "folderid".
+
+              % Next, make the cooked values.
+
+              % Assign a (bogus) default value.
+              datacooked = zeros(size(datanative));
+
+              if strcmp('boolean', thissigtype)
+                % Convert to boolean (logical) values.
+                datacooked = (datanative > 0.5);
+              elseif strcmp('flagvector', thissigtype)
+                % Convert to double but don't modify.
+                datacooked = double(datanative);
+              else
+                % Convert to double and apply offset and scaling.
+                datacooked = double(datanative);
+                datacooked = (datacooked - thisbankmeta.nativezerolevel) ...
+                  * thisbankmeta.nativescale;
+              end
+
               thisresult = ...
-                procfunc(thisbanklabel, thischan, wavedata, timedata );
+                procfunc( procmeta, procfid, thisbanklabel, thischan, ...
+                  datacooked, timecooked, datanative, timenative );
 
               % Store this result.
               foundcount = foundcount + 1;
@@ -115,7 +151,7 @@ for bidx = 1:length(banklist)
       end
 
     else
-      % FIXME - "neuroscope" and "monolithic" file types not yet supported.
+      % FIXME - "neuroscope" and "monolithic" file types NYI.
       % For both of these, we'll want to batch channels and read them N at
       % a time rather than one at a time, to avoid making repeated passes
       % through the file.
@@ -129,6 +165,7 @@ for bidx = 1:length(banklist)
     % Remember to wrap cell arrays.
     folderresults.(thisbanklabel) = ...
       struct( 'chanlist', chanfoundlist, 'resultlist', { chanresultlist } );
+
   end
 
 end

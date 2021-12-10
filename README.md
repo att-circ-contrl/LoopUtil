@@ -49,6 +49,10 @@ Library functions for performing signal processing.
 * lib-nloop-util --
 Helper functions that don't fall into the other categories.
 
+* lib-vendor-intan --
+Library functions for manipulating data saved in Intan's format, derived from
+code supplied by Intan Technologies (used and re-licensed with permission).
+
 
 ## Sample Code
 

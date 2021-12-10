@@ -1,0 +1,117 @@
+Data is saved in monolithic format ("traditional Intan"), one-file-per-type
+format (NeuroScope-compatible), or one-file-per-channel format.
+
+
+
+"Traditional Intan" format stores data as follows:
+
+- Data is stored as a self-contained ".rhd" file (for the recording
+  controller) or ".rhs" file (for the stimulate-and-record controller).
+
+- A session may be saved as multiple independent files (with a new file
+  started every N minutes).
+
+- All ".rhd" and ".rhs" files begin with a header containing metadata.
+
+- Blocks of data follow the header.
+
+- For file formats other than "traditional Intan", an "info.rhd" or
+  "info.rhs" file exists with a header and no blocks of data.
+
+See Intan's file format documentation for stucture details for the header
+and the data blocks.
+
+
+
+"One-file-per-type" format (NeuroScope-compatible) stores signals in the
+following files:
+
+- All files are saved at the full sampling rate for ease of alignment, even
+  if the underlying signals are sampled at lower rates (as with auxiliary
+  and power supply signals).
+
+- "time.dat" is a series of (signed int32) sample indices.
+
+- "amplifier.dat" stores ephys channel signals (signed int16, 0.195 uV/LSB).
+
+- "auxiliary.dat" (RHD only) stores on-chip aux analog input signals
+  (unsigned uint16, 37.4 uV/LSB)
+
+- "dcamplifier.dat" (RHS only) stores low-gain DC-coupled ephys channel
+  signals (unsigned uint16, 19.23 mV/LSB, zero level 512).
+
+- "analogin.dat" stores BNC analog input signals (unsigned uint16,
+  0.3125 mV/LSB for RHS/RHD, 50.354 uV/LSB mode 0, 0.15259 mV/LSB mode 1,
+  zero level 32768).
+
+- "analogout.dat" (RHS only) stores BNC analog output signals (unsigned
+  uint16, 0.3125 mV/LSB, zero level 32768).
+
+- "digitalin.dat" stores TTL input signals as a packed unsigned 16-bit word.
+
+- "digitalout.dat" stores TTL output signals as a packed unsigned 16-bit word.
+
+- "stim.dat" (RHS only) stores stimulation current and flags as encoded
+  unsigned 16-bit values. The least-significant 8 bits are the current
+  magnitude (units per the header), the 9th bit is the sign, the 14th bit is
+  amplifier settle, the 15th bit is the charge recovery, and the 16th bit is
+  compliance limit. Note that bit numbering starts at 1, not 0.
+
+- "supply.dat" (RHD only) stores on-chip supply voltage sensor signals
+  (unsigned uint16, 74.8 uV/LSB)
+
+
+
+"One-file-per-type" format (NeuroScope-compatible) stores signals in the
+following files:
+
+- File format is per "one-file-per-type", except with only one channel per
+  file, unless otherwise indicated.
+
+- All files are saved at the full sampling rate for ease of alignment, even
+  if the underlying signals are sampled at lower rates (as with auxiliary
+  and power supply signals).
+
+- Note that as of 2021 the stim/record controller (RHS) only has four banks
+  ("A".."D") and a maximum of 32 channels per bank ("000".."031").
+
+- "time.dat" is a series of (signed int32) sample indices.
+
+- "amp-X-NNN.dat" files store ephys channel signals for bank X ("A".."H")
+  and channel NNN ("000".."127").
+
+- "aux-X-AUXN.dat" files (RHD only) store on-chip aux analog input signals
+  for bank X ("A".."H") and channel N ("1".."6"). Channels 1..3 are for the
+  first connected chip and channels 4..6 are for the second connected chip
+  on that bank.
+
+- "dc-X-NNN.dat" files (RHS only) store low-gain DC-coupled ephys channel
+  signals for bank X ("A".."H") and channel NNN ("000".."127").
+
+- "board-ADC-NN.dat" files (RHD) store BNC analog input signals for
+  channel NN ("00".."07") of the recording controller.
+
+- "board-ANALOG-IN-N" files (RHS) store BNC analog input signals for
+  channel N ("0".."7") of the stim/record controller.
+
+- "board-ANALOG-OUT-N" files (RHS) store BNC analog output signals for
+  channel N ("0".."7").
+
+- "board-DIN-NN.dat" files store TTL input signals for channel NN
+  ("00".."15"). Samples are still unsigned uint16 values but only have
+  values of 0 or 1.
+
+- "board-DOUT-NN.dat" files store TTL output signals for channel NN
+  ("00".."15"). Samples are still unsigned uint16 values but only have
+  values of 0 or 1.
+
+- "stim-X-NNN.dat" files store encoded stimulation current and flags for
+  bank X ("A".."H") and channel NNN ("000".."127").
+
+- "vdd-X-VDDN.dat" files (RHD only) store on-chip supply voltage sensor
+  signals for bank X ("A".."H"). "VDD1" is for the first connected chip and
+  "VDD2" is for the second connected chip on that bank.
+
+
+
+This is the end of the file.

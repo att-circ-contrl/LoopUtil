@@ -44,8 +44,7 @@ end
 
 want_intan = false;
 
-if strcmpi('intanrec', devicetype) || strcmpi('intanstim', devicetype) ...
-  || strcmpi('intan', devicetype)
+if strcmpi('intan', devicetype)
 
   want_intan = true;
 
@@ -100,56 +99,6 @@ isok = (foldercount > 0);
 
 % Done.
 
-end
-
-
-%
-% Helper Functions
-
-
-function newfolder = helper_probeChannelsIntan(oldfolder, samprate)
-
-  newfolder = oldfolder;
-
-  % FIXME - Kludge in a wrapper for the old way of doing this, for testing.
-  % FIXME - This only handles one-file-per-channel data!
-
-  [chandetect ampdetect chanfiles] = ...
-    nlIntan_probeAmpChannels( oldfolder.path, struct() );
-
-  newfolder.banks = struct();
-
-  for bidx = 1:length(ampdetect)
-    thisbanklabel = ampdetect{bidx};
-    thisbanktype = 'onefileperchannel';
-    chanindices = [];
-    chanfnames = {};
-    filecount = 0;
-
-    for fidx = 1:length(chanfiles)
-      thischan = chanfiles(fidx);
-      if strcmp(thisbanklabel, thischan.bank)
-        filecount = filecount + 1;
-        chanindices(filecount) = thischan.chan;
-        chanfnames{filecount} = thischan.fname;
-      end
-    end
-
-    if filecount > 0
-      % Store a copy of the channel numbers in the handle, to guarantee that
-      % they stay in an order consistent with the filename list.
-
-      thishandle = struct( 'format', 'onefileperchan', ...
-        'chanfilechans', chanindices, 'chanfilenames', { chanfnames } );
-
-
-      % Store this bank's metadata.
-
-      newfolder.banks.(thisbanklabel) = struct( ...
-        'channels', chanindices, 'samprate', samprate, ...
-        'banktype', 'analog', 'handle', thishandle );
-    end
-  end
 end
 
 

@@ -36,9 +36,10 @@ global nlProc_computeAverageSignal_Counts;
 % Define a processing function that preprocesses a signal and adds it to
 % these counts.
 
-tallyfunc = @(metadata, folderid, bankid, chanid, wavedata, timedata) ...
+tallyfunc = @(metadata, folderid, bankid, chanid, ...
+  wavedata, timedata, wavenative, timenative) ...
   helper_addToTally(metadata, folderid, bankid, chanid, ...
-    wavedata, timedata, preprocfunc);
+    wavedata, timedata, wavenative, timenative, preprocfunc);
 
 
 % Iterate through the specified channels.
@@ -64,7 +65,8 @@ end
 
 
 function returnval = helper_addToTally( ...
-  metadata, folderid, bankid, chanid, wavedata, timedata, tallypreprocfunc )
+  metadata, folderid, bankid, chanid, ...
+  wavedata, timedata, wavenative, timenative, tallypreprocfunc )
 
   % Return a dummy value; the iterator needs this.
   returnval = 1;
@@ -75,7 +77,7 @@ function returnval = helper_addToTally( ...
 
   % Preprocess this data.
   cookedsignal = tallypreprocfunc( metadata, folderid, bankid, chanid, ...
-    wavedata, timedata );
+    wavedata, timedata, wavenative, timenative );
 
   % If we're the first signal to be processed, initialize the tallies.
   % Otherwise expand if necessary, and add this signal.
