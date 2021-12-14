@@ -59,7 +59,7 @@ end
 if ~isempty(metafile)
 
   % This returns an empty structure array on failure.
-  nativemeta = vIntan_read_header(metafile);
+  nativemeta = vIntan_readHeader(metafile);
 
   if isempty(nativemeta)
     % FIXME - Diagnostics.

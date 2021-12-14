@@ -1,6 +1,6 @@
-function metadata = vIntan_read_header( fname )
+function metadata = vIntan_readHeader( fname )
 
-% function metadata = vIntan_read_header( fname )
+% function metadata = vIntan_readHeader( fname )
 %
 % This reads the metadata header from Intan ".rhd" and ".rhs" files.
 % If reading fails, an empty structure array is returned.

@@ -24,6 +24,7 @@ REFAUTO=\
 	$(REFBASE)-plot.tex		\
 	$(REFBASE)-proc.tex		\
 	$(REFBASE)-util.tex		\
+	$(REFBASE)-vend-intan.tex	\
 	$(REFBASE)-notes.tex
 
 
@@ -73,6 +74,9 @@ refauto-bits:
 	./copy-code.pl --outfile=$(REFBASE)-util.tex --matlabdoc \
 		"--chapter=\`\`nlUtil'' Functions" --label=sect-util \
 		../lib-nloop-util/*.m
+	./copy-code.pl --outfile=$(REFBASE)-vend-intan.tex --matlabdoc \
+		"--chapter=\`\`vIntan'' Functions" --label=sect-vend-intan \
+		../lib-vendor-intan/*.m
 	./copy-code.pl --outfile=$(REFBASE)-notes.tex --verbatim \
 		"--chapter=Special Structures and Function Handles" \
 		--label=sect-notes ../lib-*/*txt
