@@ -1,8 +1,8 @@
 function resultstats = nlChan_processChannel( wavedata, samprate, ...
-  tuningfilt, tuningspect, tuningperc )
+  refdata, tuningart, tuningfilt, tuningspect, tuningperc )
 
 % function resultstats = nlChan_processChannel( wavedata, samprate, ...
-%   tuningfilt, tuningspect, tuningperc )
+%   refdata, tuningart, tuningfilt, tuningspect, tuningperc )
 %
 % This accepts a wideband waveform, performs filtering to split it into
 % spike and LFP signals, and calculates various statistics for each of these
@@ -12,6 +12,10 @@ function resultstats = nlChan_processChannel( wavedata, samprate, ...
 %
 % "wavedata" is the waveform to process.
 % "samprate" is the sampling rate.
+% "refdata" is the reference waveform. This should already be truncated and
+%   have artifacts removed, but should retain NaN values to avoid introducing
+%   new artifacts. If refdata is [], no re-referencing is performed.
+% "tuningart" is a structure containing tuning parameters for artifact removal.
 % "tuningfilt" is a structure containing tuning parameters for filtering.
 % "tuningspect" is a structure containing tuning parameters for persistence
 %   spectrum generation.
@@ -29,6 +33,12 @@ function resultstats = nlChan_processChannel( wavedata, samprate, ...
 %     low-pass-filtered LFP signal.
 %   "persistvals", "persistfreqs", and "persistpowers" are the corresponding
 %     fields returned by pspectrum() using the LFP signal.
+
+
+% Artifact rejection. This also does re-referencing and trimming.
+
+[ wavedata fracbad ] = nlChan_applyArtifactReject( ...
+  wavedata, refdata, samprate, tuningart, false );
 
 
 % Filtering and downsampling.
@@ -66,6 +76,7 @@ spikebinedges = -20:0.5:20;
 % Remember to wrap cell arrays in {}.
 
 resultstats = struct ( ...
+  'fracbad', fracbad, ...
   'spikemedian', spikemedian, 'spikeiqr', spikeiqr, ...
   'spikeskew', spikeskew, 'spikepercentvals', spikepercentvals, ...
   'spikebincounts', spikebincounts, 'spikebinedges', spikebinedges, ...

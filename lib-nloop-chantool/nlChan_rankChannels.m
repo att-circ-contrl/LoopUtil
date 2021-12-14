@@ -1,25 +1,32 @@
 function [ bestlist typbest typmiddle typworst ] = ...
-  nlChan_rankChannels( chanrecs, maxperbank, typfrac, scorefunc )
+  nlChan_rankChannels( chanresults, maxperbank, typfrac, scorefunc )
 
 % function [ bestlist typbest typmiddle typworst ] = ...
-%   nlChan_rankChannels( chanrecs, maxperbank, typfrac, scorefunc )
+%   nlChan_rankChannels( chanresults, maxperbank, typfrac, scorefunc )
 %
-% This process a list of channel records returned by nlChan_iterateChannels().
-% Channel records receive a score, and the list is sorted by that score.
-% Statistics for typical records and aggregate statistics are returned.
-% The sorted list is pruned to include at most a certain number of channels
-% per bank, and is then returned.
-% NOTE - The "typical" records are not necessarily in the pruned result list.
+% This process evaluates a result list returned by nlIO_iterateChannels().
+% Channels receive a score, and a list of channel records is compiled that is
+% sorted by that score. Channel records for "typical" best, worst, and
+% middle-scoring entries are selected, and these plus a trimmed sorted list
+% are returned.
 %
-% "chanrecs" is the list of channel statistics records to process.
+% Channel records have the format given in "CHANREC.txt".
+%
+% The sorted list is trimmed to include at most a certain number of channels
+% per bank.
+%
+% NOTE - The "typical" records are not necessarily in the trimmed result list.
+%
+% "chanresults" is a channel list per "CHANLIST.txt" that has been augmented
+%   with "resultlist" fields by per-channel signal processing.
 % "maxperbank" is the maximum number of channels per bank in the returned list.
 % "typfrac" is the percentile for finding "typical" good and bad records.
 %   This is a number between 0 and 50 (typically 5, 10, or 25).
 % "scorefunc" is a function handle that is called for each channel. It has
 %   the form:
 %     scoreval = scorefunc(resultval)
-%   The "resultval" argument is the chanrecs(n).result field, per
-%   nlChan_iterateChannels().
+%   The "resultval" argument is a channel's "resultlist" value, per
+%     nlIO_iterateChannels().
 %   Higher scores are better, for purposes of this function. A score of NaN
 %   squashes a result (removing it from the result list).
 %
@@ -31,10 +38,46 @@ function [ bestlist typbest typmiddle typworst ] = ...
 
 
 % Force input sanity.
-
 maxperbank = max(1, maxperbank);
-
 typfrac = min(0.5, typfrac);
+
+
+% Turn the input channel list into an unsorted array of channel records.
+
+reccount = 0;
+chanrecs = struct([]);
+
+foldernames = fieldnames(chanresults);
+for fidx = 1:length(foldernames)
+  folderid = foldernames{fidx};
+  thisfolder = chanresults.(folderid);
+  banknames = fieldnames(thisfolder);
+  for bidx = 1:length(banknames)
+    bankid = banknames{bidx};
+    thisbank = thisfolder.(bankid);
+    if isfield(thisbank, 'resultlist')
+      thischanlist = thisbank.chanlist;
+      thisresultlist = thisbank.resultlist;
+      for lidx = 1:length(thischanlist)
+        thisrec = struct( 'folder', folderid, 'bank', bankid, ...
+          'chan', thischanlist(lidx) );
+        % Take no chances with data type.
+        thisrec.result = thisresultlist{lidx};
+
+        reccount = reccount + 1;
+        if reccount > 1
+          chanrecs(reccount) = thisrec;
+        else
+          % Force the correct structure fields.
+          chanrecs = thisrec;
+        end
+      end
+    end
+  end
+end
+
+
+% Get locations of "typical" records, now that we know the total number.
 typcount = floor(typfrac * length(chanrecs));
 typcount = max(1, typcount);
 

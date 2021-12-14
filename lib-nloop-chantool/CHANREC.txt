@@ -1,0 +1,10 @@
+A "channel record" is a structure with the following fields:
+
+"folder" is the folder ID of the channel.
+"bank" is the bank ID of the channel.
+"chan" is the channel number of the channel.
+"result" is the processing result associated with this channel.
+
+The intention is that a vector of channel records may be returned that
+describes a ranked list of channels along with statistical analysis results
+associated with each channel.

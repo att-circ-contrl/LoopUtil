@@ -8,7 +8,8 @@
 % FIXME - Only load these if they exist locally.
 % Otherwise count on the user to have already added them.
 
-paths_needed = { 'lib-nloop-util', 'lib-nloop-proc', 'lib-nloop-intan', ...
+paths_needed = { 'lib-nloop-util', 'lib-nloop-proc', 'lib-nloop-io', ...
+  'lib-nloop-intan', 'lib-vendor-intan', ...
   'lib-nloop-plot', 'lib-nloop-chantool' };
 
 for pidx = 1:length(paths_needed)
@@ -31,19 +32,23 @@ global want_notch_harmonics;
 want_notch_harmonics = true;
 
 % Testing: Configuration values for Ali's dataset.
-want_ali_defaults = false;
+want_ali_defaults = true;
 
 
 % Defaults for variables that aren't set elsewhere.
 
 defaultindir = '.';
-defaultrefchans = struct();
+defaultrefchanbanks = struct();
 
 % FIXME - Adjust config values for use with Ali's dataset.
 if want_ali_defaults
-  defaultrefchans = struct( 'A', [47] );
+  defaultrefchanbanks = struct( 'ampA', struct( 'chanlist', 47 ) );
   trimtimes_ali = [ 360 180 ];
 end
+
+
+% Channel selection for Intan systems.
+chanfilter_intan = struct( 'keepbanks', {{ 'amp\w' }} );
 
 
 
@@ -141,6 +146,16 @@ global burstresultlist;
 
 global indir;
 global refchans;
+global metadata;
+global folderlabel;
+global chanfilter;
+
+global have_metadata;
+global have_bankrefs;
+global bankrefs;
+
+have_metadata = false;
+have_bankrefs = false;
 
 global tuningart;
 global tuningfilt;
@@ -151,6 +166,10 @@ global burst_want_persist;
 global burst_show_relative;
 global burst_datadir;
 global burst_plotdir;
+
+folderlabel = 'data';
+% FIXME - Hardcoding Intan conventions.
+chanfilter = chanfilter_intan;
 
 burst_want_persist = false;
 burst_show_relative = true;
@@ -170,13 +189,8 @@ did_band_init = false;
 % State values.
 
 global probechans;
-global probefiles;
-
 global refchansdefault;  % Global copy of the non-global config above.
-
-global samprate;
 global channelstats;
-
 global lfpfreqsteps;
 
 
@@ -190,7 +204,8 @@ global lfpfreqsteps;
 % Set configuration variables to starting values.
 
 indir = defaultindir;
-refchans = defaultrefchans;
+refchans = struct();
+refchans.(folderlabel) = defaultrefchanbanks;
 
 tuningart = nlChan_getArtifactDefaults();
 tuningfilt = nlChan_getFilterDefaults();
@@ -222,8 +237,8 @@ end
 % Initialize state to safe values.
 
 probechans = struct();
-probefiles = [];
-refchansdefault = defaultrefchans;
+refchansdefault = struct();
+refchansdefault.(folderlabel) = defaultrefchanbanks;
 
 
 
@@ -254,15 +269,19 @@ guiConstructGUI();
 function helper_runProcessing()
 
   global indir;
-  global probefiles;
   global refchans;
+  global metadata;
+  global probechans;
+
+  global have_metadata;
+  global have_bankrefs;
+  global bankrefs;
 
   global tuningart;
   global tuningfilt;
   global tuningspect;
   global tuningperc;
 
-  global samprate;
   global channelstats;
 
   global processspikechan;
@@ -284,17 +303,33 @@ function helper_runProcessing()
 
 
   %
-  % Read metadata (to get the sampling rate).
-  % We used to read time series here, but we don't actually use it.
+  % Make sure we have metadata.
 
-  guiSetProcessingMessage('Reading metadata.');
+  is_ok = have_metadata;
 
-  [ is_ok metadata ] = nlIntan_readMetadata(strcat(indir, '/info.rhd'));
 
-  if ~is_ok
-    guiSetProcessingMessage('Couldn''t read metadata.');
-  else
-    samprate = metadata.samprate;
+  %
+  % Rebuild references.
+
+  if is_ok && (~have_bankrefs)
+
+    guiSetProcessingMessage('Rebuilding references.');
+
+    bankrefs = struct();
+    have_bankrefs = true;
+
+    % NOTE - Our power scale expects uV rather than V, so multiply by 1e+6.
+    refprocfunc = @( metadata, folderid, bankid, chanid, ...
+      wavedata, timedata, wavenative, timenative ) ...
+      helper_processReference( metadata, folderid, bankid, chanid, ...
+        wavedata * 1e+6, tuningart );
+
+    % NOTE - The processing function modifies the global "bankrefs" variable.
+    % We don't need to save any results from processing.
+
+    % FIXME - Hardcoding number of simultaneous channels in memory.
+    refbadfrac = nlIO_iterateChannels( metadata, refchans, 1, refprocfunc );
+
   end
 
 
@@ -305,11 +340,18 @@ function helper_runProcessing()
 
     guiSetProcessingMessage('Reading channel data.');
 
-    procfunc = @(chanrec, wavedata) helper_processChannel( chanrec, ...
-      wavedata, samprate, tuningfilt, tuningspect, tuningperc );
+    % Make sure to omit the reference channels here.
+    signalchans = nlIO_subtractFromChanList(probechans, refchans);
 
-    channelstats = nlChan_iterateChannels( probefiles, refchans, samprate, ...
-      tuningart, procfunc );
+    % NOTE - Our power scale expects uV rather than V, so multiply by 1e+6.
+    procfunc = @( metadata, folderid, bankid, chanid, ...
+      wavedata, timedata, wavenative, timenative ) ...
+      helper_processChannel( metadata, folderid, bankid, chanid, ...
+      wavedata * 1e+6, ...
+      bankrefs, tuningart, tuningfilt, tuningspect, tuningperc );
+
+    % FIXME - Hardcoding number of simultaneous channels in memory.
+    channelstats = nlIO_iterateChannels( metadata, signalchans, 1, procfunc );
 
   end
 
@@ -397,16 +439,53 @@ end
 
 
 
-% This is a wrapper for channel processing that includes a progress banner.
+% This is a wrapper for reference processing that performs artifact rejection.
 
-function resultval = helper_processChannel(chanrec, dataseries, samprate, ...
-  tuningfilt, tuningspect, tuningperc)
+function resultval = helper_processReference( ...
+  metadata, folderid, bankid, chanid, wavedata, tuningart )
+
+  global bankrefs;
 
   guiSetProcessingMessage(sprintf( 'Processing bank %s chan %03d ...', ...
-    chanrec.bank, chanrec.chan ));
+    bankid, chanid ));
 
-  resultval = nlChan_processChannel( dataseries, samprate, ...
-    tuningfilt, tuningspect, tuningperc );
+  samprate = metadata.folders.(folderid).banks.(bankid).samprate;
+
+  % Do artifact rejection and trimming.
+  % Keep NaN values where artifacts were removed.
+
+  [ refseries fracbad ] = nlChan_applyArtifactReject( ...
+    wavedata, [], samprate, tuningart, true );
+
+  % FIXME - Store the reference even if it was mostly artifacts.
+  bankrefs.(bankid) = refseries;
+
+  % Return the artifact fraction, in case we do want to filter on that.
+  resultval = fracbad;
+
+end
+
+
+
+% This is a wrapper for channel processing that includes a progress banner.
+
+function resultval = helper_processChannel( ...
+  metadata, folderid, bankid, chanid, wavedata, ...
+  bankrefs, tuningart, tuningfilt, tuningspect, tuningperc )
+
+  guiSetProcessingMessage(sprintf( 'Processing bank %s chan %03d ...', ...
+    bankid, chanid ));
+
+  samprate = metadata.folders.(folderid).banks.(bankid).samprate;
+
+  % If we have a reference, use it; otherwise don't re-reference.
+  refdata = [];
+  if isfield(bankrefs, bankid)
+    refdata = bankrefs.(bankid);
+  end
+
+  resultval = nlChan_processChannel( wavedata, samprate, ...
+    refdata, tuningart, tuningfilt, tuningspect, tuningperc );
 
 end
 
@@ -1043,6 +1122,7 @@ function guiMakeNewRefGrid()
 
   global probechans;
   global refchans;
+  global folderlabel;
 
   global have_ref_grid;
 
@@ -1058,7 +1138,12 @@ function guiMakeNewRefGrid()
 
   % Figure out what we have and how to present it.
 
-  banklist = fieldnames(probechans);
+  banklist = {};
+  foldername = fieldnames(probechans);
+  if length(foldername) > 0
+    foldername = foldername{1};
+    banklist = fieldnames(probechans.(foldername));
+  end
   bankcount = length(banklist);
   rowcount = floor((bankcount + 3) / 4);
 
@@ -1082,7 +1167,7 @@ function guiMakeNewRefGrid()
     for bidx = 1:bankcount
 
       bankid = banklist{bidx};
-      bankchans = probechans.(bankid);
+      bankchans = probechans.(foldername).(bankid).chanlist;
       chancount = length(bankchans);
 
       if 0 < chancount
@@ -1121,8 +1206,8 @@ function guiMakeNewRefGrid()
         % Set the value, then set the value-changed callback.
 
         % Default selection is already 'none'.
-        if isfield(refchans, bankid)
-          thisref = refchans.(bankid);
+        if isfield(refchans.(folderlabel), bankid)
+          thisref = refchans.(folderlabel).(bankid).chanlist;
           if 0 < length(thisref)
             ctl.Value = thisref(1);
           end
@@ -1677,29 +1762,51 @@ function callback_selectDir(source, eventdata)
   global setupprocbutton;
 
   global indir;
+  global folderlabel;
+  global metadata;
   global probechans;
-  global probefiles;
   global refchansdefault;
+  global chanfilter;
+
+  global have_metadata;
+  global have_bankrefs;
 
   global burst_datadir;
   global burst_plotdir;
 
 
+  have_metadata = false;
+  have_bankrefs = false;
+
   newdir = uigetdir();
 
-  [ detchans detamps detfiles ] = ...
-    nlIntan_probeAmpChannels(newdir, struct());
+  % See if this folder contains anything we can understand.
+  [is_ok metadata] = nlIO_readFolderMetadata( struct(), ...
+    folderlabel, newdir, 'auto' );
+  detchans = struct();
 
-  if (1 > length(detfiles))
-
+  if ~is_ok
     ctl = ...
-      warndlg('No channels found in directory.', 'No data found.', 'modal' );
-
+      warndlg('No ephys data found in directory.', 'No data found.', 'modal' );
   else
+    detchans = nlIO_getChanListFromMetadata(metadata);
+
+    % FIXME - Hard-coded filtering!
+    detchans = nlIO_filterChanList(detchans, chanfilter);
+
+    if isempty(fieldnames(detchans))
+      ctl = ...
+        warndlg('No channels found in directory.', 'No data found.', 'modal' );
+    end
+  end
+
+  if ~isempty(fieldnames(detchans))
+
+    have_metadata = true;
 
     indir = newdir;
+    % NOTE - Already pruned the channel list in the previous step.
     probechans = detchans;
-    probefiles = detfiles;
     refchans = refchansdefault;
 
     setupdir.Text = indir;
@@ -1736,13 +1843,18 @@ end
 function callback_selectReference(source, eventdata)
 
   global refchans;
+  global bankrefs;
+  global folderlabel;
+
+  % Force a reference list rebuild the next time we need references.
+  have_bankrefs = false;
 
   bankid = source.UserData;
   channum = source.Value;
 
   % FIXME - Assume bank id and channel number are valid.
   % They're checked against the probed banks/channels when building the list.
-  refchans.(bankid) = channum;
+  refchans.(folderlabel).(bankid).chanlist = channum;
 
 end
 
@@ -2111,8 +2223,9 @@ function callback_dataSaveAll(source, eventdata)
 
   global indir;
   global refchans;
+  global metadata;
+  global chanfilter;
 
-  global samprate;
   global channelstats;
 
   global burst_datadir;
@@ -2130,7 +2243,8 @@ function callback_dataSaveAll(source, eventdata)
   % Record user selections.
 
   channelconfig = struct( ...
-    'folder', indir, 'references', refchans, 'samprate', samprate, ...
+    'folder', indir, 'references', refchans, 'metadata', metadata, ...
+    'chanswanted', chanfilter, ...
     'tuningart', tuningart, 'tuningfilt', tuningfilt, ...
     'tuningspect', tuningspect, 'tuningperc', tuningperc, ...
     'burstperc', processburstslider.UserData(processburstslider.Value), ...

@@ -18,6 +18,15 @@ by bank label. Each bank's field contains a "bank-level channel list".
 A "bank-level channel list" is a structure with the following fields:
 
 - "chanlist" is a vector containing integer-valued channel indices.
+- "scalarmeta" (optional) is a structure containing metadata that isn't
+  stored per-channel.
+Other optional fields are vectors or cell arrays with per-channel metadata.
+
+Situation-specific optional fields are described below:
+
+For channel lists derived from metadata:
+- "scalarmeta.banktype" is a copy of the signal bank metadata's "banktype"
+  field.
 
 For reference selection:
 - "reflist" is a cell array containing user-specified labels of references
