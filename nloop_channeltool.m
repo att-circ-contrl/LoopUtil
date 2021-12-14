@@ -32,7 +32,7 @@ global want_notch_harmonics;
 want_notch_harmonics = true;
 
 % Testing: Configuration values for Ali's dataset.
-want_ali_defaults = true;
+want_ali_defaults = false;
 
 
 % Defaults for variables that aren't set elsewhere.

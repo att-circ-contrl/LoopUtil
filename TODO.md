@@ -38,6 +38,17 @@ special case. Pass an arbitrary model structure to readAndBinImpedance().
 * (impedance) Fold metadata like "order to test clusters" and "maximum
 distance to be in a cluster" into ZMODELS.
 
+* (channel tool) Add support for channel mapping.
+
+* (channel tool) Add support for selecting banks to process (right now
+configuration is hard-coded to use Intan's naming conventions).
+
+* (processing) Normalize persistence spectrum power to make plotting range
+insensitive to signal amplitude.
+
+* (I/O) Provide a multi-threaded iteration function for users who have the
+parallel computing toolbox.
+
 
 ## Deferred to version 2:
 
@@ -45,6 +56,13 @@ distance to be in a cluster" into ZMODELS.
 
 ## Abbreviated changelog:
 
+* 14 Dec 2021 --
+Moved I/O routines into their own folder.
+Moved channel iteration into I/O, from channel tool.
+Refactored I/O to centralize vendor-independent code and to package
+vendor-specific code.
+Started porting Intan's code to the library, with permission. Metadata code
+is ported, monolithic "Intan format" code is not.
 * 13 Oct 2020 --
 Milestone release.
 * 09 Oct 2020 --
