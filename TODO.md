@@ -52,6 +52,13 @@ insensitive to signal amplitude.
 * (I/O) Provide a multi-threaded iteration function for users who have the
 parallel computing toolbox.
 
+* (Intan) Finish breaking out "traditional intan format" code.
+
+* (Intan) Add one-file-per-type Intan reading code (as "Neuroscope" vendor?).
+
+* (channel tool) GUI initialization fails if re-running after moving the
+burst frequency sliders (via "clear; close all; nloop_channeltool").
+
 
 ## Deferred to version 2:
 
