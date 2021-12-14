@@ -43,6 +43,9 @@ distance to be in a cluster" into ZMODELS.
 * (channel tool) Add support for selecting banks to process (right now
 configuration is hard-coded to use Intan's naming conventions).
 
+* (channel tool) Filter out channels that are artifacty (previous feature,
+removed during refactoring).
+
 * (processing) Normalize persistence spectrum power to make plotting range
 insensitive to signal amplitude.
 

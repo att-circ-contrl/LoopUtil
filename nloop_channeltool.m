@@ -167,7 +167,7 @@ global burst_show_relative;
 global burst_datadir;
 global burst_plotdir;
 
-folderlabel = 'data';
+folderlabel = 'datafolder';
 % FIXME - Hardcoding Intan conventions.
 chanfilter = chanfilter_intan;
 
@@ -315,6 +315,8 @@ function helper_runProcessing()
 
     guiSetProcessingMessage('Rebuilding references.');
 
+    % NOTE - This will leave us with an empty structure if no references
+    % were configured by the user.
     bankrefs = struct();
     have_bankrefs = true;
 
@@ -378,29 +380,34 @@ function helper_runProcessing()
     [ bu_best bu_typbest bu_typmid bu_typworst ] = ...
       nlChan_rankChannels(channelstats, inf, 0.1, burst_scorefunc);
 
-    % Plot the typical best cases.
-    % NOTE - The absolute best might be outliers, so plot typical instead.
 
-    processspikechan.Text = ...
-      sprintf( 'Typ. spikes:  %s - %03d', sp_typbest.bank, sp_typbest.chan );
-    processburstchan.Text = ...
-      sprintf( 'Typ. bursts:  %s - %03d', bu_typbest.bank, bu_typbest.chan );
+    % Only make plots if we actually had data.
 
-    drawnow;
+    if (~isempty(sp_best)) && (~isempty(bu_best))
+      % Plot the typical best cases.
+      % NOTE - The absolute best might be outliers, so plot typical instead.
 
-    nlPlot_axesPlotSpikeHist( processspikeplot, ...
-      sp_typbest.result.spikebincounts, sp_typbest.result.spikebinedges, ...
-      sp_typbest.result.spikepercentvals / sp_typbest.result.spikeiqr, ...
-      tuningperc.spikerange, '' );
+      processspikechan.Text = ...
+        sprintf( 'Typ. spikes:  %s - %03d', sp_typbest.bank, sp_typbest.chan );
+      processburstchan.Text = ...
+        sprintf( 'Typ. bursts:  %s - %03d', bu_typbest.bank, bu_typbest.chan );
 
-    guiMakeAxesNonInteractive( processspikeplot );
+      drawnow;
 
-    nlPlot_axesPlotExcursions( processburstplot, ...
-      bu_typbest.result.spectfreqs, bu_typbest.result.spectmedian, ...
-      bu_typbest.result.spectiqr, bu_typbest.result.spectskew, ...
-      tuningperc.burstrange, true, '' );
+      nlPlot_axesPlotSpikeHist( processspikeplot, ...
+        sp_typbest.result.spikebincounts, sp_typbest.result.spikebinedges, ...
+        sp_typbest.result.spikepercentvals / sp_typbest.result.spikeiqr, ...
+        tuningperc.spikerange, '' );
 
-    guiMakeAxesNonInteractive( processburstplot );
+      guiMakeAxesNonInteractive( processspikeplot );
+
+      nlPlot_axesPlotExcursions( processburstplot, ...
+        bu_typbest.result.spectfreqs, bu_typbest.result.spectmedian, ...
+        bu_typbest.result.spectiqr, bu_typbest.result.spectskew, ...
+        tuningperc.burstrange, true, '' );
+
+      guiMakeAxesNonInteractive( processburstplot );
+    end
 
   end
 
@@ -2106,6 +2113,7 @@ burstpidx, burstbandlow, burstbandhigh ));
   [ bestbursts typbest typmid typworst ] = ...
     nlChan_rankChannels(channelstats, inf, 0.1, burst_scorefunc);
 
+  % This tolerates an empty result list.
 
   newlabels = {};
   newrecs = {};

@@ -88,7 +88,10 @@ typcount = max(1, typcount);
 if (1 > length(chanrecs))
 
   % Force output sanity.
-  bestlist = chanrecs;
+  bestlist = struct([]);
+  typbest = struct([]);
+  typworst = struct([]);
+  typmiddle = struct([]);
 
 else
 

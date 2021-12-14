@@ -34,6 +34,7 @@ for fidx = 1:length(foldernames)
 
       if ~isfield(removefolder, thisbankname)
         newfolder.(thisbankname) = oldbank;
+        had_folder_data = true;
       else
 
         removebank = removefolder.(thisbankname);
