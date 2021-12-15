@@ -10,26 +10,25 @@ function addPathsLoopUtil
 
 % Detect the current path.
 
-thisdir = which('addPathsLoopUtil');
-thisdir = dir(thisdir);
-thisdir = thisdir.folder;
+fullname = which('addPathsLoopUtil');
+[ thisdir fname fext ] = fileparts(fullname);
 
 
 % Add the new paths.
 % (This checks for duplicates, so we don't have to.)
 
 % Utility libraries.
-addpath([ thisdir '/lib-nloop-util' ]);
-addpath([ thisdir '/lib-nloop-proc' ]);
-addpath([ thisdir '/lib-nloop-io' ]);
-addpath([ thisdir '/lib-nloop-plot' ]);
+addpath([ thisdir filesep 'lib-nloop-util' ]);
+addpath([ thisdir filesep 'lib-nloop-proc' ]);
+addpath([ thisdir filesep 'lib-nloop-io' ]);
+addpath([ thisdir filesep 'lib-nloop-plot' ]);
 
 % Vendor-specific libraries.
-addpath([ thisdir '/lib-nloop-intan' ]);
-addpath([ thisdir '/lib-vendor-intan' ]);
+addpath([ thisdir filesep 'lib-nloop-intan' ]);
+addpath([ thisdir filesep 'lib-vendor-intan' ]);
 
 % Application libraries.
-addpath([ thisdir '/lib-nloop-chantool' ]);
+addpath([ thisdir filesep 'lib-nloop-chantool' ]);
 
 
 % Done.
