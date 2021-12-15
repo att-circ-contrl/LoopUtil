@@ -2,22 +2,9 @@
 % Written by Christopher Thomas.
 
 %
-%
 % Library paths.
 
-% FIXME - Only load these if they exist locally.
-% Otherwise count on the user to have already added them.
-
-paths_needed = { 'lib-nloop-util', 'lib-nloop-proc', 'lib-nloop-io', ...
-  'lib-nloop-intan', 'lib-vendor-intan', ...
-  'lib-nloop-plot', 'lib-nloop-chantool' };
-
-for pidx = 1:length(paths_needed)
-  thispath = paths_needed{pidx};
-  if exist(thispath, 'dir')
-    addpath(thispath);
-  end
-end
+addPathsLoopUtil;
 
 
 

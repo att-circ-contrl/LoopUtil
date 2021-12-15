@@ -66,6 +66,11 @@ burst frequency sliders (via "clear; close all; nloop_channeltool").
 
 ## Abbreviated changelog:
 
+* 15 Dec 2021 --
+Moved libraries to a "libraries" folder and added a top-level script to add
+sub-folders to Matlab's path.
+Moved application code to "code-applications" and my test code to
+"code-examples".
 * 14 Dec 2021 --
 Moved I/O routines into their own folder.
 Moved channel iteration into I/O, from channel tool.

@@ -18,15 +18,16 @@ License.
 
 The following directories contain documentation:
 
-* manual -- LaTeX build directory for project documentation.
+* `manual` -- LaTeX build directory for project documentation.
 Use `make -C manual` to build it.
 
 
 ## Applications
 
-The following Matlab scripts are intended for direct use:
+Application scripts are intended for direct use. These are found in
+the `code-applications` directory. The following scripts are provided:
 
-* nloop_chantool.m --
+* `nloop_chantool.m` --
 This is a GUI application that looks at folders containing Intan per-channel
 data and identifies channels that have spikes and channels that have
 LFP bursts.
@@ -34,29 +35,48 @@ LFP bursts.
 
 ## Libraries
 
-The following directories contain library code:
+Libraries are provided in the `libraries` directory. With that directory
+on path, call the `addPathsLoopUtil` function to add sub-folders.
 
-* lib-nloop-chantool --
-Library functions specific to the `nloop_chantool` script.
-* lib-nloop-intan --
-Library functions for manipulating data saved in Intan's format.
-* lib-nloop-io --
+The following subdirectories contain library code:
+
+* `lib-nloop-io` --
 Library functions for loading and saving data that aren't vendor-specific.
-* lib-nloop-plot --
+* `lib-nloop-plot` --
 Helper functions for plotting. These are not publication-quality.
-* lib-nloop-proc --
+* `lib-nloop-proc` --
 Library functions for performing signal processing.
-* lib-nloop-util --
+* `lib-nloop-util` --
 Helper functions that don't fall into the other categories.
 
-* lib-vendor-intan --
-Library functions for manipulating data saved in Intan's format, derived from
-code supplied by Intan Technologies (used and re-licensed with permission).
+* `lib-nloop-intan` --
+High-level library functions for manipulating data saved in Intan's format.
+* `lib-vendor-intan` --
+Low-level library functions for manipulating data saved in Intan's format,
+derived from code supplied by Intan Technologies (used and re-licensed with
+permission).
+
+* `lib-nloop-chantool` --
+Library functions specific to the `nloop_chantool` script.
 
 
 ## Sample Code
 
-(FIXME -- Turn my test scripts into sample code.)
+Sample code scripts are intended to illustrate how the libraries are used.
+These are found in the `code-examples` directory. The following scripts
+are provided:
+
+* `do_test.m` --
+This is my test script for exercising the "LoopUtil" library. It does the
+same operations as the channel tool, without a GUI. Referencing is performed
+a bit differently as of Dec. 2021 (it can do common-average referencing and
+it does rereferencing before artifact removal rather than after). You'll
+need to edit the `plotdir` variable and create a configuration script that
+points to your data to use it.
+* `do_config_reider.m`, `do_config_frey_tungsten.m`, and
+`do_config_frey_silicon.m` are representative configuration scripts using
+private datasets. See the preamble of `do_test.m` for details on what needs
+to be configured and what optional settings may additionally be configured.
 
 
 This is the end of the file.
