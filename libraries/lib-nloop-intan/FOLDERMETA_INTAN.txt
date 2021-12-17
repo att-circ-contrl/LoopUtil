@@ -26,6 +26,9 @@ In "signal bank metadata":
 
 - "banktype" is 'boolean' for "Din" and "Dout", 'flagvector' for
   "flagsA".."flagsH", and 'analog' for other banks.
+- Ephys recording channels have "fpunits" of 'uV'; stimulation channels have
+  "fpunits" of 'uA'. Other analog channels have "fpunits" of 'V'. Channels
+  that aren't analog have "fpunits" of ''.
 - "handle" is a structure with the following fields:
 
   - "format" is 'onefileperchan', 'neuroscope', or 'monolithic'.

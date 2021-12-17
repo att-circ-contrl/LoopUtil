@@ -67,6 +67,9 @@ channels). The following fields are present:
   of zero. This is typically used with unsigned integer native data types.
 "nativescale" is a multiplier used to convert "native" data values to
   floating-point data values in suitable units (volts, amperes, etc).
+"fpunits" is a human-readable label indicating measurement units after
+  conversion to floating point ('uV', 'V', 'uA', 'A', etc). This may be ''
+  for data without meaningful units (integer, boolean, flag vector, etc).
 "handle" is an opaque object used by the LoopUtil library to manage file
   I/O state. It typically contains file format details, file descriptors for
   open files, and state flags.
