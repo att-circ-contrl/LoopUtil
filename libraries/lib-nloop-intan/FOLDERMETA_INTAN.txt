@@ -24,8 +24,11 @@ In "folder metadata":
 
 In "signal bank metadata":
 
-- "banktype" is 'boolean' for "Din" and "Dout", 'flagvector' for
-  "flagsA".."flagsH", and 'analog' for other banks.
+- "banktype" is:
+  - 'boolean' for "Din" and "Dout", if they're stored per-channel.
+  - 'integer' for "Din" and "Dout" otherwise.
+  - 'flagvector' for "flagsA".."flagsH".
+  - 'analog' for other banks.
 - Ephys recording channels have "fpunits" of 'uV'; stimulation channels have
   "fpunits" of 'uA'. Other analog channels have "fpunits" of 'V'. Channels
   that aren't analog have "fpunits" of ''.

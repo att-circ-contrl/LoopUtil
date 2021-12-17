@@ -35,7 +35,7 @@ if isdir(indir)
   scratchstim = { scratchstim.name };
 
   metafilelist = [ scratchrec scratchstim ];
-  metafilelist = strcat([ indir '/' ], metafilelist);
+  metafilelist = strcat([ indir filesep ], metafilelist);
 
 end
 
@@ -95,7 +95,7 @@ if ~isempty(metafile)
     % Initialize handle metadata.
     % NOTE - Monolithic format does not have a separate time file.
     format = 'bogus';
-    timefile = [ indir, '/', 'time.dat' ];
+    timefile = [ indir, filesep, 'time.dat' ];
 
 
     %
@@ -119,7 +119,7 @@ if ~isempty(metafile)
         chansubset = chanlist(selectmask);
 
         thishandle = struct( 'format', 'monolithic', ...
-          'fname', [ indir, '/', metafile ] );
+          'fname', [ indir, filesep, metafile ] );
 %        foldermeta.banks.(banklabel) = struct( ...
 %          'channels', chansubset, 'samprate', samprate_ephys, ...
 %          'banktype', 'analog', 'handle', thishandle, ...
@@ -312,7 +312,7 @@ function [ chanlist chanbanks chanfiles ] = ...
       outcount = outcount + 1;
       chanlist(outcount) = thischan;
       chanbanks{outcount} = thisbank;
-      chanfiles{outcount} = [ indir, '/', thisfile ];
+      chanfiles{outcount} = [ indir, filesep, thisfile ];
     end
 
   end
@@ -338,6 +338,12 @@ function newbanks = helper_addChannelFileBanks( ...
     helper_getChannelFiles(indir, dirfiles, pattern);
 
   if ~isempty(chanlist)
+    % FIXME - Get the sample count from the time file, since all channels
+    % and banks use the same sampling rate with one-file-per-channel.
+    % We know that the time file is int32.
+    timestats = dir(timefile);
+    sampcount = round(timestats.bytes / 4);
+
     uniquebanks = unique(chanbanks);
     for bidx = 1:length(uniquebanks)
       thisbank = uniquebanks{bidx};
@@ -356,7 +362,8 @@ function newbanks = helper_addChannelFileBanks( ...
         'chanfilechans', chansubset, 'chanfilenames', { filesubset }, ...
         'timefile', timefile );
       newbanks.(banklabel) = struct( ...
-        'channels', chansubset, 'samprate', samprate, 'banktype', sigtype, ...
+        'channels', chansubset, 'samprate', samprate, ...
+        'sampcount', sampcount, 'banktype', sigtype, ...
         'nativetimetype', 'int32', 'nativedatatype', nativetype, ...
         'nativezerolevel', zerolevel, 'nativescale', scale, ...
         'fpunits', units, 'handle', thishandle );
