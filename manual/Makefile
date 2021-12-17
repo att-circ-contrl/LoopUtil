@@ -18,6 +18,7 @@ REFBITS=\
 	$(REFBASE)-over.tex
 
 REFAUTO=\
+	$(REFBASE)-ft.tex		\
 	$(REFBASE)-io.tex		\
 	$(REFBASE)-plot.tex		\
 	$(REFBASE)-proc.tex		\
@@ -60,6 +61,9 @@ refauto-bits: refauto-corelibs refauto-vendorlibs refauto-applibs \
 	refauto-examples refauto-notes
 
 refauto-corelibs:
+	./copy-code.pl --outfile=$(REFBASE)-ft.tex --matlabdoc \
+		"--chapter=\`\`nlFT'' Functions" --label=sect-ft \
+		../libraries/lib-nloop-ft/*.m
 	./copy-code.pl --outfile=$(REFBASE)-io.tex --matlabdoc \
 		"--chapter=\`\`nlIO'' Functions" --label=sect-io \
 		../libraries/lib-nloop-io/*.m

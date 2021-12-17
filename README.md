@@ -56,6 +56,9 @@ Low-level library functions for manipulating data saved in Intan's format,
 derived from code supplied by Intan Technologies (used and re-licensed with
 permission).
 
+* `lib-nloop-ft` --
+Library functions for interoperating with Field Trip.
+
 * `lib-nloop-chantool` --
 Library functions specific to the `nloop_chantool` script.
 

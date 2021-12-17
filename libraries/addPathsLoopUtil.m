@@ -27,6 +27,9 @@ addpath([ thisdir filesep 'lib-nloop-plot' ]);
 addpath([ thisdir filesep 'lib-nloop-intan' ]);
 addpath([ thisdir filesep 'lib-vendor-intan' ]);
 
+% Interoperability libraries.
+addpath([ thisdir filesep 'lib-nloop-ft' ]);
+
 % Application libraries.
 addpath([ thisdir filesep 'lib-nloop-chantool' ]);
 
