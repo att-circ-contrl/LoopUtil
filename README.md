@@ -9,8 +9,8 @@ and providing stimulation triggers that are phase-aligned to oscillations.
 In the future the libraries and utilities may be extended to cover additional
 experiment scenarios.
 
-The NeuroLoop project is copyright (c) 2020 by Vanderbilt University, and
-is released under the Creative Commons Attribution 4.0 International
+The NeuroLoop project is copyright (c) 2020-2021 by Vanderbilt University,
+and is released under the Creative Commons Attribution 4.0 International
 License.
 
 
