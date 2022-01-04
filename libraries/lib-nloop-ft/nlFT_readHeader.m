@@ -5,6 +5,10 @@ function header = nlFT_readHeader(indir)
 % This probes the specified directory using nlIO_readFolderMetadata(),
 % and translates the folder's metadata into a Field Trip header.
 %
+% This calls nlFT_testWantChannel() and nlFT_testWantBank() and only saves
+% channels that are wanted. By default all channels and banks are wanted;
+% use nlFT_selectChannels() to change this.
+%
 % If probing fails, an error is thrown.
 %
 % "indir" is the directory to process.
@@ -66,24 +70,36 @@ else
       error(sprintf( [ 'Bank "%s" has %d samples, while previous ' ...
         'banks had %d samples. Field Trip doesn''t like this.' ], ...
         thisbankname, thiscount, sampcount ));
-    elseif length(thischanlist) > 0
+    elseif nlFT_testWantBank(thisbankname, thistype)
 
-      % This bank has the expected rate and lenth. Add it.
+      % This bank has the expected rate and lenth, and passes filtering.
 
-      newchanqty = length(thischanlist);
+      % Build and filter the list of prospective channel names.
 
       newchannames = {};
+      newchanqty = 0;
+
       for cidx = 1:length(thischanlist)
-        newchannames{cidx} = ...
+        thischanname = ...
           sprintf( '%s_%03d', thisbankname, thischanlist(cidx) );
+
+        if nlFT_testWantChannel(thischanname)
+          newchanqty = newchanqty + 1;
+          newchannames{newchanqty} = thischanname;
+        end
       end
 
-      channames( (chancount+1):(chancount+newchanqty) ) = newchannames;
+      % If we have any channels left, add this bank's channels.
 
-      chantypes( (chancount+1):(chancount+newchanqty) ) = { thistype };
-      chanunits( (chancount+1):(chancount+newchanqty) ) = { thisunit };
+      if length(newchannames) > 0
+        newchanqty = length(newchannames);
 
-      chancount = chancount + newchanqty;
+        channames( (chancount+1):(chancount+newchanqty) ) = newchannames;
+        chantypes( (chancount+1):(chancount+newchanqty) ) = { thistype };
+        chanunits( (chancount+1):(chancount+newchanqty) ) = { thisunit };
+
+        chancount = chancount + newchanqty;
+      end
 
     end
   end

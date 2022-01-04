@@ -11,14 +11,14 @@ In "folder metadata":
 - "devicetype" is 'intan'.
 - "nativemeta" is the output of nlIntan_readMetadata().
 - Banks that may exist are as follows:
-  - "ampA".."ampH" contain ephys channel signals.
-  - "auxA".."auxH" contain on-chip aux analog input signals.
-  - "dcA".."dcH" contain low-gain DC-coupled ephys channel signals.
+  - "AmpA".."AmpH" contain ephys channel signals.
+  - "AuxA".."AuxH" contain on-chip aux analog input signals.
+  - "DcA".."DcH" contain low-gain DC-coupled ephys channel signals.
   - "Ain" and "Aout" contain BNC analog inputs and outputs, respectiely.
   - "Din" and "Dout" contain TTL inputs and outputs, respectively.
-  - "stimA".."stimH" contain stimulation drive currents.
-  - "flagsA".."flagsH" contain encoded stimulation-related flags.
-  - "vddA".."vddH" contain voltage supply signals.
+  - "StimA".."StimH" contain stimulation drive currents.
+  - "FlagsA".."FlagsH" contain encoded stimulation-related flags.
+  - "VddA".."VddH" contain voltage supply signals.
 
 
 
@@ -27,7 +27,7 @@ In "signal bank metadata":
 - "banktype" is:
   - 'boolean' for "Din" and "Dout", if they're stored per-channel.
   - 'integer' for "Din" and "Dout" otherwise.
-  - 'flagvector' for "flagsA".."flagsH".
+  - 'flagvector' for "FlagsA".."FlagsH".
   - 'analog' for other banks.
 - Ephys recording channels have "fpunits" of 'uV'; stimulation channels have
   "fpunits" of 'uA'. Other analog channels have "fpunits" of 'V'. Channels
