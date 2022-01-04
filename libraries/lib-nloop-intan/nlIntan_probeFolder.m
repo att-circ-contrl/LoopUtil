@@ -176,6 +176,8 @@ if ~isempty(metafile)
 
     % NOTE - Files are all saved at the ephys rate, even if sampled at
     % lower rates.
+    % FIXME - The filename prefix is saved as "port_prefix" in the metadata.
+    % We don't need to probe for all possible files if we check that.
 
 
     % Amplifier channels are "amp-A-000.dat" .. "amp-H-127.dat".
@@ -207,6 +209,7 @@ if ~isempty(metafile)
 
     % Controller analog inputs are "board-ADC-00.dat" .. "board-ADC-07.dat"
     % or "board-ANALOG-IN-00.dat" .. "board-ANALOG-IN-07.dat".
+    % FIXME - Saved as 1..8, not 0..7!
 
     foldermeta.banks = helper_addChannelFileBanks( ...
       foldermeta.banks, indir, dirfiles, timefile, ...
@@ -223,6 +226,7 @@ if ~isempty(metafile)
 
     % Controller analog outputs are
     % "board-ANALOG-OUT-00.dat" .. "board-ANALOG-OUT-07.dat".
+    % FIXME - Saved as 1..8, not 0..7!
 
     foldermeta.banks = helper_addChannelFileBanks( ...
       foldermeta.banks, indir, dirfiles, timefile, ...
@@ -231,19 +235,34 @@ if ~isempty(metafile)
       voltages.board_analog_scale, 'V', '', noflags );
 
 
-    % Controller digital inputs are "board-DIN-00.dat" .. "board-DIN-15.dat".
+    % Controller digital inputs are "board-DIN-00.dat" .. "board-DIN-15.dat"
+    % or "board-DIGITAL-IN-00.dat" .. "board-DIGITAL-IN-15.dat".
+    % FIXME - Saved as 1..16, not 0..15!
 
     foldermeta.banks = helper_addChannelFileBanks( ...
       foldermeta.banks, indir, dirfiles, timefile, ...
       'board-(DIN)-(\d+)\.dat', '', 'Din', samprate_ephys, 'boolean', ...
       'uint16', 0, 1, '', '', noflags );
 
+    foldermeta.banks = helper_addChannelFileBanks( ...
+      foldermeta.banks, indir, dirfiles, timefile, ...
+      'board-(DIGITAL-IN)-(\d+)\.dat', '', 'Din', samprate_ephys, 'boolean', ...
+      'uint16', 0, 1, '', '', noflags );
+
 
     % Digital outputs are "board-DOUT-00.dat" .. "board-DOUT-15.dat".
+    % or "board-DIGITAL-OUT-00.dat" .. "board-DIGITAL-OUT-15.dat".
+    % FIXME - Saved as 1..16, not 0..15!
 
     foldermeta.banks = helper_addChannelFileBanks( ...
       foldermeta.banks, indir, dirfiles, timefile, ...
       'board-(DOUT)-(\d+)\.dat', '', 'Dout', samprate_ephys, 'boolean', ...
+      'uint16', 0, 1, '', '', noflags );
+
+    foldermeta.banks = helper_addChannelFileBanks( ...
+      foldermeta.banks, indir, dirfiles, timefile, ...
+      'board-(DIGITAL-OUT)-(\d+)\.dat', '', 'Dout', ...
+      samprate_ephys, 'boolean', ...
       'uint16', 0, 1, '', '', noflags );
 
 

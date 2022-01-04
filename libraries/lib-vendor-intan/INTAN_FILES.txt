@@ -88,22 +88,26 @@ following files:
 - "dc-X-NNN.dat" files (RHS only) store low-gain DC-coupled ephys channel
   signals for bank X ("A".."H") and channel NNN ("000".."127").
 
-- "board-ADC-NN.dat" files (RHD) store BNC analog input signals for
-  channel NN ("00".."07") of the recording controller.
+- "board-ADC-NN.dat" files store BNC analog input signals for
+  channel NN ("00".."07").
+- "board-ANALOG-IN-NN.dat" is an alternate set of filenames for this.
+- FIXME - Saved as 1..8, not 0..7!
 
-- "board-ANALOG-IN-N" files (RHS) store BNC analog input signals for
-  channel N ("0".."7") of the stim/record controller.
-
-- "board-ANALOG-OUT-N" files (RHS) store BNC analog output signals for
+- "board-ANALOG-OUT-N" files store BNC analog output signals for
   channel N ("0".."7").
+- FIXME - Saved as 1..8, not 0..7!
 
 - "board-DIN-NN.dat" files store TTL input signals for channel NN
   ("00".."15"). Samples are still unsigned uint16 values but only have
   values of 0 or 1.
+- "board-DIGITAL-IN-NN.dat" is an alternate set of filenames for this.
+- FIXME - Saved as 1..16, not 0..15!
 
 - "board-DOUT-NN.dat" files store TTL output signals for channel NN
   ("00".."15"). Samples are still unsigned uint16 values but only have
   values of 0 or 1.
+- "board-DIGITAL-OUT-NN.dat" is an alternate set of filenames for this.
+- FIXME - Saved as 1..16, not 0..15!
 
 - "stim-X-NNN.dat" files store encoded stimulation current and flags for
   bank X ("A".."H") and channel NNN ("000".."127").
