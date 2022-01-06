@@ -84,8 +84,8 @@ if ~isempty(metafile)
 
     % Build flag metadata, in case we need it.
     noflags = struct([]);
-    flagdefs = struct( 'fastsettle', 2^13, ...
-      'chargerecover', 2^14, 'compliancelimit', 2^15 );
+    flagdefs = struct( 'fastsettle', uint16(2^13), ...
+      'chargerecover', uint16(2^14), 'compliancelimit', uint16(2^15) );
 
 
     % Initialize output.

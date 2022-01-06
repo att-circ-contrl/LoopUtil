@@ -96,7 +96,6 @@ for bidx = 1:length(banklist)
             if ~is_ok
               disp(sprintf( '###  Unable to read from "%s".', thisfname ));
             else
-
               % We've just read in an array of int16 or uint16.
               % How we process this depends on what our type is and on
               % whether we have a special case to handle.
@@ -109,11 +108,16 @@ for bidx = 1:length(banklist)
                 % Manually decode 9-bit signed non-complement values to int16.
                 % Remember that Matlab calls the LSB bit 1, not bit 0.
                 wantnegative = (bitget(datanative, 9) > 0);
-                datanative = int16(bitand(datanative,0x00ff));
+                % FIXME - The file is _saved_ as uint16, but we _read_ it as
+                % signed int16 for this pass. Bitwise-and will mask off the
+                % sign bit, so this is okay.
+                datanative = bitand(datanative,0x00ffs16);
                 datanative(wantnegative) = -datanative(wantnegative);
               elseif strcmp('stimflags', thisspecial)
+                % We read this as unsigned 16-bit. Make that explicit for
+                % the mask.
                 % Mask off the 9-bit signed value, keeping the flag bits.
-                datanative = bitand(datanative, 0xfe00);
+                datanative = bitand(datanative, 0xfe00u16);
               end
 
 

@@ -3,13 +3,13 @@ function [is_ok sampdata] = nlIO_readBinaryFile(fname, dtype)
 % function [is_ok sampdata] = nlIO_readBinaryFile(fname, dtype)
 %
 % This attempts to read a packed array of the specified data type from the
-% specified file.
+% specified file. NOTE - The data is returned as-is, _not_ promoted to double.
 %
 % "fname" is the name of the file to read from.
 % "dtype" is a string identifying the Matlab data type (e.g. 'uint32').
 %
 % "is_ok" is set to true if the operation succeeds and false otherwise.
-% "sampdata" is an array containing the sample values.
+% "sampdata" is an array containing the sample values, in native format.
 
 
 is_ok = false;
@@ -20,7 +20,8 @@ if isfile(fname)
   is_ok = true;
 
   fid = fopen(fname, 'r');
-  sampdata = fread(fid, inf, dtype);
+  % NOTE - Use "srctype=>dsttype" to force keeping the native format.
+  sampdata = fread(fid, inf, [ dtype '=>' dtype ]);
   fclose(fid);
 
   if (1 > length(sampdata))
