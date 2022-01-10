@@ -52,6 +52,7 @@ else
 
   iteratebanklist = struct();
   globalchancount = 0;
+  filteredglobalchancount = 0;
   chanindexlut = struct();
 
   banknames = fieldnames(bankmeta);
@@ -89,7 +90,14 @@ else
           globalchancount = globalchancount + 1;
 
           if ismember(globalchancount, chanidxlist)
-            chanindexlut.(thischanname) = globalchancount;
+            % Add to the lookup table of output channel IDs.
+            % NOTE - the list of channel labels gets filtered too, so this
+            % should be the filtered global count, not the unfiltered global
+            % count.
+            filteredglobalchancount = filteredglobalchancount + 1;
+            chanindexlut.(thischanname) = filteredglobalchancount;
+
+            % Add to the iterated channel list for this bank.
             newchanqty = newchanqty + 1;
             newchanlist(newchanqty) = thischanidx;
           end
