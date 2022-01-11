@@ -59,6 +59,11 @@ parallel computing toolbox.
 * (channel tool) GUI initialization fails if re-running after moving the
 burst frequency sliders (via "clear; close all; nloop_channeltool").
 
+* (Open Ephys) Add a reader for old-style one-file-per-channel format.
+
+* (I/O) Reading Open Ephys with channel name templates that don't match
+ends up reading all channels without filtering (OpenEphys tests).
+
 
 ## Deferred to version 2:
 
@@ -66,6 +71,9 @@ burst frequency sliders (via "clear; close all; nloop_channeltool").
 
 ## Abbreviated changelog:
 
+* 11 Jan 2021 --
+Initial support for one-file-per-channel Intan and monolithic Open Ephys.
+Not reading events or spike data yet.
 * 15 Dec 2021 --
 Moved libraries to a "libraries" folder and added a top-level script to add
 sub-folders to Matlab's path.
