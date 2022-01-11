@@ -43,15 +43,21 @@ end
 % Parse name types that we know about.
 
 want_intan = false;
+want_openephys = false;
 
 if strcmpi('intan', devicetype)
 
   want_intan = true;
 
+elseif strcmpi('openephys', devicetype)
+
+  want_openephys = true;
+
 elseif strcmpi('auto', devicetype)
 
   % All known devices.
   want_intan = true;
+  want_openephys = true;
 
 else
   % FIXME - Diagnostics.
@@ -74,6 +80,18 @@ newfolders = {};
 if want_intan
   % This returns an empty struct if it didn't find anything.
   thisfolder = nlIntan_probeFolder(indir);
+
+  if ~isempty(fieldnames(thisfolder))
+    % Queue this folder's metadata to be added.
+    foldercount = foldercount + 1;
+    folderlabels{foldercount} = newlabel;
+    newfolders{foldercount} = thisfolder;
+  end
+end
+
+if want_openephys
+  % This returns an empty struct if it didn't find anything.
+  thisfolder = nlOpenE_probeFolder(indir);
 
   if ~isempty(fieldnames(thisfolder))
     % Queue this folder's metadata to be added.

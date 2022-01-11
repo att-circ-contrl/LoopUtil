@@ -1,0 +1,52 @@
+Miscellaneous notes about how Open Ephys stores things (in the Womelsdorf Lab
+setup) and about Open Ephys's I/O functions.
+
+Open Ephys's I/O functions: https://github.com/open-ephys/analysis-tools/
+
+
+Open Ephys has two formats:
+- "Open Ephys" format, with one file per channel. This is deprecated.
+- "Binary" format, with one file for all continuous data.
+
+
+"Open Ephys" format is structured as follows:
+
+- Each session just produces one directory.
+- There's a "settings.xml" file in the session directory.
+- There's a "Continuous_Data.openephys" file with metadata.
+- There are "(label).continuous" files with the continuous data itself.
+- There are a small number of ".events" files with monolithic event data.
+
+
+"Binary" format is structured as follows:
+
+- Each session gets a deep directory tree.
+- There's a "settings.xml" file in a session's root directory.
+- For each experiment and recording node, there's a "structure.oebin" file
+  that describes what that node recorded.
+- There are directory trees storing continuous data, event data, and spike
+  data from devices attached to the recording node. Any given device
+  produces a small number of monolithic data files (data, timestamps,
+  event states, etc).
+
+
+Open Ephys has several I/O functions, with a few peculiarities:
+
+- "list_open_ephys_binary" is pointed at a directory containing a ".oebin"
+  file. It returns a cell array containing the names of subfolders which have
+  the type of data requested. Zero, one, or multiple folders may exist.
+- "load_open_ephys_binary" loads folder number N of a requested type from
+  the list produced by "list_open_ephys_binary". This returns header
+  information with metadata, and either data or a memory-mapped file handle.
+  You want to memory-map this data; it's usually too big for RAM.
+
+- "get_session_info" is pointed at a directory containing "settings.xml".
+  This is supposed to read configuration metadata, but in practice it only
+  does this for sessions stored in the older "Open Ephys" format. So, you're
+  flying blind with ".oebin" binary format.
+- "load_open_ephys_data" and its variants are intended to read data stored
+  in the older "Open Ephys" format. I haven't tested these, since we only use
+  the new format.
+
+
+(This is the end of the file.)

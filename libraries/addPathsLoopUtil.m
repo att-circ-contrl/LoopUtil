@@ -24,6 +24,7 @@ addpath([ thisdir filesep 'lib-nloop-io' ]);
 addpath([ thisdir filesep 'lib-nloop-plot' ]);
 
 % Vendor-specific libraries.
+addpath([ thisdir filesep 'lib-nloop-openephys' ]);
 addpath([ thisdir filesep 'lib-nloop-intan' ]);
 addpath([ thisdir filesep 'lib-vendor-intan' ]);
 

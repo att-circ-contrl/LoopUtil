@@ -11,8 +11,10 @@ function folderresults = nlIntan_iterateFolderChannels( ...
 %
 % This is implemented such that only a few channels are loaded at a time.
 %
-% Channel time series are stored as sample numbers (not times). Analog data
-% is converted to microvolts. TTL data is converted to boolean.
+% "Native" channel time series are stored as sample numbers (not times).
+% "Cooked" channel time series are in seconds. Cooked analog data is
+% converted to the units specified in the bank metadata (volts or microvolts).
+% Cooked TTL data is converted to boolean.
 %
 % "foldermetadata" is a folder-level metadata structure, per FOLDERMETA.txt.
 % "folderchanlist" is a structure listing channels to process; it is a
@@ -22,7 +24,7 @@ function folderresults = nlIntan_iterateFolderChannels( ...
 % "procfunc" is a function handle used to transform channel waveform data
 %   into "result" data, per PROCFUNC.txt.
 % "procmeta" is the object to pass as the "metadata" argument of "procfunc".
-% "procfid" is the  label to pass as the "folderid" argument of "procfunc".
+% "procfid" is the label to pass as the "folderid" argument of "procfunc".
 %
 % "folderresults" is a folder-level channel list structure that has
 %   bank-level channel lists augmented with a "resultlist" field, per
@@ -162,7 +164,7 @@ for bidx = 1:length(banklist)
 
       % FIXME - Diagnostics.
       disp(sprintf( '###  Not sure how to iterate a "%s" folder.', ...
-        thisdevice ));
+        thisformat ));
     end
 
     % Store this bank's results.
