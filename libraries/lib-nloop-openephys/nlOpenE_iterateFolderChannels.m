@@ -91,16 +91,16 @@ for bidx = 1:length(banklist)
         thismmaphandle = thisdata.Data;
 
 
-        % Iterate the equested channels, reading and processing the ones
-        % that exist. Silently ignore ones that don't exist.
-
-        % FIXME - Iterating one channel at a time! This is slow.
-        % Mostly I don't want to have to debug N-up reading right now.
-
         % Get a reverse map of channels to Open Ephys channel indices.
         thischanindices = find(thishandle.selectmask);
 
+
+        % Get a list of channels that exist and their mapped indices.
+        % Silently drop requested channels that don't exist.
+
         foundcount = 0;
+        filteredchans = [];
+        filteredmappedindices = [];
         for cidx = 1:length(thisbankchans)
           thischanid = thisbankchans(cidx);
           if ismember(thischanid, thisbankmeta.channels)
@@ -109,8 +109,41 @@ for bidx = 1:length(banklist)
             thisindex = find( thischanid == thisbankmeta.channels );
             thisindex = thischanindices( min(thisindex) );
 
-            % Read this slice.
-            datanative = thismmaphandle.Data.mapped(thisindex,:);
+            foundcount = foundcount + 1;
+            filteredchans(foundcount) = thischanid;
+            filteredmappedindices(foundcount) = thisindex;
+          end
+        end
+
+        % Segment the list into batches.
+        filteredchans = helper_segmentList(filteredchans, memchans);
+        filteredmappedindices = ...
+          helper_segmentList(filteredmappedindices, memchans);
+
+
+        % Iterate the requested channels, reading and processing the ones
+        % that exist.
+        % Do this in batches rather than one at a time, to speed up reading.
+
+        foundcount = 0;
+        for batchidx = 1:length(filteredchans)
+
+          thisbatchchans = filteredchans{batchidx};
+          thisbatchmappedindices = filteredmappedindices{batchidx};
+
+          % Read the native data for this batch of channels.
+          batchdatanative = thismmaphandle.Data.mapped( ...
+            thisbatchmappedindices, : );
+
+          % Walk through the loaded channels, processing them one by one.
+          for cidx = 1:length(thisbatchchans)
+
+            % Get the channel ID.
+            thischanid = thisbatchchans(cidx);
+
+            % Get the channel's data. This should copy by reference, since
+            % we're not modifying it.
+            datanative = batchdatanative(cidx,:);
 
             % Make cooked data.
             datacooked = zeros(size(datanative));
@@ -138,6 +171,7 @@ for bidx = 1:length(banklist)
             chanresultlist{foundcount} = thisresult;
 
           end
+
         end
 
       else
@@ -171,6 +205,37 @@ end
 
 % Done.
 
+end
+
+
+%
+% Helper functions.
+
+% This function segments a long list into shorter pieces. Order is preserved.
+% "origlist" is a vector to be segmented.
+% "maxnum" is the maximum number of elements per segment.
+% "segmentlist" is a cell array containing shorter vectors.
+
+function segmentlist = helper_segmentList( origlist, maxnum )
+
+  segmentlist = {};
+
+  origlength = length(origlist);
+  if origlength > 0
+
+    startlist = 1:maxnum:origlength;
+
+    % Most segments are maxnum long.
+    endlist = startlist + maxnum - 1;
+    % The last segment might be short.
+    endlist(length(endlist)) = origlength;
+
+    for bidx = 1:length(startlist)
+      segmentlist{bidx} = origlist( startlist(bidx) : endlist(bidx) );
+    end
+  end
+
+  % Done.
 end
 
 

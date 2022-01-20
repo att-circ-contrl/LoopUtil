@@ -31,10 +31,8 @@ function data = nlFT_readData_helper( indir, wantnative, ...
 % "data" is the resulting 2D data matrix.
 
 % Magic constants.
-% FIXME - Hardcoding a number of channels to keep in memory.
-% Worst-case memory consumption is about 4 GB per channel.
 foldername = 'datafolder';
-memchans = 4;
+memchans = nlFT_getMemChans();
 
 % Read the folder metadata.
 [ isok foldermeta ] = nlIO_readFolderMetadata( ...
