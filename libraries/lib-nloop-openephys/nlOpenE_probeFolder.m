@@ -36,6 +36,11 @@ if isfile(filemonolithic)
   allbanks = struct();
 
 
+  % FIXME - Keep track of the maximum sample count from continuous banks,
+  % and assume that the sample range for event banks is the same.
+  maxsampcount = 0;
+
+
   % Process continuous banks.
   % FIXME - Using black magic to separate merged channel types.
 
@@ -55,6 +60,10 @@ if isfile(filemonolithic)
     % cleared to release it, but this doesn't seem to work in my tests.
     % FIXME - Count on it vanishing when "thisdata" is reassigned and when
     % exiting function scope. This is an ugly kludge!
+
+
+    % Update the maximum sample count.
+    maxsampcount = max(maxsampcount, thisdatasize);
 
 
     % If we have data, split the real bank into multiple virtual banks.
@@ -84,7 +93,105 @@ if isfile(filemonolithic)
   end
 
 
-  % FIXME - Events NYI. This is where our digital data ends up!
+  % Process event banks. This is where TTL data ends up.
+
+  % OpenEphys uses "TTL_N" and "TEXT_group_N" as magic strings, with a
+  % prefix indicating which device they came from.
+
+  ttlcount = 0;
+
+  for bidx = 1:length(banksevents)
+
+    % Open this bank, to get header information and sample count.
+    % FIXME - Blithely assuming we can fit event data in memory.
+
+    thisdata = ...
+      load_open_ephys_binary(filemonolithic, 'events', bidx);
+    thisdataheader = thisdata.Header;
+    thisdatasize = length(thisdata.Timestamps);
+    thisdatachans = thisdata.Header.num_channels;
+
+    if (thisdatasize > 0) && (thisdatachans > 0)
+      % Figure out if we're dealing with TTL data or text data.
+      % FIXME - Not parsing text data, as npy doesn't read it!
+
+      thisdataname = banksevents{bidx};
+      % The "description" and "channel_name" fields both exist, with similar
+      % content, for OE events. "channel_name" is more readable.
+      thisdatadesc = thisdataheader.channel_name;
+
+      if contains( thisdataname, 'ttl', 'IgnoreCase', true )
+
+        % Common components.
+
+        % Compute the letter before incrementing, so the first is 'A' + 0.
+        thisbankletter = char('A' + ttlcount);
+        ttlcount = ttlcount + 1;
+
+        thisdatatimetype = class(thisdata.Timestamps);
+
+        % Metadata template.
+        commonmeta = struct( 'samprate', thisdataheader.sample_rate, ...
+          'nativetimetype', thisdatatimetype, ...
+          'nativezerolevel', 0, 'nativescale', 1, 'fpunits', '', ...
+          'nativemeta', thisdataheader );
+
+        % Nonstandard metadata that we still want.
+        commonmeta.nativedesc = thisdatadesc;
+
+        % Handle.
+        commonmeta.handle = struct( ...
+          'format', 'monolithic', 'type', 'events', ...
+          'oefile', filemonolithic, 'oebank', bidx );
+
+
+        % Save two banks - one for individual channels, and one for words.
+
+
+        % Full data words.
+
+        thisbankname = [ 'DigWords' thisbankletter ];
+
+        thisbankmeta = commonmeta;
+        % FIXME - Record the maximum sample count, not the number of events.
+        thisbankmeta.sampcount = maxsampcount;
+        thisbankmeta.channels = [ 0 ];
+        thisbankmeta.banktype = 'eventwords';
+        % FIXME - Assuming a maximum of 64 TTL lines in the bank.
+        thisbankmeta.nativedatatype = 'uint64';
+
+        % Store this bank.
+        allbanks.(thisbankname) = thisbankmeta;
+
+
+        % Individual boolean signals.
+
+        % FIXME - These have a common time series!
+        % This means that within each bit, you'll get strings of repeated
+        % 0s and 1s, representing times when _other_ bits changed.
+
+        % FIXME - Including all channels, whether they had events or not.
+        % Channels all implicitly start with a data value of "0".
+
+        % Open Ephys numbers TTL lines starting at 1.
+        thisbankchans = 1:thisdataheader.num_channels;
+
+        thisbankname = [ 'DigBits' thisbankletter ];
+
+        thisbankmeta = commonmeta;
+        % FIXME - Record the maximum sample count, not the number of events.
+        thisbankmeta.sampcount = maxsampcount;
+        thisbankmeta.channels = thisbankchans;
+        thisbankmeta.banktype = 'eventbool';
+        thisbankmeta.nativedatatype = 'logical';
+
+        % Store this bank.
+        allbanks.(thisbankname) = thisbankmeta;
+
+      end
+    end
+
+  end
 
 
   % FIXME - Spikes NYI.

@@ -49,4 +49,21 @@ Open Ephys has several I/O functions, with a few peculiarities:
   the new format.
 
 
+Event data (from "binary" format) is structured as follows:
+
+- Event lists are stored as .npy tables in subfolders indicating the event
+  type which are in turn in subfolders indicating the devices of origin.
+- TTL events have the following fields:
+  - Timestamps (in samples).
+  - ChannelIndex (channel number that changed)
+  - Data (+chan for rising edges or -chan for falling)
+  - FullWords (Nx2 uint8 matrix with word bytes; 1 = least significant)
+- This data is redundant; ChannelIndex == abs(Data), and FullWords can be
+  reconstructed from data and vice versa.
+- Multiple bits changing at the same time results in multiple events with
+  the same timestamp.
+
+- FIXME - No information about what's in text events, as these read as empty.
+
+
 (This is the end of the file.)

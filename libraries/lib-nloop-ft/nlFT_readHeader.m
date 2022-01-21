@@ -59,6 +59,9 @@ else
 
   banknames = sort( fieldnames(bankmeta) );
 
+
+  % Main iteration.
+
   for bidx = 1:length(banknames)
     thisbankname = banknames{bidx};
     thisbankmeta = bankmeta.(thisbankname);
@@ -79,7 +82,10 @@ else
 
     % First, see if this is a bank we want to process at all.
 
-    if nlFT_testWantBank(thisbankname, thistype)
+    if nlFT_testWantBank(thisbankname, thistype) ...
+
+      % NOTE - Sparse (event) banks already report non-sparse sample count.
+      % There's no need to special-case here now.
 
       % Second, see if this bank's sampling rate and length are consistent
       % with any other banks we've processed so far.

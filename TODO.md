@@ -64,6 +64,13 @@ burst frequency sliders (via "clear; close all; nloop_channeltool").
 * (I/O) Reading Open Ephys with channel name templates that don't match
 ends up reading all channels without filtering (OpenEphys tests).
 
+* (I/O) Make Field Trip readData and readEvents call readHeader if they're
+only passed one argument. I'm not sure this is needed, but the bids_tsv
+example is set up this way.
+
+* (I/O) Add "sample range" to nlIO_iterateChannels(). Right now we're reading
+all of a channel's samples even if we only care about a short span.
+
 
 ## Deferred to version 2:
 
@@ -71,6 +78,9 @@ ends up reading all channels without filtering (OpenEphys tests).
 
 ## Abbreviated changelog:
 
+* 21 Jan 2022 --
+Partial support for Open Ephys TTL events. Reading as waveform data for
+individual bits only, for the moment.
 * 11 Jan 2021 --
 Initial support for one-file-per-channel Intan and monolithic Open Ephys.
 Not reading events or spike data yet.

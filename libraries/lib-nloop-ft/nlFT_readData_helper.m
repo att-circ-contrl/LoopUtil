@@ -157,6 +157,26 @@ function resultval = nlFT_readData_helper_double( ...
   channelindex = chanindexlut.(thischanname);
 
 
+  % If this is sparse (event) data, promote it to continuous.
+  % NOTE - We aren't using continuous timenative or timecooked, so don't
+  % promote them.
+
+  bankmeta = metadata.folders.(folderid).banks.(bankid);
+
+  if contains(bankmeta.banktype, 'event')
+    wavenative = nlUtil_sparseToContinuous( ...
+      timenative, wavenative, [1 bankmeta.sampcount] );
+
+    % We only need wavenative and wavedata.
+
+    if islogical(wavenative)
+      wavedata = wavenative;
+    else
+      wavedata = double(wavenative);
+    end
+  end
+
+
   % Get the requested span.
 
   data_length = length(wavedata);
@@ -195,6 +215,20 @@ function resultval = nlFT_readData_helper_native( ...
 
   thischanname = sprintf( '%s_%03d', bankid, chanid );
   channelindex = chanindexlut.(thischanname);
+
+
+  % If this is sparse (event) data, promote it to continuous.
+  % NOTE - We aren't using continuous timenative or timecooked, and we aren't
+  % using wavedata, so don't promote them.
+
+  bankmeta = metadata.folders.(folderid).banks.(bankid);
+
+  if contains(bankmeta.banktype, 'event')
+    wavenative = nlUtil_sparseToContinuous( ...
+      timenative, wavenative, [1 bankmeta.sampcount] );
+
+    % We only need wavenative.
+  end
 
 
   % Get the requested span.

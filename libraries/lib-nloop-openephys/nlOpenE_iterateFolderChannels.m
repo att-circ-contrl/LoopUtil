@@ -174,8 +174,107 @@ for bidx = 1:length(banklist)
 
         end
 
+      elseif strcmp('events', thiscategory)
+
+        % Load the sparse event data.
+        % FIXME - Blithely assume that this fits in memory!
+
+        thiseventlist = load_open_ephys_binary( thishandle.oefile, ...
+          'events', thishandle.oebank );
+
+
+        % NOTE - Take different actions depending on whether we have bit data
+        % or word data.
+        % We're still keeping event lists sparse, but we need to convert to
+        % to a sensible format.
+
+        if strcmp('eventbool', thissigtype)
+
+          % Get a list of channels that exist and their mapped indices.
+          % Silently drop requested channels that don't exist.
+          % Unlike "continuous" banks, "event" banks aren't combined, so we
+          % don't have to worry about only a subset of native channels being
+          % bank channels.
+
+          foundcount = 0;
+          filteredchans = [];
+          filteredmappedindices = [];
+          for cidx = 1:length(thisbankchans)
+            thischanid = thisbankchans(cidx);
+            if ismember(thischanid, thisbankmeta.channels)
+
+              % Find the slice corresponding to this channel.
+              thisindex = find( thischanid == thisbankmeta.channels );
+              thisindex = min(thisindex);
+
+              foundcount = foundcount + 1;
+              filteredchans(foundcount) = thischanid;
+              filteredmappedindices(foundcount) = thisindex;
+            end
+          end
+
+
+          % Iterate the requested channels, reading and processing the ones
+          % that exist.
+
+          % NOTE - Since we've already read the event data, there's no reason
+          % to batch channels. Just iterate them one at a time.
+
+          foundcount = 0;
+          for cidx = 1:length(filteredchans)
+
+            % Get the channel ID.
+            thischanid = filteredchans(cidx);
+            thisnativechanindex = filteredmappedindices(cidx);
+
+            % Get the events that we care about.
+            eventmask = (thisnativechanindex == thiseventlist.ChannelIndex);
+            eventtimes = thiseventlist.Timestamps(eventmask);
+            eventvals = thiseventlist.Data(eventmask);
+
+            % NOTE - Even if we have no matching elements, process the data.
+
+
+            % Turn this into a boolean sequence.
+            % Rising edges are "+chan", falling are "-chan".
+            eventvals = (eventvals > 0);
+
+            % Get derived values.
+            % Native is copy-on-write, so it should be okay.
+            % Cooked boolean is still boolean.
+            timenative = eventtimes;
+            datanative = eventvals;
+            timecooked = double(timenative) / thisbankmeta.samprate;
+            datacooked = datanative;
+
+            % Process this channel.
+            thisresult = ...
+              procfunc( procmeta, procfid, thisbanklabel, thischanid, ...
+                datacooked, timecooked, datanative, timenative );
+
+            % Store the result.
+            foundcount = foundcount + 1;
+            chanfoundlist(foundcount) = thischanid;
+            chanresultlist{foundcount} = thisresult;
+
+          end
+
+        elseif strcmp('eventwords', thissigtype)
+
+% FIXME - Word events NYI!
+          disp(sprintf( '### Not sure how to iterate "%s" events.', ...
+            thissigtype ));
+
+        else
+          % FIXME - Text events NYI!
+
+          % FIXME - Diagnostics.
+          disp(sprintf( '### Not sure how to iterate "%s" events.', ...
+            thissigtype ));
+        end
+
       else
-        % FIXME - Event and spike data NYI!
+        % FIXME - Spike data NYI!
 
         % FIXME - Diagnostics.
         disp(sprintf( '### Not sure how to iterate "%s" data.', ...

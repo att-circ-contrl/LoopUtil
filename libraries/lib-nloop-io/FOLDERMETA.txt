@@ -54,18 +54,21 @@ channels). The following fields are present:
   (sparse and unsorted channels are okay).
 "samprate" is the data sampling rate in samples per second.
 "sampcount" is the number of data samples in each channel's recording. This
-  is assumed to be the same for all channels within a bank.
+  is assumed to be the same for all channels within a bank. For sparse series
+  (event data), event timestamps are assumed to be in the range 1..sampcount.
 "banktype" is a label assigned by the LoopUtil library identifying the type
   of signal contained within this bank. Defined types are:
   - 'analog' represents continuous-range time-varying signal data.
   - 'integer' represents discrete-range time-varying signal data.
-  - 'evcode' represents integer data that changes rarely; changes may be
-    interpreted as events.
   - 'boolean' represents a signal that is either "on" or "off". Changes may
     be interpreted as events.
   - 'flagvector' is integer data that represents multiple 'boolean' signals.
     Changes may be interpreted as events, and flags may be decoded using the
     "flagdefs" structure if present.
+  - 'eventwords' is integer data stored as a sparse time series (event data
+    rather than continuous data).
+  - 'eventbool' is boolean data stored as a sparse time series (event data
+    rather than continuous data).
 "flagdefs" (optional) is present for banks of type 'flagvector'. It is a
   structure indexed by flag label containing the integer bit-mask values
   that correspond to each flag in the vector.
