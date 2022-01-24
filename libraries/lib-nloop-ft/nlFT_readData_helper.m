@@ -53,7 +53,7 @@ else
   filteredglobalchancount = 0;
   chanindexlut = struct();
 
-  banknames = fieldnames(bankmeta);
+  banknames = sort( fieldnames(bankmeta) );
 
   for bidx = 1:length(banknames)
     thisbankname = banknames{bidx};
@@ -168,12 +168,9 @@ function resultval = nlFT_readData_helper_double( ...
       timenative, wavenative, [1 bankmeta.sampcount] );
 
     % We only need wavenative and wavedata.
-
-    if islogical(wavenative)
-      wavedata = wavenative;
-    else
-      wavedata = double(wavenative);
-    end
+    % NOTE - Originally we left "logical" types intact, but that caused
+    % problems when reading data with mixed types.
+    wavedata = double(wavenative);
   end
 
 

@@ -57,6 +57,7 @@ for bidx = 1:length(banklist)
     thisbankchans = folderchanlist.(thisbanklabel).chanlist;
 
     thissigtype = thisbankmeta.banktype;
+    thissignativetype = thisbankmeta.nativedatatype;
     thiszerolevel = thisbankmeta.nativezerolevel;
     thisscale = thisbankmeta.nativescale;
 
@@ -228,23 +229,21 @@ for bidx = 1:length(banklist)
             thisnativechanindex = filteredmappedindices(cidx);
 
             % Get the events that we care about.
-            eventmask = (thisnativechanindex == thiseventlist.ChannelIndex);
-            eventtimes = thiseventlist.Timestamps(eventmask);
-            eventvals = thiseventlist.Data(eventmask);
-
             % NOTE - Even if we have no matching elements, process the data.
 
+            eventmask = (thisnativechanindex == thiseventlist.ChannelIndex);
+
+            timenative = thiseventlist.Timestamps(eventmask);
+            timecooked = double(timenative) / thisbankmeta.samprate;
+
+            eventvals = thiseventlist.Data(eventmask);
 
             % Turn this into a boolean sequence.
             % Rising edges are "+chan", falling are "-chan".
-            eventvals = (eventvals > 0);
+            % This works even if we have an empty list.
+            datanative = (eventvals > 0);
 
-            % Get derived values.
-            % Native is copy-on-write, so it should be okay.
             % Cooked boolean is still boolean.
-            timenative = eventtimes;
-            datanative = eventvals;
-            timecooked = double(timenative) / thisbankmeta.samprate;
             datacooked = datanative;
 
             % Process this channel.
@@ -261,9 +260,40 @@ for bidx = 1:length(banklist)
 
         elseif strcmp('eventwords', thissigtype)
 
-% FIXME - Word events NYI!
-          disp(sprintf( '### Not sure how to iterate "%s" events.', ...
-            thissigtype ));
+          % FIXME - We only have one channel for word data.
+          % This is an alias for merged bitwise data.
+
+          % Sanity check.
+          if length(thisbankchans) ~= 1
+            % FIXME - Diagnostics.
+            disp(sprintf( ...
+  '###  Expected one channel of word data for bank "%s"; found %d.', ...
+              thisbanklabel, length(thisbankchans) ));
+          else
+            thischanid = thisbankchans(1);
+
+            foundcount = 0;
+
+            timenative = thiseventlist.Timestamps;
+            timecooked = double(timenative) / thisbankmeta.samprate;
+
+            % This tolerates a list with zero events.
+            datanative = nlOpenE_assembleWords( ...
+              thiseventlist.FullWords, thissignativetype );
+
+            % FIXME - Double may lose bits, if we have more than 50-ish bits.
+            datacooked = double(datanative);
+
+            % Process this channel.
+            thisresult = ...
+              procfunc( procmeta, procfid, thisbanklabel, thischanid, ...
+                datacooked, timecooked, datanative, timenative );
+
+            % Store the result.
+            foundcount = foundcount + 1;
+            chanfoundlist(foundcount) = thischanid;
+            chanresultlist{foundcount} = thisresult;
+          end
 
         else
           % FIXME - Text events NYI!
