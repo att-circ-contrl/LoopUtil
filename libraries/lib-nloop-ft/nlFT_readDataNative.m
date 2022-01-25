@@ -7,6 +7,9 @@ function data = ...
 % This probes the specified directory using nlIO_readFolderMetadata(), and
 % reads all appropriate signal data into a Field Trip data matrix.
 %
+% This is intended to be called by ft_read_data() via the "dataformat"
+% argument.
+%
 % The "Native" version of this function keeps data as its native type.
 %
 % NOTE - This returns monolithic data (a 2D matrix), not epoched data.
@@ -26,7 +29,7 @@ function data = ...
 % "header" is the Field Trip header associated with this directory.
 % "firstsample" is the index of the first sample to read.
 % "lastsample" is the index of the last sample to read.
-% "chanidxlist" is a vector containing channel indices to read.
+% "chanidxlist" is a vector containing Field Trip channel indices to read.
 %
 % "data" is the resulting 2D data matrix.
 

@@ -5,6 +5,9 @@ function header = nlFT_readHeader(indir)
 % This probes the specified directory using nlIO_readFolderMetadata(),
 % and translates the folder's metadata into a Field Trip header.
 %
+% This is intended to be called by ft_read_header() via the "headerformat"
+% argument.
+%
 % This calls nlFT_testWantChannel() and nlFT_testWantBank() and only saves
 % channels that are wanted. By default all channels and banks are wanted;
 % use nlFT_selectChannels() to change this.
@@ -121,8 +124,7 @@ else
         newchanqty = 0;
 
         for cidx = 1:length(thischanlist)
-          thischanname = ...
-            sprintf( '%s_%03d', thisbankname, thischanlist(cidx) );
+          thischanname = nlFT_makeFTName( thisbankname, thischanlist(cidx) );
 
           if nlFT_testWantChannel(thischanname)
             newchanqty = newchanqty + 1;

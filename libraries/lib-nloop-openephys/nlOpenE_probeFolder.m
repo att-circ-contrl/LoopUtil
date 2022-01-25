@@ -246,7 +246,7 @@ function bankmetaset = helper_splitContinuousBank( ...
   % We'll get Open Ephys's annotated channel numbers too.
 
   % Tolerate the "name does not end in a number" case.
-  alltokens = regexp( channelnames, '^(.*?)(\d*)$', 'tokens' );
+  alltokens = regexp( channelnames, '^(.*?)_?(\d*)$', 'tokens' );
 
   % There's probably a one-line way to do this, but I'm having trouble
   % finding it.

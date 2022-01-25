@@ -1,0 +1,16 @@
+Field Trip events are constructed using channels that had type "eventbool"
+or "eventwords" (i.e. channels that are stored as sparse rather than
+continuous time series).
+
+Field Trip's event record fields that we set are "sample" (event location in
+samples), "value" (event value in the native channel type), and "type" (set
+to the channel type: "eventbool" or "eventwords"). Other fields are set to
+the empty value ([]).
+
+Field Trip does not appear to support event filtering based on source (the
+event's channel). To do this, use the "nlFT_selectChannels()" function before
+calling "ft_read_events()". There should be exactly one channel selected;
+results from selecting multiple channels are undefined.
+
+
+(This is the end of the file.)

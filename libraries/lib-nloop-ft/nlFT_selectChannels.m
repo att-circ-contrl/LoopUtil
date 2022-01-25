@@ -24,9 +24,14 @@ function nlFT_selectChannels( typeswanted, nameswanted, bankswanted )
 % of implementing channel and bank filtering without modifying Field Trip.
 
 
+% Import global variables.
+
 global nlFT_selectChannels_typeswanted;
 global nlFT_selectChannels_nameswanted;
 global nlFT_selectChannels_bankswanted;
+
+
+% Set new values for the criteria lists.
 
 nlFT_selectChannels_typeswanted = typeswanted;
 nlFT_selectChannels_nameswanted = nameswanted;

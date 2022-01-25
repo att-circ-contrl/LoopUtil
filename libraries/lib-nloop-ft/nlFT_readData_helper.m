@@ -26,7 +26,7 @@ function data = nlFT_readData_helper( indir, wantnative, ...
 % "header" is the Field Trip header associated with this directory.
 % "firstsample" is the index of the first sample to read.
 % "lastsample" is the index of the last sample to read.
-% "chanidxlist" is a vector containing channel indices to read.
+% "chanidxlist" is a vector containing Field Trip channel indices to read.
 %
 % "data" is the resulting 2D data matrix.
 
@@ -76,8 +76,7 @@ else
 
       for cidx = 1:length(thischanlist)
         thischanidx = thischanlist(cidx);
-        thischanname = ...
-          sprintf( '%s_%03d', thisbankname, thischanidx );
+        thischanname = nlFT_makeFTName( thisbankname, thischanidx );
 
         if nlFT_testWantChannel(thischanname)
 
@@ -153,7 +152,7 @@ function resultval = nlFT_readData_helper_double( ...
   % Get Field Trip's channel index for this channel.
   % We aren't necessarily reading channels in-order.
 
-  thischanname = sprintf( '%s_%03d', bankid, chanid );
+  thischanname = nlFT_makeFTName(bankid, chanid);
   channelindex = chanindexlut.(thischanname);
 
 
@@ -210,7 +209,7 @@ function resultval = nlFT_readData_helper_native( ...
   % Get Field Trip's channel index for this channel.
   % We aren't necessarily reading channels in-order.
 
-  thischanname = sprintf( '%s_%03d', bankid, chanid );
+  thischanname = nlFT_makeFTName(bankid, chanid);
   channelindex = chanindexlut.(thischanname);
 
 
