@@ -24,6 +24,11 @@ Other optional fields are vectors or cell arrays with per-channel metadata.
 
 Situation-specific optional fields are described below:
 
+For channel lists specifying data to be read:
+- "samprange" (optional) [firstsamp lastsamp] is a two-element vector
+  specifying the range of samples to read. Sample index 1 is the first sample.
+  If "samprange" isn't given or is empty ([]), all samples are read.
+
 For channel lists derived from metadata:
 - "scalarmeta.banktype" is a copy of the signal bank metadata's "banktype"
   field.

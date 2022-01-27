@@ -24,7 +24,7 @@ function data = nlFT_readData_helper( indir, wantnative, ...
 % "wantnative" is true to store native-format data and false to promote to
 %   double-precision floating-point.
 % "header" is the Field Trip header associated with this directory.
-% "firstsample" is the index of the first sample to read.
+% "firstsample" is the index of the first sample to read (starting at 1).
 % "lastsample" is the index of the last sample to read.
 % "chanidxlist" is a vector containing Field Trip channel indices to read.
 %
@@ -105,7 +105,8 @@ else
       % If we have any channels left, add this bank's channels.
 
       if length(newchanlist) > 0
-        iteratebanklist.(thisbankname) = struct( 'chanlist', newchanlist );
+        iteratebanklist.(thisbankname) = struct( ...
+          'chanlist', newchanlist, 'samprange', [ firstsample lastsample ] );
       end
 
     end
@@ -142,6 +143,10 @@ end
 % FIXME - We're ignoring the result-passing mechanism and are instead
 % modifying the "data" variable directly. This greatly reduces copying.
 
+% NOTE - We don't need to crop to the selected span here; the channel list
+% already specified the range of samples we were interested in, so that's
+% all that was read.
+
 
 % Processing function for reading data as double-precision floating-point.
 
@@ -163,8 +168,9 @@ function resultval = nlFT_readData_helper_double( ...
   bankmeta = metadata.folders.(folderid).banks.(bankid);
 
   if contains(bankmeta.banktype, 'event')
+    % NOTE - We _do_ need to specify the truncated sample range here.
     wavenative = nlUtil_sparseToContinuous( ...
-      timenative, wavenative, [1 bankmeta.sampcount] );
+      timenative, wavenative, [firstsample lastsample] );
 
     % We only need wavenative and wavedata.
     % NOTE - Originally we left "logical" types intact, but that caused
@@ -173,14 +179,7 @@ function resultval = nlFT_readData_helper_double( ...
   end
 
 
-  % Get the requested span.
-
-  data_length = length(wavedata);
-
-  thisfirst = min(firstsample, data_length);
-  thislast = min(lastsample, data_length);
-
-  wavedata = wavedata(thisfirst:thislast);
+  % NOTE - We don't need to isolate the requested span; that's already done.
 
 
   % Store this slice.
@@ -220,21 +219,15 @@ function resultval = nlFT_readData_helper_native( ...
   bankmeta = metadata.folders.(folderid).banks.(bankid);
 
   if contains(bankmeta.banktype, 'event')
+    % NOTE - We _do_ need to specify the truncated sample range here.
     wavenative = nlUtil_sparseToContinuous( ...
-      timenative, wavenative, [1 bankmeta.sampcount] );
+      timenative, wavenative, [firstsample lastsample] );
 
     % We only need wavenative.
   end
 
 
-  % Get the requested span.
-
-  data_length = length(wavenative);
-
-  thisfirst = min(firstsample, data_length);
-  thislast = min(lastsample, data_length);
-
-  wavenative = wavenative(thisfirst:thislast);
+  % NOTE - We don't need to isolate the requested span; that's already done.
 
 
   % Store this slice.

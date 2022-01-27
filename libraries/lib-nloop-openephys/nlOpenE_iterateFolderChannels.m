@@ -54,7 +54,18 @@ for bidx = 1:length(banklist)
     % Look up appropriate metadata.
 
     thisbankmeta = foldermetadata.banks.(thisbanklabel);
-    thisbankchans = folderchanlist.(thisbanklabel).chanlist;
+    thisbankchanlist = folderchanlist.(thisbanklabel);
+    thisbankchans = thisbankchanlist.chanlist;
+    thisbanksamprange = [];
+    if isfield(thisbankchanlist, 'samprange')
+      thisbanksamprange = thisbankchanlist.samprange;
+    end
+    firstsamp = 1;
+    lastsamp = 1;
+    if ~isempty(thisbanksamprange)
+      firstsamp = min(thisbanksamprange);
+      lastsamp = max(thisbanksamprange);
+    end
 
     thissigtype = thisbankmeta.banktype;
     thissignativetype = thisbankmeta.nativedatatype;
@@ -133,8 +144,14 @@ for bidx = 1:length(banklist)
           thisbatchmappedindices = filteredmappedindices{batchidx};
 
           % Read the native data for this batch of channels.
-          batchdatanative = thismmaphandle.Data.mapped( ...
-            thisbatchmappedindices, : );
+          if isempty(thisbanksamprange)
+            batchdatanative = thismmaphandle.Data.mapped( ...
+              thisbatchmappedindices, : );
+          else
+            % FIXME - We need bounds checking on firstsamp and lastsamp.
+            batchdatanative = thismmaphandle.Data.mapped( ...
+              thisbatchmappedindices, firstsamp:lastsamp );
+          end
 
           % Walk through the loaded channels, processing them one by one.
           for cidx = 1:length(thisbatchchans)
@@ -246,6 +263,16 @@ for bidx = 1:length(banklist)
             % Cooked boolean is still boolean.
             datacooked = datanative;
 
+            % If we have a sample range, filter for that range.
+            if ~isempty(thisbanksamprange)
+              eventmask = ...
+                (timenative >= firstsamp) & (timenative <= lastsamp);
+              timenative = timenative(eventmask);
+              timecooked = timecooked(eventmask);
+              datanative = datanative(eventmask);
+              datacooked = datacooked(eventmask);
+            end
+
             % Process this channel.
             thisresult = ...
               procfunc( procmeta, procfid, thisbanklabel, thischanid, ...
@@ -283,6 +310,16 @@ for bidx = 1:length(banklist)
 
             % FIXME - Double may lose bits, if we have more than 50-ish bits.
             datacooked = double(datanative);
+
+            % If we have a sample range, filter for that range.
+            if ~isempty(thisbanksamprange)
+              eventmask = ...
+                (timenative >= firstsamp) & (timenative <= lastsamp);
+              timenative = timenative(eventmask);
+              timecooked = timecooked(eventmask);
+              datanative = datanative(eventmask);
+              datacooked = datacooked(eventmask);
+            end
 
             % Process this channel.
             thisresult = ...

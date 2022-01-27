@@ -52,7 +52,12 @@ for bidx = 1:length(banklist)
 
     % Look up appropriate metadata.
     thisbankmeta = foldermetadata.banks.(thisbanklabel);
-    thisbankchans = folderchanlist.(thisbanklabel).chanlist;
+    thisbankchanlist = folderchanlist.(thisbanklabel);
+    thisbankchans = thisbankchanlist.chanlist;
+    thisbanksamprange = [];
+    if isfield(thisbankchanlist, 'samprange')
+      thisbanksamprange = thisbankchanlist.samprange;
+    end
 
     thissigtype = thisbankmeta.banktype;
     thiszerolevel = thisbankmeta.nativezerolevel;
@@ -74,8 +79,8 @@ for bidx = 1:length(banklist)
       chanfilenames = thishandle.chanfilenames;
 
       timefile = thishandle.timefile;
-      [ is_ok timenative ] = ...
-        nlIO_readBinaryFile( timefile, thisbankmeta.nativetimetype );
+      [ is_ok timenative ] = nlIO_readBinaryFile( ...
+        timefile, thisbankmeta.nativetimetype, thisbanksamprange );
       if ~is_ok
         disp(sprintf( '###  Unable to read from "%s".', timefile ));
       else
@@ -93,8 +98,8 @@ for bidx = 1:length(banklist)
           if ~isempty(thisfname)
 
             thisfname = thisfname{1};
-            [ is_ok datanative ] = ...
-              nlIO_readBinaryFile( thisfname, thisbankmeta.nativedatatype );
+            [ is_ok datanative ] = nlIO_readBinaryFile( ...
+              thisfname, thisbankmeta.nativedatatype, thisbanksamprange );
             if ~is_ok
               disp(sprintf( '###  Unable to read from "%s".', thisfname ));
             else
