@@ -68,9 +68,6 @@ ends up reading all channels without filtering (OpenEphys tests).
 only passed one argument. I'm not sure this is needed, but the bids_tsv
 example is set up this way.
 
-* (I/O) Add "sample range" to nlIO_iterateChannels(). Right now we're reading
-all of a channel's samples even if we only care about a short span.
-
 
 ## Deferred to version 2:
 
@@ -78,6 +75,10 @@ all of a channel's samples even if we only care about a short span.
 
 ## Abbreviated changelog:
 
+* 27 Jan 2022 --
+Finished event support; can interconvert between continuous and event-based
+data as-needed. Added span-based reading support for reading desired sample
+ranges; reading is now much faster for short spans.
 * 21 Jan 2022 --
 Partial support for Open Ephys TTL events. Reading as waveform data for
 individual bits only, for the moment.
