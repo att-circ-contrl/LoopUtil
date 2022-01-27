@@ -68,6 +68,10 @@ ends up reading all channels without filtering (OpenEphys tests).
 only passed one argument. I'm not sure this is needed, but the bids_tsv
 example is set up this way.
 
+* (Intan) Offer digital banks as words, in addition to as boolean signals.
+This involves stitching together per-channel files, or (for monolithic)
+splitting out word data into bits.
+
 
 ## Deferred to version 2:
 
