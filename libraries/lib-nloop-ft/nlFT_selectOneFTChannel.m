@@ -10,7 +10,7 @@ function nlFT_selectOneFTChannel( chanlabel )
 % "chanlabel" is the Field Trip channel label for the desired channel.
 
 
-nlFT_selectChannels( {}, chanlabel, {} );
+nlFT_selectChannels( {}, { chanlabel }, {} );
 
 
 % Done.

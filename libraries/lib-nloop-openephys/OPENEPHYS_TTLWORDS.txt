@@ -1,0 +1,22 @@
+Something very important to keep in mind about Open Ephys's TTL events:
+
+Individual TTL bit lines are always correct and consistent, but the word data
+associated with these events is _not_ always consistent.
+
+
+The problem happens because Open Ephys generates an event every time a bit
+changes, so if multiple bits change during one sample, multiple events with
+the same timestamp are generated. The "FullWords" vector is updated after
+each event, one bit at a time - so events with the same timestamp will have
+"FullWords" vectors with different content. The events are not necessarily
+returned in the same order that they were processed in, so there's no easy
+way to tell which "FullWords" value is the right one in a set of events
+that have the same timestamp.
+
+
+The right thing to do is to either build your own word data and ignore
+the words provided by OpenEphys, or else to use additional knowledge about
+the experiment scenario to disambiguate these cases.
+
+
+(This is the end of the file.)

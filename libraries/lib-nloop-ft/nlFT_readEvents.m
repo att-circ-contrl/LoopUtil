@@ -8,6 +8,9 @@ function eventlist = nlFT_readEventsContinuous( indir, header )
 % This is intended to be called by ft_read_event() via the "eventformat"
 % argument.
 %
+% NOTE - Field Trip expects this to return the header, rather than an event
+% list, if it's called with just one argument ("indir").
+%
 % The "nlFT_selectChannels()" function should have been called to ensure
 % that exactly one event channel is detected. Results from selecting multiple
 % channels are undefined (in practice it'll pick one channel arbitrarily).
@@ -18,6 +21,13 @@ function eventlist = nlFT_readEventsContinuous( indir, header )
 % "eventlist" is a vector of field trip event records with the "sample",
 %   "value", and "type" fields filled in. The "type" field contains the
 %   channel signal type (such as "eventbool" or "eventwords").
+
+
+% FIXME - Special-case Field Trip's "I just want the header" call.
+if nargin < 2
+  eventlist = nlFT_readHeader(indir);
+  return;
+end
 
 
 % Initialize output.
