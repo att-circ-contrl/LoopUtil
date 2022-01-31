@@ -1,10 +1,11 @@
-function eventlist = nlFT_readEvents( indir, header )
+function eventlist = nlFT_readEventsContinuous( indir, header )
 
-% function eventlist = nlFT_readEvents( indir, header )
+% function eventlist = nlFT_readEventsContinuous( indir, header )
 %
 % This probes the specified directory using nlIO_readFolderMetadata(), and
-% reads events from all sparse (event-type) channels found. The channel name
-% for each event is stored in the event's "type" field.
+% reads events from all sparse (event-type) or discrete-valued continuous
+% (boolean/integer/flagvector) channels found. The channel name for each
+% event is stored in the event's "type" field.
 %
 % This is intended to be called by ft_read_event() via the "eventformat"
 % argument.
@@ -33,8 +34,8 @@ end
 
 % Call the "read everything" function.
 
-% We only want sparse data (not continuous).
-wantpromote = false;
+% We want to promote discrete-valued continuous data into sparse event data.
+wantpromote = true;
 allevents = nlFT_readAllEvents(indir, wantpromote);
 
 

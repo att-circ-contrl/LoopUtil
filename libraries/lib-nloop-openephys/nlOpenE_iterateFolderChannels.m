@@ -301,15 +301,35 @@ for bidx = 1:length(banklist)
 
             foundcount = 0;
 
+
+            % Read the list of event words.
+
             timenative = thiseventlist.Timestamps;
-            timecooked = double(timenative) / thisbankmeta.samprate;
 
             % This tolerates a list with zero events.
             datanative = nlOpenE_assembleWords( ...
               thiseventlist.FullWords, thissignativetype );
 
+
+            % Remove samples with duplicate timestamps.
+            % NOTE - Open Ephys gives all bit-change events with the same
+            % timestamp the same FullWords values.
+
+            evcount = length(timenative);
+            timemask = zeros(evcount, 1, 'logical');
+            timemask(1:(evcount-1)) = ...
+              ( timenative(1:(evcount-1)) ~= timenative(2:evcount) );
+            timemask(evcount) = true;
+
+            datanative = datanative(timemask);
+            timenative = timenative(timemask);
+
+
+            % Get cooked series.
             % FIXME - Double may lose bits, if we have more than 50-ish bits.
             datacooked = double(datanative);
+            timecooked = double(timenative) / thisbankmeta.samprate;
+
 
             % If we have a sample range, filter for that range.
             if ~isempty(thisbanksamprange)
@@ -320,6 +340,7 @@ for bidx = 1:length(banklist)
               datanative = datanative(eventmask);
               datacooked = datacooked(eventmask);
             end
+
 
             % Process this channel.
             thisresult = ...
