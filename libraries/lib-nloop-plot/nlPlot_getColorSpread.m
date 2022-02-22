@@ -100,6 +100,24 @@ else
 end
 
 
+% NOTE - We're sometimes getting huerad + greylevel > 1.
+% This happens when we have a magnitude greater than unity. This is valid;
+% our colour space is a cube, not a sphere, and we're using spherical
+% geometry.
+% We have to flag and fix situations where this results in invalid output.
+
+maxcomponent = 0;
+for cidx = 1:length(colorlist)
+  maxcomponent = max( maxcomponent, max(colorlist{aidx}) );
+end
+
+if maxcomponent > 1.0
+  for cidx = 1:length(colorlist)
+    colorlist{cidx} = colorlist{cidx} / maxcomponent;
+  end
+end
+
+
 % Done.
 
 end
