@@ -72,6 +72,9 @@ example is set up this way.
 This involves stitching together per-channel files, or (for monolithic)
 splitting out word data into bits.
 
+* (I/O) Add support for nlFT_readTableEvents(), to parse tabular data as
+an event list. Right now we're only parsing it as waveform data.
+
 
 ## Deferred to version 2:
 
@@ -79,6 +82,9 @@ splitting out word data into bits.
 
 ## Abbreviated changelog:
 
+* 24 Feb 2022 --
+Added a Field Trip reader for in-memory tabular data. Moved
+"interpolateSeries" from `exp-utils-cjt` to here.
 * 27 Jan 2022 --
 Finished event support; can interconvert between continuous and event-based
 data as-needed. Added span-based reading support for reading desired sample
