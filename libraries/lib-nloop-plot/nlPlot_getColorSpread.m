@@ -19,6 +19,13 @@ function colorlist = nlPlot_getColorSpread(origcol, count, anglespan)
 colorlist = { origcol };
 
 
+% FIXME - Bail out immediately if we don't have enough points to generate
+% a spread.
+if count < 2
+  return;
+end
+
+
 %
 % Break this down into something HSV-like.
 
