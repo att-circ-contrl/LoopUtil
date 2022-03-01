@@ -1,10 +1,11 @@
-function newwave = nlProc_filterKludgeBandStop( oldwave, samprate, bandlist )
+function newwave = nlProc_filterBrickBandStop( oldwave, samprate, bandlist )
 
-% function newwave = nlProc_filterKludgeBandStop( oldwave, samprate, bandlist )
+% function newwave = nlProc_filterBrickBandStop( oldwave, samprate, bandlist )
 %
 % This performs band-stop filtering in the frequency domain by squashing
-% frequency components. This causes ringing near large disturbances (a
-% top-hat in the frequency domain gives a sinc function impulse response).
+% frequency components (a "brick wall" filter). This causes ringing near
+% large disturbances (a top-hat in the frequency domain gives a sinc
+% function impulse response).
 %
 % "oldwave" is the signal to filter. This is assumed to be real.
 % "samprate" is the sampling rate of "oldwave".
