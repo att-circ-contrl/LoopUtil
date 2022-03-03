@@ -22,6 +22,7 @@ addpath([ thisdir filesep 'lib-nloop-util' ]);
 addpath([ thisdir filesep 'lib-nloop-proc' ]);
 addpath([ thisdir filesep 'lib-nloop-io' ]);
 addpath([ thisdir filesep 'lib-nloop-plot' ]);
+addpath([ thisdir filesep 'lib-nloop-sanitycheck' ]);
 
 % Vendor-specific libraries.
 addpath([ thisdir filesep 'lib-nloop-openephys' ]);
