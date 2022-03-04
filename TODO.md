@@ -80,6 +80,10 @@ as either sample code or a stand-alone application.
 
 * (channel tool) Doublecheck that the Channel Tool still works.
 
+* (documentation) Add documentation (to README or in a notes folder)
+explaining how to use the channel iteration hooks and how the architecture
+as a whole is supposed to work and why it was set up that way.
+
 
 ## Deferred to version 2:
 
