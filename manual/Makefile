@@ -25,9 +25,13 @@ REFAUTO=\
 	$(REFBASE)-util.tex		\
 	$(REFBASE)-intan.tex		\
 	$(REFBASE)-vend-intan.tex	\
+	$(REFBASE)-openephys.tex	\
 	$(REFBASE)-chantool.tex		\
+	$(REFBASE)-sanity.tex		\
 	$(REFBASE)-examples.tex		\
-	$(REFBASE)-notes.tex
+	$(REFBASE)-notes-core.tex	\
+	$(REFBASE)-notes-vendor.tex	\
+	$(REFBASE)-notes-apps.tex
 
 
 default: force
@@ -60,6 +64,12 @@ $(CHANGUIDE).pdf: $(CHANBITS)
 refauto-bits: refauto-corelibs refauto-vendorlibs refauto-applibs \
 	refauto-examples refauto-notes
 
+DIRSCORE=\
+	../libraries/lib-nloop-io	\
+	../libraries/lib-nloop-plot	\
+	../libraries/lib-nloop-proc	\
+	../libraries/lib-nloop-util
+
 refauto-corelibs:
 	./copy-code.pl --outfile=$(REFBASE)-ft.tex --matlabdoc \
 		"--chapter=\`\`nlFT'' Functions" --label=sect-ft \
@@ -77,6 +87,12 @@ refauto-corelibs:
 		"--chapter=\`\`nlUtil'' Functions" --label=sect-util \
 		../libraries/lib-nloop-util/*.m
 
+DIRSVENDOR=\
+	../libraries/lib-nloop-ft	\
+	../libraries/lib-nloop-intan	\
+	../libraries/lib-vendor-intan	\
+	../libraries/lib-nloop-openephys
+
 refauto-vendorlibs:
 	./copy-code.pl --outfile=$(REFBASE)-intan.tex --matlabdoc \
 		"--chapter=\`\`nlIntan'' Functions" --label=sect-intan \
@@ -84,11 +100,21 @@ refauto-vendorlibs:
 	./copy-code.pl --outfile=$(REFBASE)-vend-intan.tex --matlabdoc \
 		"--chapter=\`\`vIntan'' Functions" --label=sect-vend-intan \
 		../libraries/lib-vendor-intan/*.m
+	./copy-code.pl --outfile=$(REFBASE)-openephys.tex --matlabdoc \
+		"--chapter=\`\`nlOpenE'' Functions" --label=sect-openephys \
+		../libraries/lib-nloop-openephys/*.m
+
+DIRSAPPS=\
+	../libraries/lib-nloop-chantool		\
+	../libraries/lib-nloop-sanitycheck
 
 refauto-applibs:
 	./copy-code.pl --outfile=$(REFBASE)-chantool.tex --matlabdoc \
 		"--chapter=\`\`nlChan'' Functions" --label=sect-chan \
 		../libraries/lib-nloop-chantool/*.m
+	./copy-code.pl --outfile=$(REFBASE)-sanity.tex --matlabdoc \
+		"--chapter=\`\`nlCheck'' Functions" --label=sect-sanity \
+		../libraries/lib-nloop-sanitycheck/*.m
 
 refauto-examples:
 	./copy-code.pl --outfile=$(REFBASE)-examples.tex --verbatim \
@@ -96,9 +122,15 @@ refauto-examples:
 		../code-examples/*.m
 
 refauto-notes:
-	./copy-code.pl --outfile=$(REFBASE)-notes.tex --verbatim \
-		"--chapter=Special Structures and Function Handles" \
-		--label=sect-notes ../libraries/lib-*/*txt
+	./copy-code.pl --outfile=$(REFBASE)-notes-core.tex --verbatim \
+		"--chapter=Core Library Structures and Additional Notes" \
+		--label=sect-notes `find $(DIRSAPPS)|grep txt`
+	./copy-code.pl --outfile=$(REFBASE)-notes-vendor.tex --verbatim \
+		"--chapter=Hardware Library Structures and Additional Notes" \
+		--label=sect-notes `find $(DIRSVENDOR)|grep txt`
+	./copy-code.pl --outfile=$(REFBASE)-notes-apps.tex --verbatim \
+	"--chapter=Application Library Structures and Additional Notes" \
+		--label=sect-notes `find $(DIRSAPPS)|grep txt`
 
 $(REFNAME).pdf: $(REFBITS) refauto-bits
 	pdflatex $(REFNAME).tex
