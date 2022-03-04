@@ -75,6 +75,11 @@ splitting out word data into bits.
 * (I/O) Add support for nlFT_readTableEvents(), to parse tabular data as
 an event list. Right now we're only parsing it as waveform data.
 
+* (sanity tool) Consider porting the Exp Utils sanity-checking tool over
+as either sample code or a stand-alone application.
+
+* (channel tool) Doublecheck that the Channel Tool still works.
+
 
 ## Deferred to version 2:
 
@@ -82,6 +87,9 @@ an event list. Right now we're only parsing it as waveform data.
 
 ## Abbreviated changelog:
 
+* 04 Mar 2022 --
+Added data series "sanity check" functions. Updated documentation.
+Bug fix in palette generation function. Additional FT utility function.
 * 24 Feb 2022 --
 Added a Field Trip reader for in-memory tabular data. Moved
 "interpolateSeries" from `exp-utils-cjt` to here.

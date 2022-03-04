@@ -38,7 +38,9 @@ LFP bursts.
 Libraries are provided in the `libraries` directory. With that directory
 on path, call the `addPathsLoopUtil` function to add sub-folders.
 
-The following subdirectories contain library code:
+Library subdirectories are listed below.
+
+"Core" libraries:
 
 * `lib-nloop-io` --
 Library functions for loading and saving data that aren't vendor-specific.
@@ -49,18 +51,26 @@ Library functions for performing signal processing.
 * `lib-nloop-util` --
 Helper functions that don't fall into the other categories.
 
+"Abstraction" libraries:
+
+* `lib-nloop-ft` --
+Library functions for interoperating with Field Trip.
 * `lib-nloop-intan` --
 High-level library functions for manipulating data saved in Intan's format.
 * `lib-vendor-intan` --
 Low-level library functions for manipulating data saved in Intan's format,
 derived from code supplied by Intan Technologies (used and re-licensed with
 permission).
+* `lib-nloop-openephys` --
+High-level library functions for manipulating data saved in Open Ephys's
+format.
 
-* `lib-nloop-ft` --
-Library functions for interoperating with Field Trip.
+"Application" libraries:
 
 * `lib-nloop-chantool` --
 Library functions specific to the `nloop_chantool` script.
+* `lib-nloop-check` --
+Library functions specific to the in-house "sanity checking" script.
 
 
 ## Sample Code
