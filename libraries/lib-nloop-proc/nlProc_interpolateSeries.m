@@ -46,7 +46,7 @@ olddata = olddata(sortidx);
 if length(oldtimes) < 1
 
   % No data. Initialize to zero.
-  newdata = zeros([ 1 desiredlength ]);
+  newdata = zeros([ 1 length(newtimes) ]);
 
 elseif length(oldtimes) < 2
 
