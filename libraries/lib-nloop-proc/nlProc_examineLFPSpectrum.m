@@ -18,7 +18,7 @@ function [ isgood typelabel fitexponent ...
 % "samprate" is the sampling rate of the waveform data.
 % "freqrange" [ min max ] is the range of frequencies to fit over.
 % "binwidth" is the relative width of frequency bins. A value of 0.1 would
-%   mean a bin width of 2 Hz at a frequency of 20 Hz.
+%   mean a bin width of 2 Hz for a bin with a center frequency of 20 Hz.
 %
 % "isgood" is true if the spectrum looks like LFP background, false otherwise.
 % "typelabel" is a human-readable descriptive label. Typical values are
