@@ -1,0 +1,34 @@
+Open Ephys-specific folder metadata format is as follows. This is intended
+as a reference for maintaining code; nothing outside of this set of functions
+should need to look at Open Ephys-specific metadata.
+
+The sole exception is knowing what to look for in the "devicetype" field.
+
+
+FIXME - This may need to be updated if support for one file per channel
+format and for spike data are added.
+
+
+
+In "folder metadata":
+
+- "devicetype" is 'openephys'.
+- "firsttime" is the smallest timestamp value seen across all banks, in
+  native format. The I/O functions subtract this from all per-bank timestamps.
+
+
+
+In "signal bank metadata":
+
+- "nativemeta" is the "header" field from the output of
+    "load_open_ephys_binary()".
+- "banktype" is:
+  - 'analog' for continuous data.
+  - 'eventwords' for the read-as-words alias of event data.
+  - 'eventbool' for the read-as-bits alias of event data.
+- "firsttime" is the smallest timestamp value seen in this bank, in native
+  format.
+
+
+
+This is the end of the file.

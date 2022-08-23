@@ -96,7 +96,8 @@ for bidx = 1:length(banklist)
           'continuous', thishandle.oebank, 'mmap' );
 
         % Get raw and cooked timestamps.
-        timenative = thisdata.Timestamps;
+        % FIXME - Subtract the global base timestamp value.
+        timenative = thisdata.Timestamps - foldermetadata.firsttime;
         timecooked = double(timenative) / thisbankmeta.samprate;
 
         % Get the handle to memory-mapped data.
@@ -250,7 +251,9 @@ for bidx = 1:length(banklist)
 
             eventmask = (thisnativechanindex == thiseventlist.ChannelIndex);
 
-            timenative = thiseventlist.Timestamps(eventmask);
+            % FIXME - Subtract the global base timestamp value.
+            timenative = thiseventlist.Timestamps(eventmask) ...
+              - foldermetadata.firsttime;
             timecooked = double(timenative) / thisbankmeta.samprate;
 
             eventvals = thiseventlist.Data(eventmask);
@@ -326,6 +329,8 @@ for bidx = 1:length(banklist)
 
 
             % Get cooked series.
+            % FIXME - Subtract the global base timestamp value.
+            timenative = timenative - foldermetadata.firsttime;
             % FIXME - Double may lose bits, if we have more than 50-ish bits.
             datacooked = double(datanative);
             timecooked = double(timenative) / thisbankmeta.samprate;

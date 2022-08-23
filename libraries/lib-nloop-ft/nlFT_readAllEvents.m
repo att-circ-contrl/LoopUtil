@@ -137,7 +137,7 @@ alleventmeta = struct( ...
 %
 % Helper Functions
 
-% NOTE - This is nexted, rather than local, so that it can access the parent
+% NOTE - This is nested, rather than local, so that it can access the parent
 % function's "allXX" variables.
 
 % FIXME - We're ignoring the result-passing mechanism and are instead

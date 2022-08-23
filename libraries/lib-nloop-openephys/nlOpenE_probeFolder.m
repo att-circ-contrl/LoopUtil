@@ -39,6 +39,7 @@ if isfile(filemonolithic)
   % FIXME - Keep track of the maximum sample count from continuous banks,
   % and assume that the sample range for event banks is the same.
   maxsampcount = 0;
+  firsttimelist = [];
 
 
   % Process continuous banks.
@@ -54,6 +55,7 @@ if isfile(filemonolithic)
     thisdatasize = length(thisdata.Timestamps);
     thisdatatimetype = class(thisdata.Timestamps);
     thisdatanativetype = thisdata.Data.Format{1};
+    thisfirsttime = min(thisdata.Timestamps);
 
     % FIXME - We can't explicitly close the memmapfile object.
     % FIXME - Matlab's documentation says the memmapfile object can be
@@ -62,8 +64,9 @@ if isfile(filemonolithic)
     % exiting function scope. This is an ugly kludge!
 
 
-    % Update the maximum sample count.
+    % Update the maximum sample count and first timestamp list.
     maxsampcount = max(maxsampcount, thisdatasize);
+    firsttimelist = [ firsttimelist thisfirsttime ];
 
 
     % If we have data, split the real bank into multiple virtual banks.
@@ -71,7 +74,8 @@ if isfile(filemonolithic)
       % Store common template information.
       thisbankcommon = struct( 'samprate', thisdataheader.sample_rate, ...
         'sampcount', thisdatasize, 'nativetimetype', thisdatatimetype, ...
-        'nativedatatype', thisdatanativetype, 'nativemeta', thisdataheader );
+        'nativedatatype', thisdatanativetype, 'firsttime', thisfirsttime, ...
+        'nativemeta', thisdataheader );
 
       % Split this bank into sub-banks by black magic.
       thisbankmetaset = helper_splitContinuousBank( ...
@@ -129,10 +133,11 @@ if isfile(filemonolithic)
         ttlcount = ttlcount + 1;
 
         thisdatatimetype = class(thisdata.Timestamps);
+        thisfirsttime = min(thisdata.Timestamps);
 
         % Metadata template.
         commonmeta = struct( 'samprate', thisdataheader.sample_rate, ...
-          'nativetimetype', thisdatatimetype, ...
+          'nativetimetype', thisdatatimetype, 'firsttime', thisfirsttime, ...
           'nativezerolevel', 0, 'nativescale', 1, 'fpunits', '', ...
           'nativemeta', thisdataheader );
 
@@ -144,6 +149,8 @@ if isfile(filemonolithic)
           'format', 'monolithic', 'type', 'events', ...
           'oefile', filemonolithic, 'oebank', bidx );
 
+        % Update the first timestamp list.
+        firsttimelist = [ firsttimelist thisfirsttime ];
 
         % Save two banks - one for individual channels, and one for words.
 
@@ -200,8 +207,13 @@ if isfile(filemonolithic)
   % Assemble the folder metadata structure.
   % FIXME - No native metadata to store, since we can't read settings.xml.
 
+  thisfirsttime = 0;
+  if ~isempty(firsttimelist)
+    thisfirsttime = min(firsttimelist);
+  end
+
   foldermeta = struct( 'path', indir, 'devicetype', 'openephys', ...
-    'banks', allbanks );
+    'banks', allbanks, 'firsttime', thisfirsttime );
 
 elseif isfile(fileperchan)
 
