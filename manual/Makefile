@@ -124,7 +124,7 @@ refauto-examples:
 refauto-notes:
 	./copy-code.pl --outfile=$(REFBASE)-notes-core.tex --verbatim \
 		"--chapter=Core Library Structures and Additional Notes" \
-		--label=sect-notes `find $(DIRSAPPS)|grep txt`
+		--label=sect-notes `find $(DIRSCORE)|grep txt`
 	./copy-code.pl --outfile=$(REFBASE)-notes-vendor.tex --verbatim \
 		"--chapter=Hardware Library Structures and Additional Notes" \
 		--label=sect-notes `find $(DIRSVENDOR)|grep txt`
