@@ -24,8 +24,12 @@ dirlist = dir([ startdir filesep '**' filesep targetname ]);
 
 for didx = 1:length(dirlist)
   thisentry = dirlist(didx);
-  fnames_found = [ fnames_found { thisentry.name } ];
-  paths_found = [ paths_found { thisentry.folder } ];
+  thisfullname = [ thisentry.folder filesep thisentry.name ];
+
+  if ~isdir(thisfullname)
+    fnames_found = [ fnames_found { thisentry.name } ];
+    paths_found = [ paths_found { thisentry.folder } ];
+  end
 end
 
 % NOTE - If we had multiple matching files in a folder, we'll have duplicate
