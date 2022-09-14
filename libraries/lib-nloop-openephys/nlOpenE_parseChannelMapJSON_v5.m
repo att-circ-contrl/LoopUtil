@@ -11,7 +11,7 @@ function maplist = nlOpenE_parseChannelMapJSONv5( jsonstruct )
 % "jsonstruct" is a structure containing JSON data, from "jsondecode()".
 %
 % "maplist" is a structure array with one entry per mapping table found in
-%   the original structure. The fields are:
+%   the original structure. The fields (per "OPENEPHYS_CHANMAP.txt") are:
 %   "oldchan" is a vector indexed by new channel number containing the old
 %     channel number that maps to each new location, or NaN if none does.
 %   "oldref" is a vector indexed by new channel number containing the old

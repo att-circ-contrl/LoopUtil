@@ -13,7 +13,7 @@ function maplist = nlOpenE_parseChannelMapXML_v5( xmlstruct )
 %   "readstruct()".
 %
 % "maplist" is a structure array with one entry per mapping table found in
-%   the configuration file. The fields are:
+%   the configuration file. The fields (per "OPENEPHYS_CHANMAP.txt") are:
 %   "oldchan" is a vector indexed by new channel number containing the old
 %     channel number that maps to each new location, or NaN if none does.
 %   "oldref" is a vector indexed by new channel number containing the old

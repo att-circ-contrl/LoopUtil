@@ -6,7 +6,8 @@ function thismap = ...
 %
 % This parses an array of source channel indices indices, an array of
 % reference set indices, a reference lookup list, and an array of "enabled"
-% flags, and assembles a structure describing this channel mapping.
+% flags, and assembles a structure describing this channel mapping (per
+% "OPENEPHYS_CHANMAP.txt").
 %
 % NOTE - Reference banks start at 1, not 0. Convert before calling.
 %

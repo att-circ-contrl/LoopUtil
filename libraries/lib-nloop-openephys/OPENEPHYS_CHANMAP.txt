@@ -1,0 +1,24 @@
+This file documents Matlab structures used to represent configurations of
+the ChannelMappingNode plugin in Open Ephys.
+
+In Open Ephys v0.5.x, this also includes referencing information. In Open
+Ephys v0.6.x, re-referencing is moved to its own plugin.
+
+
+
+An Open Ephys v5 channel map is represented as a structure with the following
+fields:
+
+"oldchan" is a vector indexed by new channel number containing the old
+  channel number that maps to each new location, or NaN if none does.
+
+"oldref" is a vector indexed by new channel number containing the old
+  channel number to be used as a reference for each new location, or NaN
+  if unspecified.
+
+"isenabled" is a vector of boolean values indexed by new channel number
+  indicating which new channels are enabled.
+
+
+
+(This is the end of the file.)
