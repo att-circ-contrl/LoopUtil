@@ -32,6 +32,10 @@ The folder metadata structure has the following fields:
   needed to read that data).
 "banks" is a structure with one field per signal bank, indexed by signal bank
   label, containing signal bank metadata structures.
+"nativeorder" (optional) is a structure array containing bank and channel
+  numbers in the order in which the underlying device sorted them. These
+  are stored in "bank" and "channel" fields, respectively. This is not
+  guaranteed to contain all types of channel.
 "nativemeta" (optional) is an object containing device-specific metadata in
   its original form. This is typically, but not necessarily, a structure.
 

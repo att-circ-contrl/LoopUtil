@@ -35,6 +35,9 @@ if isfile(filemonolithic)
 
   allbanks = struct();
 
+  % We're storing the native order of continuous channels only.
+  nativechans = struct([]);
+
 
   % FIXME - Keep track of the maximum sample count from continuous banks,
   % and assume that the sample range for event banks is the same.
@@ -78,9 +81,12 @@ if isfile(filemonolithic)
         'nativemeta', thisdataheader );
 
       % Split this bank into sub-banks by black magic.
-      thisbankmetaset = helper_splitContinuousBank( ...
+      % Record the native order in case the caller needs it.
+      [ thisbankmetaset thisorderbanks thisorderchans ] = ...
+        helper_splitContinuousBank( ...
         thisbankcommon, 'monolithic', filemonolithic, bidx, thisdataheader );
 
+      % Update metadata.
       thisbanknamelist = fieldnames(thisbankmetaset);
       for nidx = 1:length(thisbanknamelist)
         thisname = thisbanknamelist{nidx};
@@ -88,10 +94,23 @@ if isfile(filemonolithic)
 
         % Rename duplicates. This will look ugly but should rarely happen.
         if isfield(allbanks, thisname)
+          oldname = thisname;
           thisname = sprintf('b%d%s', bidx, thisname);
+
+          % Rename this bank in the native channel order list too.
+          thisorderbanks(strcmp(thisorderbanks, oldname)) = { thisname };
         end
 
         allbanks.(thisname) = thisbankmeta;
+      end
+
+      % Save the native channel order.
+      thisnativechans = ...
+        struct( 'bank', thisorderbanks, 'channel', thisorderchans );
+      if isempty(nativechans)
+        nativechans = thisnativechans;
+      else
+        nativechans = vertcat(nativechans, thisnativechans);
       end
     end
   end
@@ -215,6 +234,10 @@ if isfile(filemonolithic)
   foldermeta = struct( 'path', indir, 'devicetype', 'openephys', ...
     'banks', allbanks, 'firsttime', thisfirsttime );
 
+  if ~isempty(nativechans)
+    foldermeta.nativeorder = nativechans;
+  end
+
 elseif isfile(fileperchan)
 
   % FIXME - Per-channel Open Ephys format NYI!
@@ -237,8 +260,9 @@ end
 % We need to add "channels", "banktype", "nativezerolevel", "nativescale",
 % "fpunits", and "handle".
 
-function bankmetaset = helper_splitContinuousBank( ...
-  metacommon, oeformat, oefile, oebankindex, dataheader )
+function [ bankmetaset nativeorderbanks nativeorderchans ] = ...
+  helper_splitContinuousBank( ...
+    metacommon, oeformat, oefile, oebankindex, dataheader )
 
   % Initialize output.
   bankmetaset = struct();
@@ -273,6 +297,18 @@ function bankmetaset = helper_splitContinuousBank( ...
       thisnum = 0;
     end
     channelnamenumbers(cidx) = thisnum;
+  end
+
+  % Store the native order of bank and channel tuples as column cell arrays.
+
+  nativeorderbanks = channelnamebanks;
+  if ~iscolumn(nativeorderbanks)
+    nativeorderbanks = transpose(nativeorderbanks);
+  end
+
+  nativeorderchans = num2cell(channelnamenumbers);
+  if ~iscolumn(nativeorderchans)
+    nativeorderchans = transpose(nativeorderchans);
   end
 
 
