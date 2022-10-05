@@ -1,0 +1,39 @@
+An iteration processing function handle is called to perform signal
+processing when iterating across trials and channels within a Field Trip
+data structure. The intention is to simplify processing of Field Trip data
+using non-FT functions.
+
+
+An iteration processing function has the form:
+
+[ waveresult otherresult ] = ...
+  iterfunc( wavedata, timedata, samprate, trialidx, chanidx, chanlabel )
+
+"wavedata" is a vector containing the waveform to be processed (from the
+  Field Trip data's "trial" field).
+"timedata" is a vector containing sample times (from the Field Trip data's
+  "time" field).
+"samprate" is the sampling rate (from the Field Trip data's "fsample" field).
+"trialidx" is the trial number.
+"chanidx" is the channel number.
+"chanlabel" is the corresponding channel labe (from the Field Trip data's
+  "label" field).
+
+"waveresult" is a vector containing modified waveform data. This is
+  typically used to build a modified version of the "trial" cell array.
+"otherresult" is an arbitrary data type containing any other information
+  that the user wishes to associate with this input data/trial/channel.
+
+
+A typical iteration processing functiton definition would be as follows.
+This example wraps a helper function that is passed additional arguments
+set at the time the processing function is defined.
+
+tuning_parameters = (stuff);
+other_parameters = (stuff);
+iterfunc = @( wavedata, timedata, samprate, trialidx, chanidx, chanlabel ) ...
+  helper_do_iteration_processing( wavedata, timedata, samprate, ...
+    trialidx, chanidx, chanlabel, tuning_parameters, other_parameters );
+
+
+This is the end of the file.
