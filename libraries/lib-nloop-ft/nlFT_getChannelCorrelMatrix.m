@@ -1,8 +1,8 @@
 function [ rmatrix pmatrix ] = ...
-  nlFT_getChannelCorrelMatrix( data_before, data_after )
+  nlFT_getChannelCorrelMatrix( data_before, data_after, wantprogress )
 
 % function [ rmatrix pmatrix ] = ...
-%   nlFT_getChannelCorrelMatrix( data_before, data_after )
+%   nlFT_getChannelCorrelMatrix( data_before, data_after, wantprogress )
 %
 % This checks for correlation between channels in the "before" and "after"
 % datasets, returning the correlation coefficients and null hypothesis
@@ -19,6 +19,8 @@ function [ rmatrix pmatrix ] = ...
 %
 % "data_before" is a Field Trip dataset prior to channel mapping.
 % "data_after" is a Field Trip dataset after channel mapping.
+% "wantprogress" is true to display a progress banner, false otherwise.
+%   If omitted, it defaults to true.
 %
 % "rmatrix" is a matrix indexed by (chanbefore,chanafter) containing
 %   correlation coefficient values.
@@ -33,13 +35,22 @@ trialcount = length(data_before.trial);
 rmatrix = [];
 pmatrix = [];
 
+if ~exist('wantprogress', 'var')
+  wantprogress = true;
+end
+
+
 % Iterate channels as the outer loop and trials as the inner loop.
 % This avoids having to concatenate the entire dataset at one time.
 
+tic;
+
 for srcidx = 1:beforecount
-  % FIXME - Progress indicator.
-  disp(sprintf( '.. Finding correlations for channel %d of %d...', ...
-    srcidx, beforecount ));
+  % Progress indicator.
+  if wantprogress
+    disp(sprintf( '.. Finding correlations for channel %d of %d...', ...
+      srcidx, beforecount ));
+  end
 
   for dstidx = 1:aftercount
 
@@ -61,8 +72,11 @@ for srcidx = 1:beforecount
   end
 end
 
-% FIXME - Progress indicator.
-disp('.. Finished computing correlations.');
+% Progress indicator.
+if wantprogress
+  disp(sprintf( '.. Finished computing correlations (in %d seconds).', ...
+    round(toc) ));
+end
 
 
 % Done.

@@ -1,13 +1,17 @@
-function [ isgood rvalues badgroups ] = nlProc_findCorrelatedChannels( ...
-  wavedata, thresh_abs, thresh_rel )
+function [ changroups rvalues groupdefs ] = ...
+  nlProc_findCorrelatedChannels( wavedata, thresh_abs, thresh_rel )
 
-% function [ isgood rvalues badgroups ] = nlProc_findCorrelatedChannels( ...
-%   wavedata, thresh_abs, thresh_rel )
+% function [ changroups rvalues groupdefs ] = ...
+%   nlProc_findCorrelatedChannels( wavedata, thresh_abs, thresh_rel )
 %
 % This attempts to find sets of strongly-correlated channels in waveform data.
-% Sets like that are usually floating channels coupling identical noise.
+% These may be floating channels coupling identical noise (for high-frequency
+% data) or may be measuring from the same environment (for LFP data).
 %
-% This is judged using Pearson's Correlation Coefficient.
+% NOTE - Channel correlation time goes up as the square of the number of
+% channels!
+%
+% Correlation is judged using Pearson's Correlation Coefficient.
 %
 % "wavedata" is an Nchans*Nsamples matrix containing waveform data.
 % "thresh_abs" is an absolute threshold. Channel pairs with correlation
@@ -20,11 +24,11 @@ function [ isgood rvalues badgroups ] = nlProc_findCorrelatedChannels( ...
 %   absolute value of all correlation coefficients that are below +thresh_abs
 %   and above -thresh_abs.
 %
-% "isgood" is a vector of boolean values indicating whether channels pass both
-%   tests (i.e. are not copies of any other channel).
+% "changroups" is a vector indicating which group each channel is a member of,
+%   or NaN if a channel is not a member of a group (not strongly correlated).
 % "rvalues" is an Nchans*Nchans matrix containing correlation coefficient
 %   values for all channel pairs.
-% "badgroups" is a cell array containing vectors representing groups of
+% "groupdefs" is a cell array containing vectors representing groups of
 %   mutually correlated channels. Each vector contains channel indices for
 %   the members of that group.
 
@@ -55,40 +59,15 @@ coefflist = coefflist(coefflist < thresh_abs);
 thresh_rel = thresh_rel * median(coefflist);
 
 
-% Figure out which channels are "good".
-
-isgood = logical([]);
-for cidx = 1:chancount
-
-  % Get the coefficients for this channel.
-  thischancoeffs = rvalues(:,cidx);
-
-  % The channel will always correlate with itself.
-  thischancoeffs(cidx) = NaN;
-  thischancoeffs = thischancoeffs(~isnan(thischancoeffs));
-
-  % Check for coefficients that are too positive.
-  % Negative is okay; that indicates differential channel pairs.
-  thisgood = true;
-  if any(thischancoeffs > thresh_abs)
-    thisgood = false;
-  end
-  if (~isnan(thresh_rel)) && any(thischancoeffs > thresh_rel)
-    thisgood = false;
-  end
-
-  isgood(cidx) = thisgood;
-end
-
 
 % Figure out which channels are mutually correlated.
 
 % First pass - make initial groups. This may result in partly-overlapping
 % groups (if two channels correlate with a third but not with each other).
 
-badgroups = {};
-badgroupcount = 0;
-scratchlist = true(size(isgood));
+groupdefs = {};
+groupcount = 0;
+scratchlist = true(1,chancount);
 
 for cidx = 1:chancount
   % If we haven't grouped this channel yet, test it.
@@ -97,7 +76,7 @@ for cidx = 1:chancount
     % Figure out which channels this channel is correlated with.
 
     thischancoeffs = rvalues(:,cidx);
-    % Keep self-correlation, this time.
+    % Keep self-correlation.
 
     chanmask = (thischancoeffs > thresh_abs);
     if ~isnan(thresh_rel)
@@ -108,8 +87,8 @@ for cidx = 1:chancount
     % If it's anything other than "just itself", make a new group.
 
     if sum(chanmask) > 1
-      badgroupcount = badgroupcount + 1;
-      badgroups{badgroupcount} = find(chanmask);
+      groupcount = groupcount + 1;
+      groupdefs{groupcount} = find(chanmask);
       scratchlist(chanmask) = false;
     end
 
@@ -119,10 +98,10 @@ end
 % Second pass - merge groups that have channels in common.
 % Each channel should belong to at most one group.
 
-oldgroups = badgroups;
-oldgroupcount = badgroupcount;
-badgroups = {};
-badgroupcount = 0;
+oldgroups = groupdefs;
+oldgroupcount = groupcount;
+groupdefs = {};
+groupcount = 0;
 
 for cidx = 1:chancount
 
@@ -147,8 +126,8 @@ for cidx = 1:chancount
     % See if we're also part of an already-saved group.
 
     newgroupid = 0;
-    for gidx = 1:badgroupcount
-      if ismember(cidx, badgroups{gidx})
+    for gidx = 1:groupcount
+      if ismember(cidx, groupdefs{gidx})
         newgroupid = gidx;
       end
     end
@@ -159,14 +138,25 @@ for cidx = 1:chancount
 
     if newgroupid > 0
       % NOTE - Groups were generated as column vectors.
-      badgroups{newgroupid} = unique( [ badgroups{newgroupid} ; allfound ] );
+      groupdefs{newgroupid} = ...
+        unique( [ groupdefs{newgroupid} ; allfound ] );
     else
-      badgroupcount = badgroupcount + 1;
-      badgroups{badgroupcount} = allfound;
+      groupcount = groupcount + 1;
+      groupdefs{groupcount} = allfound;
     end
 
   end
 
+end
+
+
+% Lastly, walk through the group definitions building the channel group map.
+
+changroups = NaN(1,chancount);
+
+for gidx = 1:length(groupdefs)
+  thisgroupdef = groupdefs{gidx};
+  changroups(thisgroupdef) = gidx;
 end
 
 
