@@ -281,23 +281,50 @@ function [ bankmetaset nativeorderbanks nativeorderchans ] = ...
   % Get prefixes from names. These should also be consistent within banks.
   % We'll get Open Ephys's annotated channel numbers too.
 
-  % Tolerate the "name does not end in a number" case.
-  alltokens = regexp( channelnames, '^(.*?)_?(\d*)$', 'tokens' );
 
-  % There's probably a one-line way to do this, but I'm having trouble
-  % finding it.
+  % NOTE - There are multiple types of pattern, here.
+  % "AAAnnn" is the default; e.g. "CH12", "AUX6".
+  % "AAAnnnBBB" also shows up with TORTE; e.g. "CH112MAG".
+
+
+  % This is our fallback default, so tolerate "missing number" and "missing
+  % prefix". This will match anything, including the empty string.
+  tokensdefault = regexp( channelnames, '^(.*?)_?(\d*)$', 'tokens' );
+
+  % TORTE's naming convention for derived signals.
+  tokenssuffix = regexp( channelnames, '^(\D+)_?(\d+)_?(\D+)$', 'tokens' );
+
   % Indexing is alltokens{channelnum}{matchnum}{tokennum}.
   % Since any possible string will match exactly once, "matchnum" is 1.
   channelnamebanks = {};
   channelnamenumbers = [];
-  for cidx = 1:length(alltokens)
-    channelnamebanks{cidx} = alltokens{cidx}{1}{1};
-    thisnum = str2num(alltokens{cidx}{1}{2});
+  for cidx = 1:length(channelnames)
+    % Anything that didn't match gives an empty cell array.
+    thisdefault = tokensdefault{cidx};
+    thissuffix = tokenssuffix{cidx};
+
+    % Figure out which parsing attempt to use.
+    thisbank = '';
+    thisnumstr = '';
+    if ~isempty(thissuffix)
+      % Name had the form "AAA_nnn_BBB".
+      thisbank = [ thissuffix{1}{1} thissuffix{1}{3} ];
+      thisnumstr = thissuffix{1}{2};
+    else
+      % Default always matches, even if the result doesn't make sense.
+      thisbank = thisdefault{1}{1};
+      thisnumstr = thisdefault{1}{2};
+    end
+
+    % Store this channel's bank and index.
+    channelnamebanks{cidx} = thisbank;
+    thisnum = str2num(thisnumstr);
     if isempty(thisnum)
       thisnum = 0;
     end
     channelnamenumbers(cidx) = thisnum;
   end
+
 
   % Store the native order of bank and channel tuples as column cell arrays.
 
