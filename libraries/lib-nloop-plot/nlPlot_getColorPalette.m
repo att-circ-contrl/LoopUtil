@@ -12,6 +12,7 @@ function cols = nlPlot_getColorPalette()
 
 cols = struct();
 
+% Standard plot colours.
 cols.blu = [ 0.0 0.4 0.7 ];
 cols.brn = [ 0.8 0.4 0.1 ];  % Tweaked; original was [ 0.9 0.3 0.1 ].
 cols.yel = [ 0.9 0.7 0.1 ];
@@ -19,6 +20,10 @@ cols.mag = [ 0.5 0.2 0.5 ];
 cols.grn = [ 0.5 0.7 0.2 ];
 cols.cyn = [ 0.3 0.7 0.9 ];
 cols.red = [ 0.7 0.3 0.4 ];  % Lightened a bit; was [ 0.6 0.1 0.2 ].
+
+% Other colours of interest.
+cols.blk = [ 0.0 0.0 0.0 ];
+cols.wht = [ 1.0 1.0 1.0 ];
 
 
 %
