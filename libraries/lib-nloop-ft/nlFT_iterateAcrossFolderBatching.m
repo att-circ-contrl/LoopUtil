@@ -68,8 +68,9 @@ for trialbidx = 1:trialbatchsize:trialcount
   tidxend = trialbidx + trialbatchsize - 1;
   tidxend = min(tidxend, trialcount);
 
-  thistriallist = trialdefs_full(trialbidx:tidxend,:);
-  config_load.trl = thistriallist;
+  thistrialnumlist = trialbidx:tidxend;
+  thistrialdefs = trialdefs_full(thistrialnumlist,:);
+  config_load.trl = thistrialdefs;
 
 
   % Progress report.
@@ -115,7 +116,7 @@ for trialbidx = 1:trialbatchsize:trialcount
 
     thisdata = ft_preprocessing( config_load );
     [ newdata thisaux ] =  ...
-      iterfunc_batched( thisdata, thischanlist, thistriallist );
+      iterfunc_batched( thisdata, thischanlist, thistrialnumlist );
 
     auxdata(trialbidx:tidxend,chanbidx:cidxend) = thisaux;
 
