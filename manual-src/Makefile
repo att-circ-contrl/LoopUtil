@@ -39,7 +39,7 @@ default: force
 changuide: $(CHANGUIDE).pdf
 libref: $(REFNAME).pdf
 
-force: clean changuide libref
+force: clean changuide libref install
 	make autoclean
 
 clean: tclean autoclean
@@ -53,6 +53,9 @@ tclean:
 	rm -f $(CHANGUIDE)*.log $(CHANGUIDE)*.aux $(CHANGUIDE)*.toc
 	rm -f $(REFNAME)*.log $(REFNAME)*.aux $(REFNAME)*.toc
 	rm -f texput.*
+
+install:
+	mv *pdf ../manual
 
 
 $(CHANGUIDE).pdf: $(CHANBITS)
