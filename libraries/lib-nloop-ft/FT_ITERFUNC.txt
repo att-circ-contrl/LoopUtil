@@ -16,7 +16,7 @@ An iteration processing function has the form:
 "samprate" is the sampling rate (from the Field Trip data's "fsample" field).
 "trialidx" is the trial number.
 "chanidx" is the channel number.
-"chanlabel" is the corresponding channel labe (from the Field Trip data's
+"chanlabel" is the corresponding channel label (from the Field Trip data's
   "label" field).
 
 "waveresult" is a vector containing modified waveform data. This is

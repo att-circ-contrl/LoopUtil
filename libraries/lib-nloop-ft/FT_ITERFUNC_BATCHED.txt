@@ -1,0 +1,62 @@
+A batched iteration processing function handle is called to perform signal
+processing when iterating across a very large FT dataset in batches of
+channels or batches of trials (to avoid loading the entire dataset into
+memory).
+
+The intention is to abstract away the channel and trial batching logic.
+
+A batched iteration processing function has the form:
+
+[ ftdata_new auxdata ] = ...
+  iterfunc_batched( ftdata_old, chanindices_orig, trialindices_orig )
+
+"ftdata_old" is a "ft_datatype_raw" structure containing this batch's data.
+"chanindices_orig" is a vector with one entry per channel in ftdata_old
+  containing each channel's corresponding index in the larger dataset
+  (prior to batching).
+"trialindices_orig" is a vector with one entry per trial in ftdata_old
+  containing each trial's corresponding index in the larger dataset
+  (prior to batching).
+
+"ftdata_new" is a modified version of ftdata_old (after any iterator
+  data processing is performed), or struct([]) to omit consturction.
+"auxdata" is a cell array indexed by {trial, channel} containing arbitrary
+  user-defined data that the user wishes to associate with each trial/channel.
+
+
+A typical batched iteration processing function definition would be as
+follows. This example wraps a helper function that is passed additional
+arguments set at the time the processing function is defined, and also
+wraps nlFT_iterateAcrossData() for per-trial/per-channel processing.
+
+
+tuning_parameters = (stuff);
+other_parameters = (stuff);
+processing_config = (stuff);
+
+iterfunc_batched = @( ftdata_old, chanindices_orig, trialindices_orig ) = ...
+  helper_do_batch_iteration( ftdata_old, ...
+    chanindices_orig, trialindices_orig ...
+    processing_config, tuning_parameters, other_parameters );
+
+
+function [ ftdata_new auxdata ] = helper_do_batch_iteration( ...
+  ftdata_old, chanindices_orig, trialindices_orig, ...
+  proc_config, tuning_params, other_params )
+
+  ftdata_new = ft_preprocessing(proc_config, ftdata_old);
+
+  iterfunc_single = @( wavedata, timedata, samprate, ...
+    trialidx, chanidx, chanlabel ) ...
+    helper_do_channel_iteration( wavedata, timedata, samprate, ...
+      trialidx, chanidx, chanlabel, chanindices_orig, trialindices_orig, ...
+      tuning_params, other_params );
+
+  [ newtrials auxdata ] = ...
+    nlFT_iterateAcrossData( ftdata_new, iterfunc_single );
+  ftdata_new.trial = newtrials;
+
+end
+
+
+This is the end of the file.
