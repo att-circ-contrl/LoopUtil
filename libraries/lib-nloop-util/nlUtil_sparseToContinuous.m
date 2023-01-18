@@ -60,6 +60,9 @@ if sampcount > 0
   eventcount = length(eventtimes);
   eventtimes(eventcount + 1) = lastsamp + 1;
 
+  % Shift times to match the output window.
+  eventtimes = eventtimes + 1 - firstsamp;
+
   % Walk through the event list, rendering spans.
   for eidx = 1:eventcount
     thisstart = eventtimes(eidx);
