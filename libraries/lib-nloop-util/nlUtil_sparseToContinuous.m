@@ -5,10 +5,13 @@ function wavedata = ...
 %   nlUtil_sparseToContinuous( eventtimes, eventvalues, samprange )
 %
 % This converts a sequence of nonuniformly-sampled events into a continuous
-% waveform. Samples are assumed to reflect the first instances of changed
-% waveform values; this signal is held constant at the last seen sample value.
+% waveform. Events are assumed to reflect the first instances of changed
+% waveform values; this signal is held constant after each event until the
+% next event is seen.
 %
-% Events are sorted prior to processing.
+% This sorts the event list by timestamp prior to processing.
+%
+% Event timestamps are assumed to be sample indices.
 %
 % "eventtimes" are the timestamps (sample indices) associated with each event.
 % "eventvalues" are the data values associated with each event.
