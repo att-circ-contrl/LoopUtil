@@ -1,6 +1,6 @@
 function is_ok = nlIO_writeBinaryFile(fname, sampdata, dtype)
 
-% function is_ok sampdata = nlIO_writeBinaryFile(fname, sampdata, dtype)
+% function is_ok = nlIO_writeBinaryFile(fname, sampdata, dtype)
 %
 % This attempts to write the specified sample data as a packed array of the
 % specified data type. Per fwrite(), data is rounded and saturated if
