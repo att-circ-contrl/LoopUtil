@@ -24,25 +24,27 @@ falltimes = [];
 bothtimes = [];
 
 if ~isempty(ftevents)
+  if ~isempty(fieldnames(ftevents))
 
-  event_labels = { ftevents(:).type };
-  event_states = logical([ ftevents(:).value ]);
-  event_times = [ ftevents(:).sample ];
+    event_labels = { ftevents(:).type };
+    event_states = logical([ ftevents(:).value ]);
+    event_times = [ ftevents(:).sample ];
 
-  if ~isempty(desiredlabel)
-    evmask = strcmp(event_labels, desiredlabel);
-    event_states = event_states(evmask);
-    event_times = event_times(evmask);
+    if ~isempty(desiredlabel)
+      evmask = strcmp(event_labels, desiredlabel);
+      event_states = event_states(evmask);
+      event_times = event_times(evmask);
+    end
+
+    if ~isnan(samprate)
+      event_times = event_times / samprate;
+    end
+
+    risetimes = sort( event_times(event_states) );
+    falltimes = sort( event_times(~event_states) );
+    bothtimes = sort( event_times );
+
   end
-
-  if ~isnan(samprate)
-    event_times = event_times / samprate;
-  end
-
-  risetimes = sort( event_times(event_states) );
-  falltimes = sort( event_times(~event_states) );
-  bothtimes = sort( event_times );
-
 end
 
 

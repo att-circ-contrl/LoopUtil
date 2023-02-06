@@ -21,14 +21,16 @@ eventindices = [];
 eventvalues = [];
 
 if ~isempty(ftevents)
-  eventindices = [ ftevents(:).sample ];
-  eventvalues = [ ftevents(:).value ];
-  eventlabels = { ftevents(:).type };
+  if ~isempty(fieldnames(ftevents))
+    eventindices = [ ftevents(:).sample ];
+    eventvalues = [ ftevents(:).value ];
+    eventlabels = { ftevents(:).type };
 
-  if ~isempty(desiredlabel)
-    evmask = strcmp(eventlabels, desiredlabel);
-    eventindices = eventindices(evmask);
-    eventvalues = eventvalues(evmask);
+    if ~isempty(desiredlabel)
+      evmask = strcmp(eventlabels, desiredlabel);
+      eventindices = eventindices(evmask);
+      eventvalues = eventvalues(evmask);
+    end
   end
 end
 
