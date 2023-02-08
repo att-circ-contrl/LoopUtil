@@ -16,13 +16,22 @@ timeidx = 1:length(oldseries);
 timesparse = timeidx(~isnan(oldseries));
 oldsparse = oldseries(~isnan(oldseries));
 
-% FIXME - Used spline interpolation originally, but that has large overshoot.
-newseries = interp1(timesparse, oldsparse, timeidx, 'linear', NaN);
+% Handle the "everything's trash" case.
+newseries = zeros(size(oldseries));
 
-timesparse = timeidx(~isnan(newseries));
-newsparse = newseries(~isnan(newseries));
+if length(timesparse) >= 2
+  % First pass: Fill in gaps.
 
-newseries = interp1(timesparse, newsparse, timeidx, 'nearest', 'extrap');
+  % FIXME - Used spline interpolation originally, but that has large overshoot.
+  newseries = interp1(timesparse, oldsparse, timeidx, 'linear', NaN);
+
+  % Second pass: Extend endpoints.
+
+  timesparse = timeidx(~isnan(newseries));
+  newsparse = newseries(~isnan(newseries));
+
+  newseries = interp1(timesparse, newsparse, timeidx, 'nearest', 'extrap');
+end
 
 
 %
