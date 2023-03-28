@@ -44,14 +44,14 @@ nonmatchcount = 0;
 
 for fidx = 1:length(flist)
   thisfname = flist{fidx};
-  thisval = xmlstruct.(thisfname);
+  thischildlist = xmlstruct.(thisfname);
 
   % Only process child nodes, not text or attributes.
-  if isstruct(thisval)
+  if isstruct(thischildlist)
 
     % This is an array of child nodes.
-    for cidx = 1:length(thisval)
-      thischild = thisval(cidx);
+    for cidx = 1:length(thischildlist)
+      thischild = thischildlist(cidx);
 
       tagmatch = true;
       if ~isempty(tagswanted)
@@ -59,14 +59,14 @@ for fidx = 1:length(flist)
         tagmatch = any(strcmpi( thisfname, tagswanted ));
       end
 
-      attribmatch = nlUtil_testXMLStructAttributes(thisval, attribswanted);
+      attribmatch = nlUtil_testXMLStructAttributes(thischild, attribswanted);
 
       if tagmatch && attribmatch
         matchcount = matchcount + 1;
-        matches{matchcount} = thisval;
+        matches{matchcount} = thischild;
       else
         nonmatchcount = nonmatchcount + 1;
-        nonmatches{nonmatchcount} = thisval;
+        nonmatches{nonmatchcount} = thischild;
       end
     end
 
