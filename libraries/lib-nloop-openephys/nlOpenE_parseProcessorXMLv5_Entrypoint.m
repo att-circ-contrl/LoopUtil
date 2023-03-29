@@ -91,6 +91,10 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
   elseif strcmp(procmeta.procname, 'Record Node')
     procmeta = nlOpenE_parseProcessorXMLv5_FileRecord( ...
       procmeta, xmlstruct, proceditor );
+  elseif strcmp(procmeta.procname, 'Phase Calculator')
+    % TNE Lab phase calculator.
+    procmeta = nlOpenE_parseProcessorXMLv5_TNEPhaseCalculator( ...
+      procmeta, xmlstruct, proceditor );
   end
 
 end

@@ -105,7 +105,7 @@ thismsg = [ thismsg ').' ];
 newmeta.descsummary = [ newmeta.descsummary { thismsg } ];
 newmeta.descdetailed = [ newmeta.descdetailed { thismsg } ];
 
-thismsg = [ '  Folder: "', newmeta.writefolder, '"' ];
+thismsg = [ '   Folder: "', newmeta.writefolder, '"' ];
 newmeta.descsummary = [ newmeta.descsummary { thismsg } ];
 newmeta.descdetailed = [ newmeta.descdetailed { thismsg } ];
 
