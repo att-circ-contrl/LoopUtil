@@ -1,0 +1,40 @@
+Processor node metadata from Open Ephys v5 is saved as structures (one per
+processor node), derived from the "processor" tag parse trees returned by
+readstruct(). These metadata structures have the following fields:
+
+
+Common to all processor node types:
+
+
+"rawconfig" is the raw XML parse tree for the processor node, as returned
+  by "readstruct()".
+
+"procname" is a character vector containing the "pluginName" attribute.
+"proclib" is a character vector containing the "libraryName" attribute.
+"procnode" is a number containing the "NodeId" attribute.
+
+"channelselect" is a logical vector containing the channel selection state's
+  "param" attribute values from all "channel" tags in the processor node.
+  This may be an empty vector for special nodes like splitters.
+  Note that the "number" attribute starts counting at 0, so the index in
+  "channelselect" is equal to "number" + 1.
+
+"descsummary" is a cell array of character vectors containing a
+  human-readable short summary of the node configuration. This may be {}.
+"descdetailed" is a cell array of character vectors containing a
+  human-readable detailed description of the node configuration. This
+  may be {}.
+
+
+
+For nodes with plugin name 'Intan Rec. Controller':
+
+
+
+Unrecognized plugin names will still return the "common to all types"
+metadata, which includes the full parse tree, facilitating user processing
+of unrecognized configuration information.
+
+
+
+(This is the end of the file.)

@@ -1,29 +1,20 @@
-function [ procmeta proceditor ] = ...
-  nlOpenE_parseProcessorNodeXML_v5( xmlstruct )
+function procmeta = nlOpenE_parseProcessorXMLv5_Entrypoint( xmlstruct )
 
-% function [ procmeta proceditor ] = ...
-%   nlOpenE_parseProcessorNodeXML_v5( xmlstruct )
+% function procmeta = nlOpenE_parseProcessorXMLv5_Entrypoint( xmlstruct )
 %
-% This parses an Open Ephys v0.5 XML processor node, extracting information
-% common to all nodes (or almost all; splitters are special).
+% This parses an Open Ephys v0.5 XML processor node configuration tag and
+% extracts configuration metadata from it.
+%
+% This is an "entry point" function; it extracts information common to all
+% nodes and then calls helper functions to extract additional information
+% specific to individual plugins and node types.
 %
 % "xmlstruct" is a structure containing an XML parse tree (per readstruct()).
 %   This should be the parse tree for a "processor" node from an Open Ephys
 %   v0.5 configuration file.
 %
 % "procmeta" is a structure containing node metadata, or struct([]) if an
-%   error occurred.
-% "proceditor" is a structure containing the node's EDITOR tag, or struct([])
-%   if no editor is present (as with splitter nodes).
-%
-% Metadata fields include the following:
-%   "procname" is the "pluginName" attribute (a character vector).
-%   "proclib" is the "libraryName" attribute (a character vector).
-%   "procnode" is the "NodeId" attribute (a number).
-%   "channelselect" is a logical vector containing the channel selection
-%     state "param" values of all "channel" tags in the processor node.
-%     Note that "number" starts counting at 0, so index is "number" + 1.
-%     This may be an empty vector for special nodes like splitters.
+%   error occurred. Node metadata is described in PROCMETA_OPENEPHYSv5.txt.
 
 
 procmeta = struct([]);
@@ -75,11 +66,25 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
   procmeta.channelselect = channelselect;
 
 
+  % Get the editor tag's parse tree.
   % This usually, but doesn't always, exist.
   thiseditor = ...
     nlUtil_findXMLStructNodesTopLevel( xmlstruct, { 'editor' }, {} );
   if ~isempty(thiseditor)
     proceditor = thiseditor{1};
+  end
+
+
+  % Store empty description fields.
+  procmeta.descsummary = {};
+  procmeta.descdetailed = {};
+
+
+  % If this is a type of processor that we recognize, call a helper function.
+
+  if strcmp(procmeta.procname, 'Intan Rec. Controller')
+    procmeta = nlOpenE_parseProcessorXMLv5_IntanRec( ...
+      procmeta, xmlstruct, proceditor );
   end
 
 end
