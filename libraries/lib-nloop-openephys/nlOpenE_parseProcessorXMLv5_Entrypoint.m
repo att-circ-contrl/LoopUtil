@@ -95,6 +95,10 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
     % TNE Lab phase calculator.
     procmeta = nlOpenE_parseProcessorXMLv5_TNEPhaseCalculator( ...
       procmeta, xmlstruct, proceditor );
+  elseif strcmp(procmeta.procname, 'Crossing Detector')
+    % TNE Lab crossing detector.
+    procmeta = nlOpenE_parseProcessorXMLv5_TNECrossingDetector( ...
+      procmeta, xmlstruct, proceditor );
   end
 
 end

@@ -56,6 +56,65 @@ For nodes with plugin name 'Record Node':
 
 
 
+For nodes with plugin name "Phase Calculator" (TNE Lab):
+
+
+"bandcorners" [ low high ] describes the corner frequencies of the phase
+  calculator's bandpass filter.
+"bandedges" [ low high ] describes the nominal cutoff frequencies of the
+  phase calculator's bandpass fitler.
+
+"predictorder" is the order of the AR predictor used by the phase calculator.
+"predictupdatems" is the update interval (in ms) for training the predictor.
+
+"outputmode" is a character vector indicating which outputs are produced
+  by the phase calculator. Valid values are 'phase', 'magnitude', and 'both'.
+  Single outputs replace the input channel; 'both' adds an extra channel
+  for magnitude and replaces the input channel with phase.
+
+
+
+For nodes with plugin name "Crossing Detector" (TNE Lab):
+
+"inputchan" is the ephys channel number to monitor.
+"wantrising" is true if triggers happen when crossing low-to-high.
+"wantfalling" is true if triggers happen when crossing high-to-low.
+
+"outputTTLchan" is the number of the output TTL channel to generate events on.
+  This is in a new TTL bank (new "event channel").
+
+"threshtype" is a character vector indicating the method by which thresholding
+  is performed. Valid values are 'constant', 'random', 'channel', 'adaptive',
+  and 'averagemult'.
+
+"threshold" is the threshold value used for 'constant' thresholding, and the
+  multiplier used for 'averagemult' thresholding.
+"randomrange" [ min max ] is the range threshold values are drawn from when
+  using 'random' thresholding (uniform random sampling within that range span).
+"extthreshchan" is the analog channel number to use as an externally supplied
+  threshold with 'channel' triggering.
+"averageseconds" is the approximate smoothing time used for averaging with
+  'averagemult' thresholding.
+
+Adaptive thresholding receives an input "indicator" signal and adjusts its
+threshold until the input signal meets a target value. Its configuration
+parameters are:
+
+"adaptinputname" is a character vector containing the label of the input
+  channel to monitor as an "indicator".
+"adapttarget" is the value that the algorithm tries to get the indicator
+  input to meet.
+"adaptinputrange" [ min max ] is the range to which input values should be
+  clamped, or [] to not perform clamping.
+"adaptoutputrange" [ min max ] is the range to which adjusted threshold
+  values should be clamped, or [] to not perform clamping.
+"adaptlearnratestart" is the initial learning rate to use when adjusting.
+"adaptlearnratemin" is the value to which the learning rate decays towards.
+"adaptlearnratedecay" is the decay rate for the learning rate. See the TNE
+  Lab web page for a detailed discussion of the algorithm.
+
+
+
 Unrecognized plugin names will still return the "common to all types"
 metadata, which includes the full parse tree, facilitating user processing
 of unrecognized configuration information.
