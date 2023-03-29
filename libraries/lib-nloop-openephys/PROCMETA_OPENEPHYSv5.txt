@@ -30,6 +30,20 @@ Common to all processor node types:
 For nodes with plugin name 'Intan Rec. Controller':
 
 
+"samprate" is the sampling rate used by the recording controller, in Hz.
+"bandpass" [ low high ] describes the corner frequencies of the headstage
+  band-pass filters connected to the controller.
+"chanlabels" is a cell array containing the names of the channels
+  exported by the recording controller (in Open Ephys's order).
+
+
+
+For nodes with plugin name 'Channel Map':
+
+
+"chanmap" is a structure containing a channel map, per OPENEPHYS_CHANMAP.txt.
+
+
 
 Unrecognized plugin names will still return the "common to all types"
 metadata, which includes the full parse tree, facilitating user processing

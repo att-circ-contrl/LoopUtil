@@ -85,6 +85,9 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
   if strcmp(procmeta.procname, 'Intan Rec. Controller')
     procmeta = nlOpenE_parseProcessorXMLv5_IntanRec( ...
       procmeta, xmlstruct, proceditor );
+  elseif strcmp(procmeta.procname, 'Channel Map')
+    procmeta = nlOpenE_parseProcessorXMLv5_ChannelMap( ...
+      procmeta, xmlstruct, proceditor );
   end
 
 end
