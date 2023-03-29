@@ -88,6 +88,9 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
   elseif strcmp(procmeta.procname, 'Channel Map')
     procmeta = nlOpenE_parseProcessorXMLv5_ChannelMap( ...
       procmeta, xmlstruct, proceditor );
+  elseif strcmp(procmeta.procname, 'Record Node')
+    procmeta = nlOpenE_parseProcessorXMLv5_FileRecord( ...
+      procmeta, xmlstruct, proceditor );
   end
 
 end

@@ -45,6 +45,17 @@ For nodes with plugin name 'Channel Map':
 
 
 
+For nodes with plugin name 'Record Node':
+
+
+"writefolder" is a character vector storing the folder path to save to.
+"wantevents" is true if events are to be saved, false otherwise.
+"wantspikes" is true if spikes are to be saved, false otherwise.
+"savedchans" is a logical vector indicating whether each channel is to be
+  saved (FIXME: out of those accepted by channelselect?).
+
+
+
 Unrecognized plugin names will still return the "common to all types"
 metadata, which includes the full parse tree, facilitating user processing
 of unrecognized configuration information.

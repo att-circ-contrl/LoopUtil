@@ -12,7 +12,7 @@ function newmeta = nlOpenE_parseProcessorXMLv5_ChannelMap( ...
 %   It contains the "common" metadata described in PROCMETA_OPENEPHYSv5.txt.
 % "xmlproc" is a structure containing the XML parse tree (per readstruct())
 %   of the "processor" tag being interpreted.
-% "xmleditor" is a structure cotnaining the XML parse tree of the "editor"
+% "xmleditor" is a structure containing the XML parse tree of the "editor"
 %   tag within the "processor" tag, or struct([]) if none was found.
 %
 % "newmeta" is a copy of "oldmeta" augmented with plugin-specific metadata.

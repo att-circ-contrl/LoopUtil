@@ -42,7 +42,7 @@ chaninfo = ...
 
 if isempty(chaninfo)
   % Problem.
-  disp([ '###  [nlOpenE_parseIntanRecorderXML_v5]  ' ...
+  disp([ '###  [nlOpenE_parseProcessorXMLv5_IntanRec]  ' ...
     'Can''t find CHANNEL_INFO tag.' ]);
 else
   chaninfo = chaninfo{1};
@@ -66,7 +66,7 @@ else
 end
 
 
-% Build human-deadable descriptions.
+% Build human-readable descriptions.
 
 thismsg = sprintf( [ '.. Node %d is an Intan recording controller' ...
   ' (%.1f-%d Hz, %.1f ksps, %d ch).' ], newmeta.procnode, ...
