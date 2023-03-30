@@ -101,6 +101,8 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
       procmeta, xmlstruct, proceditor );
   elseif strcmp(procmeta.procname, 'TTL Cond Trigger')
     % ACC Lab conditional trigger.
+    procmeta = nlOpenE_parseProcessorXMLv5_ACCConditionalTrig( ...
+      procmeta, xmlstruct, proceditor );
   end
 
 end

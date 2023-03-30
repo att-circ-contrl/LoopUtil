@@ -76,6 +76,7 @@ For nodes with plugin name "Phase Calculator" (TNE Lab):
 
 For nodes with plugin name "Crossing Detector" (TNE Lab):
 
+
 "inputchan" is the ephys channel number to monitor.
 "wantrising" is true if triggers happen when crossing low-to-high.
 "wantfalling" is true if triggers happen when crossing high-to-low.
@@ -112,6 +113,53 @@ parameters are:
 "adaptlearnratemin" is the value to which the learning rate decays towards.
 "adaptlearnratedecay" is the decay rate for the learning rate. See the TNE
   Lab web page for a detailed discussion of the algorithm.
+
+
+
+For nodes with plugin name "TTL Cond Trigger" (ACC Lab):
+
+
+"outcount" is the number of outputs (always 4, for now).
+"incount" is the number of inputs per output (always 4, for now).
+
+"outconditions" is a cell array with one structure per output; each structure
+  has the following fields:
+
+  "enabled" is true if the output is being used and false otherwise.
+  "anyall" is 'any' or 'all', indicating how inputs are combined.
+  "name" is a character vector containing the output name.
+
+  (Logic processing fields are also present, described below.)
+
+  "inconditions" is a cell array with one structure per input; each structure
+    has the following fields:
+
+    "enabled" is true if the input is being used and false otherwise.
+    "digbankidx" is the input TTL bank (channel) number, starting at 0.
+    "digbit" is the input TTL bit (sub-channel) number, starting at 0.
+    "name" is a character vector containing the input name.
+
+    (Logic processing fields are also present, described below.)
+
+
+Logic processing fields are a set of fields that define how a signal's
+output is derived from its input:
+
+  "trigtype" is 'high' (level-triggered active-high), 'low' (level-triggered
+    active-low), 'rising' (edge-triggered), or 'falling' (edge-triggered).
+  "delayminsamps" and "delaymaxsamps" define the time to wait from the
+    trigger conditions being met to the output signal being asserted. For any
+    given trigger event, this is uniformly sampled from the specified range.
+  "sustainsamps" is the number of samples for which the output is to be
+    asserted.
+  "deadsamps" is the number of samples that have to elapse between one
+    detected trigger event and the next detected trigger event. Detections
+    that happen during the dead time are ignored.
+  "deglitchsamps" is the number of samples for which the input must be stable
+    before a trigger event is recognized. It must be less than or equal to
+    "delayminsamps".
+  "activehigh" is true if the output is driven high when asserted, and false
+    if the output is driven low when asserted.
 
 
 
