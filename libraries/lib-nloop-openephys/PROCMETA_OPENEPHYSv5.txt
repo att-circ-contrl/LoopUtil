@@ -56,6 +56,19 @@ For nodes with plugin name 'Record Node':
 
 
 
+For nodes with plugin name 'File Reader':
+
+
+"filename" is a character vector storing the file being read from.
+"sampstart" is the first sample number in the file.
+"sampstop" is the last sample number in the file.
+"chancount" is the number of channels saved.
+
+NOTE - Sampling rate and channel names aren't saved in the config state.
+All of that has to be found by opening and parsing the file.
+
+
+
 For nodes with plugin name 'Arduino Output':
 
 
@@ -80,6 +93,13 @@ For nodes with plugin name 'Arduino Output':
   gate, starting at 0.
 "gatelabel" is a character vector with the channel (bank) name of the TTL
   input being used as a gate.
+
+
+
+For nodes with plugin name 'Bandpass Filter':
+
+
+"band" [ low high ] describes the filter corner frequencies in Hz.
 
 
 
