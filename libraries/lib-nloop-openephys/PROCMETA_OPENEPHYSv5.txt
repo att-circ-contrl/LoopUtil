@@ -56,7 +56,34 @@ For nodes with plugin name 'Record Node':
 
 
 
-For nodes with plugin name "Phase Calculator" (TNE Lab):
+For nodes with plugin name 'Arduino Output':
+
+
+"serialdev" is a character vector with the name of the serial device the
+  Arduino is connected to.
+"ardoutput" is the Arduino digital I/O number used for output.
+
+"inputpretty" is the native name of the TTL input being monitored. It has
+  the form "channel:bit (channel name)".
+"inputbank" is the channel (bank) number of the TTL input being monitored,
+  starting at 0.
+"inputbit" is the sub-channel (bit) number of the TTL input being monitored,
+  starting at 0.
+"inputlabel" is a character vector with the channel (bank) name of the TTL
+  input being monitored.
+
+"gatepretty" is the native name of the TTL input being used as a gate. It has
+  the form "channel:bit (channel name)".
+"gatebank" is the channel (bank) number of the TTL input being used as a gate,
+  starting at 0.
+"gatebit" is the sub-channel (bit) number of the TTL input being used as a
+  gate, starting at 0.
+"gatelabel" is a character vector with the channel (bank) name of the TTL
+  input being used as a gate.
+
+
+
+For nodes with plugin name 'Phase Calculator' (TNE Lab):
 
 
 "bandcorners" [ low high ] describes the corner frequencies of the phase
@@ -74,7 +101,7 @@ For nodes with plugin name "Phase Calculator" (TNE Lab):
 
 
 
-For nodes with plugin name "Crossing Detector" (TNE Lab):
+For nodes with plugin name 'Crossing Detector' (TNE Lab):
 
 
 "inputchan" is the ephys channel number to monitor.
@@ -116,7 +143,7 @@ parameters are:
 
 
 
-For nodes with plugin name "TTL Cond Trigger" (ACC Lab):
+For nodes with plugin name 'TTL Cond Trigger' (ACC Lab):
 
 
 "outcount" is the number of outputs (always 4, for now).
