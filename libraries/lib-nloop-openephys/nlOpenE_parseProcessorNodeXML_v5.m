@@ -1,6 +1,6 @@
-function procmeta = nlOpenE_parseProcessorXMLv5_Entrypoint( xmlstruct )
+function procmeta = nlOpenE_parseProcessorNodeXML_v5( xmlstruct )
 
-% function procmeta = nlOpenE_parseProcessorXMLv5_Entrypoint( xmlstruct )
+% function procmeta = nlOpenE_parseProcessorNodeXML_v5( xmlstruct )
 %
 % This parses an Open Ephys v0.5 XML processor node configuration tag and
 % extracts configuration metadata from it.
@@ -99,6 +99,8 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
     % TNE Lab crossing detector.
     procmeta = nlOpenE_parseProcessorXMLv5_TNECrossingDetector( ...
       procmeta, xmlstruct, proceditor );
+  elseif strcmp(procmeta.procname, 'TTL Cond Trigger')
+    % ACC Lab conditional trigger.
   end
 
 end
