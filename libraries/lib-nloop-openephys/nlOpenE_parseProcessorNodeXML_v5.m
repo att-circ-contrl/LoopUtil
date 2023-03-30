@@ -94,6 +94,10 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
   elseif strcmp(procmeta.procname, 'Arduino Output')
     procmeta = nlOpenE_parseProcessorXMLv5_ArduinoOut( ...
       procmeta, xmlstruct, proceditor );
+  elseif strcmp(procmeta.procname, 'Bandpass Filter')
+    procmeta = nlOpenE_parseProcessorXMLv5_Bandpass( ...
+      procmeta, xmlstruct, proceditor );
+  % NOTE - Not getting config for splitter or lfp viewer.
 
   elseif strcmp(procmeta.procname, 'Phase Calculator')
     % TNE Lab phase calculator.
@@ -109,6 +113,7 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
     procmeta = nlOpenE_parseProcessorXMLv5_ACCConditionalTrig( ...
       procmeta, xmlstruct, proceditor );
   end
+  % NOTE - Not getting config for ACC Lab TTL front panel or toggle panel.
 
 end
 
