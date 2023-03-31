@@ -33,6 +33,7 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
   procmeta.proclib = char( xmlstruct.('libraryNameAttribute') );
   procmeta.procnode = xmlstruct.('NodeIdAttribute');
 
+
   % We usually, but don't always, have a list of <CHANNEL> tags.
 
   chanlist = ...
@@ -64,6 +65,17 @@ if isfield(xmlstruct, 'pluginNameAttribute') ...
   end
 
   procmeta.channelselect = channelselect;
+
+
+  % We usually, but don't always, have a list of <EVENTCHANNEL> tags.
+  % These have "name="N" number="N"" from 0..N-1, so just count how many
+  % there are and don't bother parsing them.
+  % These are the TTL _banks_, not the individual TTL _channels_.
+
+  evbanklist = ...
+    nlUtil_findXMLStructNodesTopLevel( xmlstruct, { 'eventchannel' }, {} );
+
+  procmeta.eventbanks = length(evbanklist);
 
 
   % Get the editor tag's parse tree.
