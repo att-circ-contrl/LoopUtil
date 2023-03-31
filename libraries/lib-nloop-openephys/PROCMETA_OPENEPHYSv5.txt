@@ -18,6 +18,8 @@ Common to all processor node types:
   This may be an empty vector for special nodes like splitters.
   Note that the "number" attribute starts counting at 0, so the index in
   "channelselect" is equal to "number" + 1.
+"eventbanks" is an integer indicating the number of <EVENTCHANNEL> tags
+  found in this processor node.
 
 "descsummary" is a cell array of character vectors containing a
   human-readable short summary of the node configuration. This may be {}.
