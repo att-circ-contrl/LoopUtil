@@ -130,8 +130,8 @@ For nodes with plugin name 'Crossing Detector' (TNE Lab):
 "wantrising" is true if triggers happen when crossing low-to-high.
 "wantfalling" is true if triggers happen when crossing high-to-low.
 
-"outputTTLchan" is the number of the output TTL channel to generate events on.
-  This is in a new TTL bank (new "event channel").
+"outputTTLchan" is the (1-based) number of the output TTL bit to generate
+  events on. This is in a new TTL bank (new "event channel").
 
 "threshtype" is a character vector indicating the method by which thresholding
   is performed. Valid values are 'constant', 'random', 'channel', 'adaptive',
