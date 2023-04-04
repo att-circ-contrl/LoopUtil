@@ -153,23 +153,25 @@ for outloopidx = 1:length(newmeta.outconditions)
   [ thisoutlogicmain thisoutlogicaux ] = ...
     helper_summarizeLogic(thisoutmeta);
 
-  thismsg = [ 'Out' num2str(outloopidx-1) ': "' thisoutname ...
-    '": ' thisoutlogicmain ];
+  % NOTE - We started some sessions with outputs disabled that we enabled
+  % while running. So report disabled ones in the summary too.
+  % Only outputs can be toggled at run-time; inputs are fixed.
+
+  enlabel = ' (off)';
   if thisoutenabled
-    descsummary = [ descsummary { thismsg } ];
+    enlabel = '';
   end
+
+  thismsg = [ 'Out' num2str(outloopidx-1) enlabel ': "' thisoutname ...
+    '": ' thisoutlogicmain ];
+  descsummary = [ descsummary { thismsg } ];
   descdetailed = [ descdetailed { thismsg } { thisoutlogicaux } ];
-  if ~thisoutenabled
-    descdetailed = [ descdetailed { '(Disabled)' } ];
-  end
 
   thismsg = 'Any of:';
   if strcmp('all', thisoutanyall)
     thismsg = 'All of:';
   end
-  if thisoutenabled
-    descsummary = [ descsummary { thismsg } ];
-  end
+  descsummary = [ descsummary { thismsg } ];
   descdetailed = [ descdetailed { thismsg } ];
 
   for inloopidx = 1:length(thisoutmeta.inconditions)
@@ -190,7 +192,9 @@ for outloopidx = 1:length(newmeta.outconditions)
       thismsg = [ thismsg num2str(thisinbank) ':' num2str(thisinbit) ];
     end
     thismsg = [ thismsg '): "' thisinname '": ' thisinlogicmain ];
-    if thisoutenabled && thisinenabled
+
+    % Suppress disabled inputs, but show even if the output is disabled.
+    if thisinenabled
       descsummary = [ descsummary { thismsg } ];
     end
     descdetailed = [ descdetailed { thismsg } { [ '   ' thisinlogicaux ] } ];
@@ -257,9 +261,9 @@ function [ descmain descaux ] = helper_summarizeLogic( logicmeta )
 
   descmain = [ 'Trig on ' logicmeta.trigtype ', asserted ' ];
   if logicmeta.activehigh
-    descmain = [ descmain ' high for ' ];
+    descmain = [ descmain 'high for ' ];
   else
-    descmain = [ descmain ' low for ' ];
+    descmain = [ descmain 'low for ' ];
   end
   descmain = [ descmain sprintf('%d samps.', logicmeta.sustainsamps) ];
 
