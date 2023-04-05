@@ -84,6 +84,11 @@ as either sample code or a stand-alone application.
 explaining how to use the channel iteration hooks and how the architecture
 as a whole is supposed to work and why it was set up that way.
 
+* (sanity tool) Change "find correlated channels" to interpret the relative
+threshold as a divisor for the median's headroom, rather than as a multiplier
+for the median value itself, to make it less sensitive to the exact median
+value in the data.
+
 
 ## Deferred to version 2:
 
