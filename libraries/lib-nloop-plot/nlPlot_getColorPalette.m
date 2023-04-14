@@ -7,6 +7,7 @@ function cols = nlPlot_getColorPalette()
 %
 % Colors suppled are "blu", "brn", "yel", "mag", "grn", "cyn", and "red".
 % These are mostly cribbed from get(cga,'colororder'), with tweaks.
+% Additional colours are "blk", "wht", and "gry".
 %
 % "cols" is a structure containing color triplets.
 
@@ -24,6 +25,7 @@ cols.red = [ 0.7 0.3 0.4 ];  % Lightened a bit; was [ 0.6 0.1 0.2 ].
 % Other colours of interest.
 cols.blk = [ 0.0 0.0 0.0 ];
 cols.wht = [ 1.0 1.0 1.0 ];
+cols.gry = [ 0.7 0.7 0.7 ];
 
 
 %
