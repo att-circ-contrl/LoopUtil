@@ -55,6 +55,9 @@ if isfield(ftdataset, 'sampleinfo')
   % This has the first and last absolute sample index of each trial.
   firsttimes = ftdataset.sampleinfo(:,1);
 
+% FIXME - Diagnostics.
+%disp('xx Getting trial times from sampleinfo.');
+
   % FIXME - Assume sample indices are 1-based.
   firsttimes = firsttimes - 1;
   firsttimes = firsttimes / samprate;
@@ -64,6 +67,9 @@ elseif isfield(ftconfig, 'trl')
   % This has trial start, trial end, and trigger offset (Ntrials x 3).
   % Trigger offset is positive if the trial starts after the trigger.
   firsttimes = ftconfig.trl(:,1);
+
+% FIXME - Diagnostics.
+%disp('xx Getting trial times from config.trl.');
 
   % FIXME - Assume sample indices are 1-based.
   firsttimes = firsttimes - 1;
