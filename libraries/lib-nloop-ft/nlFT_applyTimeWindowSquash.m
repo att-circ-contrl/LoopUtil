@@ -17,7 +17,7 @@ function newftdata = nlFT_applyTimeWindowSquash( oldftdata, timemasks )
 
 newftdata = oldftdata;
 
-trialcount = 1:length(timemasks);
+trialcount = length(timemasks);
 
 for tidx = 1:trialcount
   thistrial = newftdata.trial{tidx};
