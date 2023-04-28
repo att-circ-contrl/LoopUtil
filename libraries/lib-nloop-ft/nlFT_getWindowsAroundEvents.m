@@ -25,10 +25,22 @@ function masklist = ...
 masklist = {};
 
 
+% We need to perturb limits slightly; otherwise if the limits are an exact
+% multiple of the sampling interval we can get peculiarities (samples being
+% included on some trials and excluded in others despite the window size
+% nominally being the same).
+
+epsilon_secs = 1e-8;
+
+
 % Convert the window to seconds.
+% Also perturb it, per above.
 
 winbefore = min(window_ms) * 0.001;
 winafter = max(window_ms) * 0.001;
+
+winbefore = winbefore - epsilon_secs;
+winafter = winafter + epsilon_secs;
 
 
 % Get other metadata.
@@ -116,9 +128,9 @@ end
 for tidx = 1:trialcount
   thistime = trialtimes{tidx};
 
-  % Remember that the window start doesn't need to be negated.
-  minevtime = min(thistime) + winafter;
-  maxevtime = max(thistime) + winbefore;
+  % Remember that the winbefore is typically negative.
+  minevtime = min(thistime) - winafter;
+  maxevtime = max(thistime) - winbefore;
 
   evmask = (evtimes_sec >= minevtime) & (evtimes_sec <= maxevtime);
   evsubset = evtimes_sec(evmask);
@@ -129,7 +141,7 @@ for tidx = 1:trialcount
   for eidx = 1:length(evsubset)
     thisev = evsubset(eidx);
 
-    % Remember that the window start doesn't need to be negated.
+    % Remember that the winbefore doesn't need to be negated.
     thisevfirst = thisev + winbefore;
     thisevlast = thisev + winafter;
 

@@ -22,10 +22,12 @@ newseries = zeros(size(oldseries));
 if length(timesparse) >= 2
   % First pass: Fill in gaps.
 
+  % Linear interpolation within the valid range, and set to NaN outside it.
   % FIXME - Used spline interpolation originally, but that has large overshoot.
   newseries = interp1(timesparse, oldsparse, timeidx, 'linear', NaN);
 
   % Second pass: Extend endpoints.
+  % The only NaN areas left are ones outside the valid sample range.
 
   timesparse = timeidx(~isnan(newseries));
   newsparse = newseries(~isnan(newseries));
