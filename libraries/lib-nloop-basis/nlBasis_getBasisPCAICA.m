@@ -132,33 +132,19 @@ for bidx = 1:length(basiscounts)
   thisbasis = icamodel.basisvecs * pcamodel.basisvecs;
   thiscoeffs = icamodel.coeffs;
 
+  thismodel = struct( 'basisvecs', thisbasis, 'coeffs', thiscoeffs, ...
+    'background', pcamodel.background );
+
 
   % Get the explained variance for this decomposition.
-  % The explained variance fraction is the square of the correlation
-  % coefficient of original and reconstructed, for well-behaved distributions.
-
-  % NOTE - We're reconstructing without the mean, here.
-  % If we add the mean, most of the explained variance comes from it, so
-  % our FOM is always nearly perfect.
-  % Mean gets subtracted from the original data to compare apples to apples.
-
-  datarecon = thiscoeffs * thisbasis;
-  rvalues = [];
-  for vidx = 1:nvectors
-    thisdatavalue = datavalues(vidx,:) - pcamodel.background;
-    thisrmatrix = corrcoef( datarecon(vidx,:), thisdatavalue );
-    rvalues(vidx) = thisrmatrix(1,2);
-  end
-  thisfom = mean(rvalues .* rvalues);
-  datarecon = [];
+  thisfom = nlBasis_calcExplainedVariance( datavalues, thismodel );
 
 
   % If this is better than what we already have, store it.
 
   if isnan(expvar) || (thisfom > expvar)
     expvar = thisfom;
-    basis = struct( 'basisvecs', thisbasis, 'coeffs', thiscoeffs, ...
-      'background', pcamodel.background );
+    basis = thismodel;
   end
 
   if ~strcmp(verbosity, 'quiet')
