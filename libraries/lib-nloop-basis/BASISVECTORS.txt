@@ -1,0 +1,25 @@
+The "nlBasis_getBasisVectors" function decomposes a set of input signals into
+weighted sums of a set of basis vectors, plus a common background.
+
+
+Input signals are stored as is a Nvectors x Ntimesamples matrix of sample
+vectors. For ephys data, this is typically Nchans x Ntimesamples.
+
+
+A basis decomposition is stored as a structure with the following fields:
+
+"basisvecs" is a Nbasis x Ntimesamples matrix where each row is a basis
+  vector.
+"coeffs" is a Nvectors x Nbasis matrix with basis vector weights for each
+  input vector.
+"background" is a 1 x Ntimesamples vector containing a constant background
+  to be added to all vectors during reconstruction. This is typically, but
+  not always, either zero or the mean across sample vectors.
+
+
+The input is reconstructed as:
+
+recon = coeffs * basisvecs + repmat( background, Nvectors, 1 );
+
+
+(This is the end of the file.)

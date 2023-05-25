@@ -17,9 +17,12 @@ fullname = which('addPathsLoopUtil');
 % Add the new paths.
 % (This checks for duplicates, so we don't have to.)
 
+% Signal processing libraries.
+addpath([ thisdir filesep 'lib-nloop-proc' ]);
+addpath([ thisdir filesep 'lib-nloop-basis' ]);
+
 % Utility libraries.
 addpath([ thisdir filesep 'lib-nloop-util' ]);
-addpath([ thisdir filesep 'lib-nloop-proc' ]);
 addpath([ thisdir filesep 'lib-nloop-io' ]);
 addpath([ thisdir filesep 'lib-nloop-plot' ]);
 addpath([ thisdir filesep 'lib-nloop-sanitycheck' ]);
