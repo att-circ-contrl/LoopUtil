@@ -1,5 +1,5 @@
-The "nlBasis_getBasisVectors" function decomposes a set of input signals into
-weighted sums of a set of basis vectors, plus a common background.
+The "nlBasis_getBasisVectors_XX" functions decompose a set of input signals
+into weighted sums of a set of basis vectors, plus a common background.
 
 
 Input signals are stored as is a Nvectors x Ntimesamples matrix of sample
