@@ -35,6 +35,8 @@ ntimesamps = scratch(2);
 
 
 maxbasiscount = max(basiscounts);
+% We can only have as many components as we have data vectors.
+maxbasiscount = min(maxbasiscount, nvectors);
 
 % Sort the basis counts to test, so that we can identify the smallest that
 % reaches the threshold.
@@ -55,7 +57,7 @@ if nvectors < 2
 end
 
 if ~strcmp(verbosity, 'quiet')
-  disp('.. Getting basis vectors using PCA.');
+%  disp('.. Getting basis vectors using PCA.');
 end
 
 
@@ -82,9 +84,16 @@ for bidx = 1:length(basiscounts)
   end
 
 
-  % Evaluate decomposition with this many vectors.
+  % Bail out if we're asking for more components than we have.
 
   nbasis = basiscounts(bidx);
+
+  if nbasis > nvectors
+    continue;
+  end
+
+
+  % Evaluate decomposition with this many vectors.
 
   thisfom = sum( pcaexplained(1:nbasis) );
   thisfom = thisfom / 100;

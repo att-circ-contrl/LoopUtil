@@ -28,7 +28,7 @@ function [ silval basis ] = nlBasis_getBasisKmeans( ...
 %
 % "silval" is the silhouette value of the k-means decomposition.
 % "basis" is a structure describing the k-means decomposition, per
-%   BASISVECTORS.txt. Each mean is one basis vector.
+%   BASISVECTORS.txt. Each mean is one basis vector. The background is zero.
 
 
 silval = NaN;
