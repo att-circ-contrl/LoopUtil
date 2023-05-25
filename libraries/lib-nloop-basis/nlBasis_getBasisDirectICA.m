@@ -26,7 +26,7 @@ function [ expvar basis ] = nlBasis_getBasisDirectICA( ...
 %   this is not NaN, then the smallest component count with an explained
 %   variance above minexpvar is chosen (or the largest explained variance
 %   if none are above-threshold).
-% "verbosity" is 'verbose', 'normal' or 'quiet'.
+% "verbosity" is 'verbose', 'normal', or 'quiet'.
 %
 % "expvar" is the explained variance of the ICA decomposition.
 % "basis" is a structure describing the ICA decomposition, per
@@ -43,8 +43,6 @@ ntimesamps = scratch(2);
 
 zerobg = zeros(1,ntimesamps);
 
-
-maxbasiscount = max(basiscounts);
 
 % Sort the basis counts to test, so that we can identify the smallest that
 % reaches the threshold.
