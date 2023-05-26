@@ -17,13 +17,7 @@ newftdata = oldftdata;
 
 for tidx = 1:trialcount
   thistrial = newftdata.trial{tidx};
-
-  for cidx = 1:chancount
-    thiswave = thistrial(cidx,:);
-    thistrial(cidx,:) = nlProc_fillNaN(thiswave);
-  end
-
-  newftdata.trial{tidx} = thistrial;
+  newftdata.trial{tidx} = nlProc_fillNaNRows(thistrial);
 end
 
 
