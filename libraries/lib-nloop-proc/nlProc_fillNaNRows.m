@@ -12,13 +12,13 @@ function newmatrix = nlProc_fillNaNRows( oldmatrix )
 
 newmatrix = oldmatrix;
 
-scratch size(oldmatrix);
+scratch = size(oldmatrix);
 rowcount = scratch(1);
 
 for ridx = 1:rowcount
-  thisrow = oldmatrix(ridx,:);
+  thisrow = newmatrix(ridx,:);
   thisrow = nlProc_fillNaN(thisrow);
-  oldmatrix(ridx,:) = thisrow;
+  newmatrix(ridx,:) = thisrow;
 end
 
 
