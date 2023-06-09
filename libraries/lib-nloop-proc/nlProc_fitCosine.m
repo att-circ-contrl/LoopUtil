@@ -1,37 +1,61 @@
-function [ fitmag fitfreq fitphase fitmean ] = nlProc_fitCosine( ...
-  wavedata, samprate, freqrange )
+function [ fitmag fitfreq fitphase fitpoly ] = nlProc_fitCosine( ...
+  wavedata, samprate, freqrange, polyorder )
 
-% function [ fitmag fitfreq fitphase fitmean ] = nlProc_fitCosine( ...
-%   wavedata, samprate, freqrange )
+% function [ fitmag fitfreq fitphase fitpoly ] = nlProc_fitCosine( ...
+%   wavedata, samprate, freqrange, polyorder )
 %
 % This curve-fits a constant-amplitude cosine to the specified input wave.
-%
 % This is intended to be used when the approximate frequency is known.
 %
-% "wavedata" is the waveform series to curve fit.
+% A polynomial-fit background is optionally subtracted before the cosine fit
+% is performed. If unspecified, order 0 is used (mean subtraction).
+%
+% "wavedata" is the waveform data series to curve fit.
 % "samprate" is the sampling rate of the waveform.
 % "freqrange" [ min max ] is the frequency range to curve fit across.
+% "polyorder" (optional) is the polynomial fit order to use before doing the
+%   cosine fit. This defaults to 0th order (mean subtraction).
 %
 % "fitmag" is the amplitude of the curve-fit cosine wave.
 % "fitfreq" is the frequency of the curve-fit cosine wave.
 % "fitphase" is the phase of the curve-fit cosine wave at the first sample
 %   of the input wave.
-% "fitmean" is the mean of the input (subtracted before the curve fit).
+% "fitpoly" is a row vector containing polynomial fit coefficients, highest
+%   order first. For 0th order (default), this is a scalar containing the
+%   mean of the input signal.
 
 
 fitmag = NaN;
 fitfreq = NaN;
 fitphase = NaN;
-fitmean = NaN;
+fitpoly = NaN;
 
 
-% FIXME - Doing this by brute force.
+% Default to 0th order.
+if ~exist('polyorder', 'var')
+  polyorder = 0;
+end
 
+
+
+% Get initial useful information.
 
 sampcount = length(wavedata);
 
 timeseries = 1:sampcount;
 timeseries = (timeseries - 1) / samprate;
+
+
+% Do the polynomial fit.
+
+fitpoly = polyfit(timeseries, wavedata, polyorder);
+
+bgwave = polyval(fitpoly, timeseries);
+bgwave = reshape(bgwave, size(wavedata));
+
+
+
+% FIXME - Doing this using a brute force frequency sweep.
 
 
 % Get a reasonable range of frequencies to test.
@@ -52,6 +76,8 @@ freqstep = max(0.003 * freqdelta, freqstep);
 
 besterr = inf;
 
+need_optimize_bg = false;
+
 for thisfreq = min(freqrange):freqstep:max(freqrange)
 
   thisomega = 2 * pi * thisfreq;
@@ -60,11 +86,10 @@ for thisfreq = min(freqrange):freqstep:max(freqrange)
 
   if false
     % Express the input as a * cos(t) + b * sin(t).
-    % Get the mean as a separate step.
+    % De-trend/de-mean as a separate step.
 
-    % Subtract the mean.
-    fitmean = mean(wavedata);
-    zerowave = wavedata - fitmean;
+    % Subtract the polynomial fit.
+    zerowave = wavedata - bgwave;
 
     % FIXME - This only works for an integer number of periods!
     afactor = (2 / sampcount) * sum( zerowave .* cosseries );
@@ -73,14 +98,15 @@ for thisfreq = min(freqrange):freqstep:max(freqrange)
 
   if true
     % Express the input as a * cos(t) + b * sin(t).
-    % Get the mean as a separate step.
+    % De-trend/de-mean as a separate step.
 
     % Subtract the mean.
-    fitmean = mean(wavedata);
-    zerowave = wavedata - fitmean;
+    % Subtract the polynomial fit.
+    zerowave = wavedata - bgwave;
 
     % General case for a fractional number of periods.
-    % FIXME - Computing the mean ahead of time causes this to be perturbed!
+    % FIXME - We're neglecting terms related to the mean, which can perturb
+    % the result.
     % [a ; b] = inv([ sum(cos2), sum(sincos) ; sum(sincos), sum(cos2) ]) times
     %   [ sum(x(t)cos) ; sum(x(t)sin) ]
 
@@ -99,9 +125,9 @@ for thisfreq = min(freqrange):freqstep:max(freqrange)
 
   if false
     % Express the input as a * cos(t) + b * sin(t) + mu.
+    % FIXME - This overrides the choice of polynomial order.
 
     % General case for a fractional number of periods, including mu.
-    % FIXME - This will sometimes perturb mu strangely (stability issues?).
     % [a ; b; mu] = inv( ...
     %   [ sum(cos2), sum(sincos), sum(cos) ; ...
     %     sum(sincos), sum(cos2), sum(sin) ; ...
@@ -125,14 +151,17 @@ for thisfreq = min(freqrange):freqstep:max(freqrange)
 
     afactor = abvector(1);
     bfactor = abvector(2);
-    fitmean = abvector(3);
+
+    % FIXME - Override the polynomial fit.
+    need_optimize_bg = true;
+    thispoly = abvector(3);
   end
 
 
   % Calculate the squared error after the fit and save this if it's an
   % improvement.
 
-  thisrecon = afactor * cosseries + bfactor * sinseries + fitmean;
+  thisrecon = afactor * cosseries + bfactor * sinseries + bgwave;
   thiserr = wavedata - thisrecon;
   thiserr = sum(thiserr .* thiserr);
 
@@ -145,6 +174,10 @@ for thisfreq = min(freqrange):freqstep:max(freqrange)
     fitmag = abs(thiscoeff);
     fitphase = angle(thiscoeff);
     fitfreq = thisfreq;
+
+    if need_optimize_bg
+      fitpoly = thispoly;
+    end
   end
 
 end
