@@ -25,11 +25,6 @@ fitphase = NaN;
 fitmean = NaN;
 
 
-% Subtract the mean.
-fitmean = mean(wavedata);
-wavedata = wavedata - fitmean;
-
-
 % FIXME - Doing this by brute force.
 
 
@@ -59,22 +54,37 @@ besterr = inf;
 
 for thisfreq = min(freqrange):freqstep:max(freqrange)
 
-  % Express the input as a * cos(t) + b * sin(t).
-
   thisomega = 2 * pi * thisfreq;
   cosseries = cos(timeseries * thisomega);
   sinseries = sin(timeseries * thisomega);
 
   if false
+    % Express the input as a * cos(t) + b * sin(t).
+    % Get the mean as a separate step.
+
+    % Subtract the mean.
+    fitmean = mean(wavedata);
+    zerowave = wavedata - fitmean;
+
     % FIXME - This only works for an integer number of periods!
-    afactor = (2 / sampcount) * sum( wavedata .* cosseries );
-    bfactor = (2 / sampcount) * sum( wavedata .* sinseries );
-  else
+    afactor = (2 / sampcount) * sum( zerowave .* cosseries );
+    bfactor = (2 / sampcount) * sum( zerowave .* sinseries );
+  end
+
+  if true
+    % Express the input as a * cos(t) + b * sin(t).
+    % Get the mean as a separate step.
+
+    % Subtract the mean.
+    fitmean = mean(wavedata);
+    zerowave = wavedata - fitmean;
+
     % General case for a fractional number of periods.
+    % FIXME - Computing the mean ahead of time causes this to be perturbed!
     % [a ; b] = inv([ sum(cos2), sum(sincos) ; sum(sincos), sum(cos2) ]) times
     %   [ sum(x(t)cos) ; sum(x(t)sin) ]
 
-    xvector = [ sum(wavedata .* cosseries) ; sum(wavedata .* sinseries) ];
+    xvector = [ sum(zerowave .* cosseries) ; sum(zerowave .* sinseries) ];
 
     sumcos2 = sum(cosseries .* cosseries);
     sumsin2 = sum(sinseries .* sinseries);
@@ -87,18 +97,51 @@ for thisfreq = min(freqrange):freqstep:max(freqrange)
     bfactor = abvector(2);
   end
 
+  if false
+    % Express the input as a * cos(t) + b * sin(t) + mu.
+
+    % General case for a fractional number of periods, including mu.
+    % FIXME - This will sometimes perturb mu strangely (stability issues?).
+    % [a ; b; mu] = inv( ...
+    %   [ sum(cos2), sum(sincos), sum(cos) ; ...
+    %     sum(sincos), sum(cos2), sum(sin) ; ...
+    %     sum(cos), sum(sin), sum(1) ]) ...
+    %   * [ sum(x(t)cos) ; sum(x(t)sin) ; sum(x(t)) ]
+
+    xvector = [ sum(wavedata .* cosseries) ; sum(wavedata .* sinseries) ; ...
+      sum(wavedata) ];
+
+    sumcos2 = sum(cosseries .* cosseries);
+    sumsin2 = sum(sinseries .* sinseries);
+    sumsincos = sum(sinseries .* cosseries);
+    sumcos = sum(cosseries);
+    sumsin = sum(sinseries);
+    sumone = length(timeseries);
+
+    scmatrix = [ sumcos2 sumsincos sumcos; sumsincos sumsin2 sumsin ; ...
+      sumcos sumsin sumone ];
+
+    abvector = inv(scmatrix) * xvector;
+
+    afactor = abvector(1);
+    bfactor = abvector(2);
+    fitmean = abvector(3);
+  end
+
 
   % Calculate the squared error after the fit and save this if it's an
   % improvement.
 
-  thisrecon = afactor * cosseries + bfactor * sinseries;
+  thisrecon = afactor * cosseries + bfactor * sinseries + fitmean;
   thiserr = wavedata - thisrecon;
   thiserr = sum(thiserr .* thiserr);
 
   if thiserr < besterr
     besterr = thiserr;
 
-    thiscoeff = afactor + i * bfactor;
+    % A positive sine component gives a negative phase offset, and vice versa.
+    thiscoeff = afactor - i * bfactor;
+
     fitmag = abs(thiscoeff);
     fitphase = angle(thiscoeff);
     fitfreq = thisfreq;
