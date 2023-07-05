@@ -20,6 +20,7 @@ fullname = which('addPathsLoopUtil');
 % Signal processing libraries.
 addpath([ thisdir filesep 'lib-nloop-proc' ]);
 addpath([ thisdir filesep 'lib-nloop-basis' ]);
+addpath([ thisdir filesep 'lib-nloop-artifact' ]);
 
 % Utility libraries.
 addpath([ thisdir filesep 'lib-nloop-util' ]);

@@ -1,0 +1,21 @@
+An artifact curve fit parameter structure describes a curve fit performed
+by one of the nlArt_fitXX functions.
+
+
+Fields common to all types:
+
+"fittype" is a character vector indicating the curve fit model used.
+  'exp' is a first-order exponential decay fit.
+
+
+
+First-order exponential decay fit:
+
+This has the form:   f(t) = coeff * exp(t/tau) + offset
+
+"fittype" is 'exp'.
+Parameter fields are:  "coeff", "tau", "offset"
+
+
+
+(This is the end of the file.)

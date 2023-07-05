@@ -12,7 +12,7 @@ function fitparams = ...
 % "timeseries" is a vector with sample timestamps.
 % "waveseries" is a vector with sample values to be curve-fit.
 % "offset" is a scalar specifying an offset value, [ tmin tmax ] specifying
-%   a time range to estimate the offset value from, or NaN to let this
+%   a time range to estimate the offset value from, or [] or NaN to let this
 %   function guess at the offset by whatever means it sees fit.
 % "method" is a character vector specifying the algorithm to use to perform
 %   the exponential fit.
@@ -103,7 +103,9 @@ limittime = testtimes(limitidx);
 
 if strcmp(method, 'log')
 
-  % Line fit in the log domain.
+  % Fit coeff and tau but not offset.
+
+  % Line fit in the log domain to get tau.
 
   if limitval > 0
     logwave = log(testwave);
@@ -122,7 +124,7 @@ if strcmp(method, 'log')
   end
 
 
-  % FIXME - Use the least-squares fit in the linear domain to get coeff.
+  % Use a least-squares fit in the linear domain to get coeff.
   % The log domain fit is dominated by the (noisy) tail, and we care more
   % about the high-amplitude part.
 
@@ -139,10 +141,13 @@ if strcmp(method, 'log')
 
 elseif strcmp(method, 'pinmax')
 
+  % Fit coeff and tau but not offset.
+
   % Pin the maximum point, and fit both omega and coeff.
   % Do this by optimizing d * exp(w(t-t0)), then converting back.
   % d = f(t0) = limitval, so we don't need to compute it explicitly.
-  % Using "testwave / limitval" ensures that it's positive.
+  % Using "testwave / limitval" ensures that we're taking the log of a
+  % positive value even if limitval and testwave are negative.
 
   shifttimes = testtimes - limittime;
   omega = sum( shifttimes .* log(testwave / limitval) ) ...
