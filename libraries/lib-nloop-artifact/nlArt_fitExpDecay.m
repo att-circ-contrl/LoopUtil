@@ -94,7 +94,7 @@ testwave = shiftwave(testmask);
 % FIXME - We should pick one of the endpoints! Outliers in the middle will
 % contaminate this.
 limitidx = min(find(limitmask));
-limittime = testtimes(limitidx);
+limittime = timeseries(limitidx);
 
 
 %
