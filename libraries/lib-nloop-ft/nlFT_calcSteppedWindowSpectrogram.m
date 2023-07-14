@@ -20,7 +20,7 @@ function [ freqlist timelist spectpowers ] = ...
 %
 % "freqlist" is a vector containing frequencies for which power was computed.
 % "timelist" is a vector containing window center times that were evaluated.
-% "spectpowers" is a nTrials x nChannels x nTimes x nFrequencies matrix
+% "spectpowers" is a nTrials x nChannels x nFrequencies x nTimes matrix
 %   containing evaluated spectral power.
 
 
@@ -50,7 +50,7 @@ for tidx = 1:trialcount
 
     timecount = length(timelist);
     freqcount = length(freqlist);
-    spectpowers(tidx,cidx,1:timecount,1:freqcount) = thisslice;
+    spectpowers(tidx,cidx,1:freqcount,1:timecount) = thisslice;
   end
 end
 

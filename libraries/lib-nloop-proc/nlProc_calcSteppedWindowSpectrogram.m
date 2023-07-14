@@ -21,7 +21,7 @@ function [ freqlist timelist spectpowers ] = ...
 %
 % "freqlist" is a vector containing frequencies for which power was computed.
 % "timelist" is a vector containing window center times that were evaluated.
-% "spectpowers" is a nTimes x nFrequencies matrix containing evaluated
+% "spectpowers" is a nFrequencies x nTimes matrix containing evaluated
 %   spectral power (in arbitrary units).
 
 
@@ -65,6 +65,8 @@ stepstart = 0.5 * (timelength - stepcount * winstep);
 
 midtimes = 0:stepcount;
 midtimes = midtimes * winstep + stepstart;
+
+midtimes = midtimes + min(timespan);
 
 
 % Convert the desired midpoint times to sample indices.
@@ -110,7 +112,7 @@ for midx = 1:length(midsamps)
   % This should already be real, but roundoff errors can happen.
   spectfragment = real(spectfragment);
 
-  spectpowers(midx,1:freqcount) = spectfragment;
+  spectpowers(1:freqcount,midx) = spectfragment;
 end
 
 
