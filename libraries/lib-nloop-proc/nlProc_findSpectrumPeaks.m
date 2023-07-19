@@ -15,7 +15,7 @@ function [ peakfreqs peakheights peakwidths binlevels bincenters ] = ...
 %   A value of 0.1 would mean a bin width of 2 Hz at a frequency of 20 Hz.
 % "backgroundwidth" is the ratio between the upper and lower frequencies of
 %   the span used to evaluate noise background around any given bin. A value
-%   of 1.0 would mean evaluating noise over a one-octave span.
+%   of 2.0 would mean evaluating noise over a one-octave span.
 % "peakthresh" is the magnitude threshold for recognizing a peak in the
 %   frequency spectrum. This is a multiple of the average local background.
 %
