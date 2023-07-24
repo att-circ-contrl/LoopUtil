@@ -103,6 +103,12 @@ for bidx = 1:length(banklist)
         % Get the handle to memory-mapped data.
         thismmaphandle = thisdata.Data;
 
+        % NOTE - Get the mapped sample range for bounds checking.
+        % "Format" is: { 'type', [ first last ], 'mapped' }
+        mapsampspan = thismmaphandle.Format{2};
+        readfirst = max(firstsamp, min(mapsampspan));
+        readlast = min(lastsamp, max(mapsampspan));
+
 
         % Get a reverse map of channels to Open Ephys channel indices.
         thischanindices = find(thishandle.selectmask);
@@ -149,9 +155,14 @@ for bidx = 1:length(banklist)
             batchdatanative = thismmaphandle.Data.mapped( ...
               thisbatchmappedindices, : );
           else
-            % FIXME - We need bounds checking on firstsamp and lastsamp.
-            batchdatanative = thismmaphandle.Data.mapped( ...
-              thisbatchmappedindices, firstsamp:lastsamp );
+            % FIXME - We might be asked for more samples than we have.
+            % NaN out the invalid range and only read the valid part.
+            batchdatanative = ...
+              nan( length(thisbatchmappedindices), 1 + lastsamp - firstsamp );
+            batchdatanative( 1:length(thisbatchmappedindices), ...
+              (1 + readfirst - firstsamp):(1 + readlast - firstsamp) ) = ...
+              thismmaphandle.Data.mapped( ...
+                thisbatchmappedindices, readfirst:readlast );
           end
 
           % Walk through the loaded channels, processing them one by one.
