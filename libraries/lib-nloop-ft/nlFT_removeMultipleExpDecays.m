@@ -1,8 +1,8 @@
 function [ newftdata fitlist ] = ...
-  nlFT_removeMultipleExpDecays( oldftdata, fenceposts )
+  nlFT_removeMultipleExpDecays( oldftdata, fenceposts, method )
 
 % function [ newftdata fitlist ] = ...
-%   nlFT_removeMultipleExpDecays( oldftdata, fenceposts )
+%   nlFT_removeMultipleExpDecays( oldftdata, fenceposts, method )
 %
 % This is a wrapper for nlArt_removeMultiplExpDecays().
 %
@@ -17,6 +17,13 @@ function [ newftdata fitlist ] = ...
 %   curve fitting. The span between the last two times is curve fit and its
 %   contribution subtracted, then the next-last span, and so forth. Only the
 %   portion of the wave following the earliest fencepost is modified.
+% "method", if present, is a character vector or cell array specifying the
+%   algorithms to use to perform exponential fits ('log', 'pinmax', or
+%   'pinboth', per "nlArt_fitExpDecay()"). If this is a character vector,
+%   the same algorithm is used for all fits. If this is a cell array, it
+%   should have one fewer elements than "fenceposts", and specifies the
+%   algorithm used for each fit. If "method" is absent, or if any method is
+%   specified as '', a default method is chosen.
 %
 % "newftdata" is a copy of "oldftdata" with the curve fits subtracted.
 % "fitlist" is a {ntrials, nchannels, nfits} cell array holding curve fit
@@ -27,6 +34,12 @@ function [ newftdata fitlist ] = ...
 % Initialize output.
 newftdata = oldftdata;
 fitlist = {};
+
+
+% If we weren't given a method, tell it to use the default.
+if ~exist('method', 'var')
+  method = '';
+end
 
 
 % Iterate trials and channels, performing curve fitting.
@@ -42,7 +55,7 @@ for tidx = 1:trialcount
     thiswave = thistrial(cidx,:);
 
     [ thiswave thisfitlist ] = nlArt_removeMultipleExpDecays( ...
-      thistime, thiswave, fenceposts );
+      thistime, thiswave, fenceposts, method );
 
     fitcount = length(thisfitlist);
     fitlist(tidx,cidx,1:fitcount) = thisfitlist(:);
