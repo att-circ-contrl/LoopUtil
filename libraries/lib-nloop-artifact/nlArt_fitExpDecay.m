@@ -44,11 +44,19 @@ if isnan(offset) || isempty(offset)
   thismask = (timeseries >= (maxtime - spantime));
   meanlast = mean(waveseries(thismask));
 
-  meanglobal = mean(waveseries);
-  if abs(meanglobal - meanfirst) < abs(meanglobal - meanlast)
-    offset = meanfirst;
-  else
+  % FIXME - Force it to pick the last segment as the offset, to get a
+  % decaying exponential. We'll otherwise sometimes get a rising one if
+  % looking at a noisy wave with a small artifact.
+  if true
     offset = meanlast;
+  else
+
+    meanglobal = mean(waveseries);
+    if abs(meanglobal - meanfirst) < abs(meanglobal - meanlast)
+      offset = meanfirst;
+    else
+      offset = meanlast;
+    end
   end
 
 elseif length(offset) > 1

@@ -36,6 +36,8 @@ fitlist = {};
 
 
 % Get methods for each segment.
+% By default, pin the curve fit to the most extreme sample, so that the tail
+% doesn't dominate the curve fit.
 
 defaultmethod = 'pinmax';
 if ~exist('method', 'var')
@@ -103,10 +105,25 @@ for fidx = 1:length(tailminlist)
   thismask = (timeseries > thistailmin) & (timeseries < thistailmax);
 
   % Automatic DC level extraction is fine.
-  % Pin the curve fit to the most extreme sample, so that the tail doesn't
-  % dominate the curve fit.
   thisfit = nlArt_fitExpDecay( ...
     timeseries(thismask), newwave(thismask), NaN, methodlist{fidx} );
+
+
+  % FIXME - Straight-up reject fits that have a positive tau (rising
+  % exponential). This can happen with ramps, and gives overwhelmingly
+  % bad fit results for times beyond the fit region.
+  if true && isfield(thisfit, 'tau')
+    if thisfit.tau > 0
+      disp([ '[nlArt_removeMultipleExpDecays]  Rejecting growing' ...
+        ' exponential curve fit.' ]);
+
+      thisfit.tau = -inf;
+      if isfield(thisfit, 'coeff')
+        thisfit.coeff = 0;
+      end
+    end
+  end
+
 
   % Subtract this fit from the entire "after first fencepost" segment.
   % NOTE - Squash the "offset" portion before reconstructing.
