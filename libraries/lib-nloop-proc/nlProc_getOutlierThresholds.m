@@ -1,7 +1,7 @@
-function [ threshlow threshhigh ] = nlProc_getOutlierThresholds( ...
+function [ threshlow threshhigh midval ] = nlProc_getOutlierThresholds( ...
   dataseries, lowperc, highperc, lowmult, highmult )
 
-% function [ threshlow threshhigh ] = nlProc_getOutlierThresholds( ...
+% function [ threshlow threshhigh midval ] = nlProc_getOutlierThresholds( ...
 %   dataseries, lowperc, highperc, lowmult, highmult )
 %
 % This function computes low and high thresholds for outliers based on
@@ -21,6 +21,7 @@ function [ threshlow threshhigh ] = nlProc_getOutlierThresholds( ...
 %
 % "threshlow" is the low outlier threshold.
 % "threshhigh" is the high outlier threshold.
+% "midval" is the median.
 
 
 percvals = prctile( dataseries, [ lowperc, 50, highperc ] );
