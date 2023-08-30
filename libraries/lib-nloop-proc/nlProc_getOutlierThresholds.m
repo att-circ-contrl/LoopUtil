@@ -1,11 +1,11 @@
-function outliervec = nlProc_getOutliers( ...
+function [ threshlow threshhigh ] = nlProc_getOutlierThresholds( ...
   dataseries, lowperc, highperc, lowmult, highmult )
 
-% function outliervec = nlProc_getOutliers( ...
+% function [ threshlow threshhigh ] = nlProc_getOutlierThresholds( ...
 %   dataseries, lowperc, highperc, lowmult, highmult )
 %
-% This function flags outliers in a data series based on their distance from
-% the median.
+% This function computes low and high thresholds for outliers based on
+% distance from the median.
 %
 % "dataseries" is a vector containing samples to process.
 % "lowperc" is the percentile from which the lower threshold is derived
@@ -19,14 +19,17 @@ function outliervec = nlProc_getOutliers( ...
 %   distance from the median to the upper percentile value is multiplied by
 %   this amount.
 %
-% "outliervec" is a boolean vector of the same size as "dataseries" that's
-%   true for data samples past the outlier thresholds and false otherwise.
+% "threshlow" is the low outlier threshold.
+% "threshhigh" is the high outlier threshold.
 
 
-[ thresholow threshhigh ] = nlProc_getOutlierThresholds( ...
-  dataseries, lowperc, highperc, lowmult, highmult );
+percvals = prctile( dataseries, [ lowperc, 50, highperc ] );
+lowval = percvals(1);
+midval = percvals(2);
+highval = percvals(3);
 
-outliervec = (dataseries <= threshlow) | (dataseries >= threshhigh);
+threshlow = midval + (lowval - midval) * lowmult;
+threshhigh = midval + (highval - midval) * highmult;
 
 
 % Done.
