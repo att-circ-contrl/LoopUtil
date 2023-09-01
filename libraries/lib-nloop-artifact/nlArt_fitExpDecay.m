@@ -172,6 +172,15 @@ elseif strcmp(method, 'pinmax')
 
 elseif strcmp(method, 'pinboth')
 
+  % For y = c * exp(wt) + oset, _for known oset_, we get:
+  % w = [ ln(y2 - oset) / ln(y1 - oset) ] / (t2 - t1)
+  % c = (y1 - oset) / exp(wt1)  or  c = (y1 - oset) exp(- wt1)
+
+  % Optimizing oset requires taking the partial derivative of y with
+  % respect to oset, which is a massive pain in the tail.
+  % We _have_ to optimize oset, since using a fixed/supplied offset will
+  % give an atrociously bad fit anywhere other than the endpoints.
+
   % FIXME - NYI.
   disp([ '### [nlArt_fitExpDecay]  Method "pinboth" not yet implemented.' ]);
 
