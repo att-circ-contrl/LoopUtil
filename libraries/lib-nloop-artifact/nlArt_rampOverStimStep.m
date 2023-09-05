@@ -16,7 +16,7 @@ function newwave = ...
 % "waveseries" is a vector with sample values.
 % "ramp_span" [ min max ] is a time range over which to apply the ramp.
 % "stim_span" [ min max ] is a time range containing stimulation artifacts
-%   to be squashed.
+%   to be squashed, or [] to auto-detect an existing NaN span.
 %
 % "newwave" is a copy of "waveseries" with the stimulation region NaNed out
 %   and a gradual ramp between pre-stimulation and post-stimulation DC
@@ -32,8 +32,23 @@ newwave = waveseries;
 rampmin = min(ramp_span);
 rampmax = max(ramp_span);
 
-stimmin = min(stim_span);
-stimmax = max(stim_span);
+if isempty(stim_span)
+
+  % Autodetect NaN regions and span all of them.
+  thismask = isnan(waveseries);
+  if any(thismask)
+    stimmin = min(timeseries(thismask));
+    stimmax = max(timeseries(thismask));
+  else
+    % We have no NaN regions. Pick a small region in the middle.
+    stimmin = 0.5 * (rampmin + rampmax);
+    stimmax = stimmin + 0.01 * (rampmax - rampmin);
+  end
+
+else
+  stimmin = min(stim_span);
+  stimmax = max(stim_span);
+end
 
 
 % Get spans over which to measure DC levels for ramping.

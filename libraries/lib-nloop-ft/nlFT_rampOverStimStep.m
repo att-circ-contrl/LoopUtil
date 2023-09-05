@@ -17,7 +17,8 @@ function newftdata = ...
 % "oldftdata" is a ft_datatype_raw structure with trial data to process.
 % "ramp_span" [ min max ] is a time range over which to apply the ramp.
 % "stim_span" [ min max ] is a time range containing stimulation artifacts
-%   to be squashed.
+%   to be squashed, or [] to auto-detect existing NaN spans (which may
+%   be different lengths for each trial/channel).
 %
 % "newftdata" is a copy of "oldftdata" with stimation regions in each trial
 %   NaNed out and a gradual ramp between pre-stimulation and

@@ -9,9 +9,9 @@ function outliervec = nlProc_getOutliers( ...
 %
 % "dataseries" is a vector containing samples to process.
 % "lowperc" is the percentile from which the lower threshold is derived
-%   (e.g. "25" for the lower quartile).
+%   (e.g. 25 for the lower quartile).
 % "highperc" is the percentile from which the upper threshold is derived
-%   (e.g. "75" for the upper quartile).
+%   (e.g. 75 for the upper quartile).
 % "lowmult" is a multiplier for generating the lower outlier threshold. The
 %   distance from the median to the lower percentile value is multiplied by
 %   this amount.
