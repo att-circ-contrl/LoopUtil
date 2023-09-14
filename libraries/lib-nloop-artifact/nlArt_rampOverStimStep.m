@@ -40,9 +40,8 @@ if isempty(stim_span)
     stimmin = min(timeseries(thismask));
     stimmax = max(timeseries(thismask));
   else
-    % We have no NaN regions. Pick a small region in the middle.
-    stimmin = 0.5 * (rampmin + rampmax);
-    stimmax = stimmin + 0.01 * (rampmax - rampmin);
+    % We have no NaN regions. Bail out without modifying the wave.
+    return;
   end
 
 else
