@@ -2,12 +2,13 @@ function reconwave = nlArt_reconFit( timeseries, fitparams )
 
 % function reconwave = nlArt_reconFit( timeseries, fitparams )
 %
-% This reconstructs a curve fit over a specified time span.
+% This reconstructs one or more curve fits over a specified time span.
 % This is intended for use with artifact curve-fitting functions.
 %
 % "timeseries" is a vector with sample timestamps.
 % "fitparams" is a structure (with nlArt_XX curve fit parameters) per
-%   ARTFITPARAMS.txt or a "cfit" object with curve fit toolbox parameters.
+%   ARTFITPARAMS.txt, or a "cfit" object with curve fit toolbox parameters,
+%   or a cell array containing multiple such structures/objects.
 %
 % "reconwave" is a vector with reconstructed sample values.
 
@@ -16,8 +17,18 @@ function reconwave = nlArt_reconFit( timeseries, fitparams )
 reconwave = zeros(size(timeseries));
 
 
-% Check to see if this is ours or if it's from the curve fit toolbox.
-if strcmp('cfit', class(fitparams))
+% Check to see what type of curve fit descriptor we're dealing with.
+
+if iscell(fitparams)
+
+  % Multiple objects; recurse.
+
+  for fidx = 1:length(fitparams)
+    thisrecon = nlArt_reconFit( timeseries, fitparams{fidx} );
+    reconwave = reconwave + thisrecon;
+  end
+
+elseif strcmp('cfit', class(fitparams))
 
   % Curve fit toolbox.
   reconwave = feval(fitparams, timeseries);
