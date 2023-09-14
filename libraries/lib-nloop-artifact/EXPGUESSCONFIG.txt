@@ -1,0 +1,60 @@
+Exponential fits with guessed locations are configured using a structure with
+the following fields:
+
+"max_curves" is the number of components to curve fit.
+
+"fitmethod" is a character vector specifying the curve fit algorithm used.
+  This is 'log' or 'pinmax', per nlArt_fitExpDecay().
+
+"lowpass_corner" is the corner frequency in Hz of the low-pass filter
+  to apply before performing curve fits, or NaN to not filter.
+
+"lowpass_squash_ms" [ start stop ] is a time range to squash before
+  performing low-pass filtering, in milliseconds. This is intended to
+  suppress ringing from artifacts. Set this to [] to not squash.
+
+"full_time_range_ms" is the time range over which curve fitting is to be
+  performed, in milliseconds.
+
+"min_fit_offset_ms" is the minimum offset relative to the start of
+  full_time_range_ms at which fits are to be performed. The intent is to
+  avoid ill-behaved regions at the exact time of stimulation.
+
+"post_level_span" [ min max ] is the fraction of the time range to use for
+  estimating the after-setting DC level (e.g. [ 0.5 0.9 ]).
+
+"from_detect_level_span" [ min max ] is the time range to use for updating
+  the DC level estimate after curve fitting, as a multiple of the
+  excursion detection time within the full time range (e.g. [ 1.0 2.0 ] ).
+
+"detect_threshold" is the amount by which the signal must depart from the
+  DC level for an artifact to be considered present. This is a multiple
+  of the median-to-quartile distance (about two thirds of a standard
+  deviation). Typical values are 6-12 for clear exponential excursions.
+
+"fit_range" [ min max ] is a multiplier to apply to the excursion detection
+  time to get the time range over which to curve fit (e.g. [ 0.7 3.0 ]).
+
+"next_mult" is a multiplier to apply to the excursion detection time to get
+  the maximum acceptable detection time for the next excursion (e.g. 0.9).
+  This is to prevent the algorithm from continually re-fitting the same
+  span (which it can do if it's having trouble getting a good curve fit).
+
+"detect_max_start" is a relative position within the full time range
+  (e.g. 0.3). Excursions detected after this time are assumed to be
+  spurious (wandering DC level).
+
+"min_detect_ms" is the minimum time after the beginning of the time range
+  when an artifact excursion may be detected. Excursions before this time
+  (i.e. very short excursions) are assumed to be spurious. In practice
+  these either have strange shapes (hard to fit) or are excursions
+  introduced by previous curve fits.
+
+"min_first_detect_ms" is the minimum time after the beginning of the time
+  range when the first artifact excursion may be detected. If the first
+  attempt at detecting excursions finds an artifact before this time, the
+  attempt is abandoned. This happens when the threshold is set too high and
+  the tail of the exponential isn't detected.
+
+
+(This is the end of the file.)

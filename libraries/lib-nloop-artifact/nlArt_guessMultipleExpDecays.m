@@ -10,14 +10,15 @@ function [ newwave fitlist reportstr ] = nlArt_guessMultipleExpDecays( ...
 % performed to remove artifacts. It's more robust than fitting to fixed
 % time spans, but requires a lot of hand-tuned configuration parameters.
 %
-% Artifacts are assumed to start at t = 0.
+% Artifacts are assumed to be confined to a user-specified span. Fits are
+% subtracted only within that span, for generating the corrected wave.
 %
 % Plots of curve fit attempts are optionally generated. These are useful
 % when hand-tuning the configuration parameters.
 %
 % "timeseries" is a vector containing sample times.
 % "waveseries" is a vector containing sample values to be curve-fit.
-% "fitconfig" is a configuration structure, per EXPGUESSCONFIG.
+% "fitconfig" is a configuration structure, per EXPGUESSCONFIG.txt.
 % "plotconfig" is a structure with the following fields, or struct([]) to
 %   suppress plotting:
 %   "fileprefix" is a prefix used when building plot filenames.
@@ -27,6 +28,8 @@ function [ newwave fitlist reportstr ] = nlArt_guessMultipleExpDecays( ...
 %     in milliseconds for which plots are to be generated.
 %   "plot_labels" is a cell array containing filename- and plot-safe
 %     character vectors associated with each of the plotting time ranges.
+%   "time_squash_ms" [ min max ] is a time range to set NaN when plotting,
+%     or [] to not squash.
 % "tattle_verbosity" is 'quiet', 'terse', 'normal', or 'verbose'. This
 %   controls how many debugging/progress messages are sent to the console.
 % "report_verbosity" is 'quiet', 'terse', 'normal', or 'verbose'. This
@@ -67,7 +70,15 @@ samprate = 1 / mean(diff(timeseries));
 
 if ~isnan(fitconfig.lowpass_corner)
 
-  % Remember to pave over NaNs before filtering.
+  % If we want to squash an artifact region before filtering, do so.
+  if ~isempty(fitconfig.lowpass_squash_ms)
+    squashmin = min(fitconfig.lowpass_squash_ms) / 1000;
+    squashmax = max(fitconfig.lowpass_squash_ms) / 1000;
+    thismask = (timeseries > squashmin) & (timeseries < squashmax);
+    waveseries(thismask) = NaN;
+  end
+
+  % Pave over NaNs before filtering.
   nanmask = isnan(waveseries);
   waveseries = nlProc_fillNaN(waveseries);
 
@@ -88,30 +99,25 @@ end
 
 
 % Get relevant timespans.
-% NOTE - Assuming t = 0 is the artifact time.
+% Clamping to the user-specified time range.
 
 firsttime = min(timeseries);
 lasttime = max(timeseries);
 
-% Tolerate negative values here.
-scratch = firsttime * abs( fitconfig.pre_level_span );
-prefirst = min(scratch);
-prelast = max(scratch);
+fullfirst = min(fitconfig.full_time_range_ms) / 1000;
+fulllast = max(fitconfig.full_time_range_ms) / 1000;
 
-scratch = lasttime * fitconfig.post_level_span;
+firsttime = max(firsttime, fullfirst);
+lasttime = min(lasttime, fulllast);
+
+scratch = (lasttime - firsttime) * fitconfig.post_level_span + firsttime;
 postfirst = min(scratch);
 postlast = max(scratch);
 
-minfittime = fitconfig.min_fit_ms / 1000;
+minfittime = firsttime + ( fitconfig.min_fit_offset_ms / 1000 );
 
-fitlastmin = fitconfig.min_detect_ms / 1000;
-fitfirstmin = fitconfig.min_first_detect_ms / 1000;
-
-
-% Get the pre-stimulation DC level.
-
-thismask = (timeseries >= prefirst) & (timeseries <= prelast);
-dcbefore = median(waveseries(thismask));
+fitlastmin = firsttime + ( fitconfig.min_detect_ms / 1000 );
+fitfirstmin = firsttime + ( fitconfig.min_first_detect_ms / 1000 );
 
 
 % Iteratively produce fit estimates.
@@ -309,28 +315,33 @@ while ~done
     end
 
 
+
     % Set up the DC level region and search region for the next detection.
 
-    % This forces the search limit to walk forward on every iteration.
-    searchlimit = artdetect * fitconfig.next_mult;
+    % Walk the search limit forward on each iteration, to avoid re-fitting.
+    searchlimit = (artdetect - firsttime) * fitconfig.next_mult;
+    searchlimit = searchlimit + firsttime;
 
+    % Figure out where we want to measure the DC level.
     if false
       % This estimates DC at the detection point, where the curve fit should
       % be most accurate.
-      scratch = artdetect * fitconfig.post_level_span;
+      scratch = (artdetect - firsttime) * fitconfig.post_level_span;
     elseif false
       % This estimates DC at the tail of the area we just curve fit.
       % This is sometimes better (with a good fit) and sometimes worse
       % (if a poor fit caused the DC level to wander).
-      scratch = artlast * fitconfig.post_level_span;
+      scratch = (artlast - firsttime) * fitconfig.post_level_span;
     elseif true
       % This estimates DC from a user-specified multiple of the detect time.
-      scratch = artdetect * fitconfig.dc_from_detect_span;
+      scratch = (artdetect - firsttime) * fitconfig.dc_from_detect_span;
     else
       % This keeps the original DC estimation region, which will fail if the
       % curve fit causes the local level to wander.
-      scratch = [ postfirst postlast ];
+      scratch = [ postfirst postlast ] - firsttime;
     end
+
+    scratch = scratch + firsttime;
     postfirst = min(scratch);
     postlast = max(scratch);
 
@@ -425,6 +436,14 @@ function helper_plotCurveFitAttempt( timeseries, waveseries, plotconfig, ...
   filebase = plotconfig.fileprefix;
   titlebase = plotconfig.titleprefix;
 
+  time_squash_range = plotconfig.time_squash_ms / 1000;
+  if ~isempty(time_squash_range)
+    thismask = (timeseries >= min(time_squash_range)) ...
+      & (timeseries <= max(time_squash_range));
+    waveseries(thismask) = NaN;
+  end
+
+  % This tolerates NaN samples without trouble.
   maxtime = -inf;
   mintime = inf;
   for zidx = 1:length(zoomsizes_ms)

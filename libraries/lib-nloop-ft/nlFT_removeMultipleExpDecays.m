@@ -4,7 +4,7 @@ function [ newftdata fitlist ] = ...
 % function [ newftdata fitlist ] = ...
 %   nlFT_removeMultipleExpDecays( oldftdata, fenceposts, method )
 %
-% This is a wrapper for nlArt_removeMultiplExpDecays().
+% This is a wrapper for nlArt_removeMultipleExpDecays().
 %
 % This attempts to curve fit and remove settling artifacts composed of
 % multiple exponential decay tails.
