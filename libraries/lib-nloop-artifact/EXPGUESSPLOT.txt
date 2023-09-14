@@ -1,0 +1,32 @@
+Exponential fit debug plots are configured using a structure with the
+following fields:
+
+
+"fileprefix" is a prefix to use when building plot and report filenames.
+
+"titleprefix" is a plot-safe human-readable prefix to use when building
+  plot titles.
+
+"plot_sizes_ms" is a cell array containing [ min max ] time ranges
+  in milliseconds for which plots are to be generated.
+
+"plot_labels" is a cell array containing filename- and plot-safe
+  character vectors associated with each of the plotting time ranges.
+
+"time_squash_ms" [ min max ] is a time range to set NaN when plotting
+  (so that artifacts don't perturb the Y axis range), or [] to not squash.
+
+
+
+Additional fields for nlFT_guessMultipleExpDecays:
+
+
+"max_trial_count" is the maximum number of trials for which debug plots
+  are to be generated.
+
+"max_chan_count" is the maximum number of channels for which debug plots
+  are to be generated.
+
+
+
+(This is the end of the file.)

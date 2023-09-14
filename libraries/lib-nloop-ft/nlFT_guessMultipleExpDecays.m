@@ -19,20 +19,8 @@ function fitlist = nlFT_guessMultipleExpDecays( ...
 % "fitconfig" is a configuration structure, per EXPGUESSCONFIG.txt.
 % "want_plots" is true if debug plots of curve fits are to be generated.
 % "want_reports" is true if summaries of curve fit progress are to be saved.
-% "plotconfig" is a structure with the following fields, or struct([]) to
-%   suppress plotting and reports:
-%   "fileprefix" is a prefix used when building plot and report filenames.
-%   "titleprefix" is a prefix used when building plot titles.
-%   "plot_sizes_ms" is a cell array containing [ min max ] time range tuples
-%     in milliseconds for which plots are to be generated.
-%   "plot_labels" is a cell array containing filename- and plot-safe
-%     character vectors associated with each of the plotting time ranges.
-%   "time_squash_ms" [ min max ] is a time range to set NaN when plotting,
-%     or [] to not squash.
-%   "max_trial_count" is the maximum number of trials for which debug plots
-%     are to be generated.
-%   "max_chan_count" is the maximum number of channels for which debug plots
-%     are to be generated.
+% "plotconfig" is a structure with the fields described in EXPGUESSPLOT.txt,
+%   or struct([]) to suppress plotting and reports.
 % "tattle_verbosity" is 'quiet', 'terse', 'normal', or 'verbose'. This
 %   controls how many debugging/progress messages are sent to the console.
 % "report_verbosity" is 'quiet', 'terse', 'normal', or 'verbose'. This
@@ -86,9 +74,6 @@ if want_plots
     chanmask(1,:) = (scratch >= plot_thresh);
   end
 end
-% FIXME - Diagnostics.
-disp(sprintf('Trialmask  %d/%d    Chanmask  %d/%d\n', ...
-sum(trialmask), length(trialmask), sum(chanmask), length(chanmask) ));
 
 
 % Perform curve fitting.

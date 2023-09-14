@@ -19,22 +19,14 @@ function [ newwave fitlist reportstr ] = nlArt_guessMultipleExpDecays( ...
 % "timeseries" is a vector containing sample times.
 % "waveseries" is a vector containing sample values to be curve-fit.
 % "fitconfig" is a configuration structure, per EXPGUESSCONFIG.txt.
-% "plotconfig" is a structure with the following fields, or struct([]) to
-%   suppress plotting:
-%   "fileprefix" is a prefix used when building plot filenames.
-%   "titleprefix" is a plot-safe human-readable prefix to use when building
-%     plot titles.
-%   "plot_sizes_ms" is a cell array containing [ min max ] time range tuples
-%     in milliseconds for which plots are to be generated.
-%   "plot_labels" is a cell array containing filename- and plot-safe
-%     character vectors associated with each of the plotting time ranges.
-%   "time_squash_ms" [ min max ] is a time range to set NaN when plotting,
-%     or [] to not squash.
+% "plotconfig" is a structure with the fields described in EXPGUESSPLOT.txt,
+%   or struct([]) to suppress plotting and reports.
 % "tattle_verbosity" is 'quiet', 'terse', 'normal', or 'verbose'. This
 %   controls how many debugging/progress messages are sent to the console.
 % "report_verbosity" is 'quiet', 'terse', 'normal', or 'verbose'. This
 %   controls how many debugging/progress messages are appended to the
 %   report string.
+% "reportlabel" is an identifier to prepend to curve fit report messages.
 %
 % "newwave" is a copy of "waveseries" with the curve fits subtracted.
 % "fitlist" is a cell array holding curve fit parameters for successive
