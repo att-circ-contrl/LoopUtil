@@ -6,6 +6,9 @@ the following fields:
 "fitmethod" is a character vector specifying the curve fit algorithm used.
   This is 'log' or 'pinmax', per nlArt_fitExpDecay().
 
+"want_pin_minimum" is true to perform one additional 'pinmax' curve fit at
+  the "min_fit_offset_ms" time, and false otherwise.
+
 "lowpass_corner" is the corner frequency in Hz of the low-pass filter
   to apply before performing curve fits, or NaN to not filter.
 

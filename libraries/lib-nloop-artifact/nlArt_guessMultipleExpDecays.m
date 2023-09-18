@@ -118,76 +118,128 @@ fitcount = 0;
 done = false;
 residue = waveseries;
 
+final_curve_now = false;
+
 searchlimit = postlast;
 
 while ~done
 
-  % Figure out what our "we have a clear artifact" range is in the residue.
-  % We're clamping the "first" value to t = 0, since if there was a stepwise
-  % discontinuity at stimulation the previous samples may look like outliers.
-  % We're clamping the "last" value to the "search limit" time, so that we
-  % can perform successive curve fits without re-matching the same region.
+  if ~final_curve_now
 
-  [ artfirst artlast threshlow threshhigh dcafter ] = ...
-    nlProc_getOutlierTimeRange( timeseries, waveseries, ...
-      [ 0 searchlimit ], [ postfirst postlast ], ...
-      25, 75, fitconfig.detect_threshold, fitconfig.detect_threshold );
+    % Normal iteration of the search window.
 
+    % Figure out what our "we have a clear artifact" range is in the residue.
+    % We're clamping the "first" value to t = 0, since if there was a
+    % stepwise discontinuity at stimulation the previous samples may look
+    % like outliers.
+    % We're clamping the "last" value to the "search limit" time, so that we
+    % can perform successive curve fits without re-matching the same region.
 
-  % Check for ending conditions from detection.
-  % A "first" value substantially _later_ than t = 0 means we're in a sham
-  % case and set the threshold too low.
-  % We only actually use the "last" value.
-
-  if isnan(artlast)
-    % Nothing detected.
-    done = true;
-  elseif artlast < minfittime
-    done = true;
-  elseif artlast < fitlastmin
-    done = true;
-  elseif (fitcount < 1) && (artlast < fitfirstmin)
-    done = true;
-  elseif artfirst > (fitconfig.detect_max_start * abs(artlast))
-    % Late oscillation or double triggering, I think.
-    done = true;
-  end
+    [ detectfirst detectlast threshlow threshhigh dcafter ] = ...
+      nlProc_getOutlierTimeRange( timeseries, waveseries, ...
+        [ firsttime searchlimit ], [ postfirst postlast ], ...
+        25, 75, fitconfig.detect_threshold, fitconfig.detect_threshold );
 
 
-  % Report the initial detected artifact range.
+    % Check for ending conditions from detection.
+    % A "first" value substantially _later_ than t = 0 means we're in a sham
+    % case and set the threshold too low.
+    % We only actually use the "last" value.
 
-  if isnan(artlast)
-    [ tattlestr reportstr ] = helper_addMessage( ...
-      tattlestr, reportstr, tattle_all, write_all, ...
-      [ '(' reportlabel ')  No artifact detected.' ] );
-  elseif done
-    [ tattlestr reportstr ] = helper_addMessage( ...
-      tattlestr, reportstr, tattle_all, write_all, ...
-      sprintf( '(%s)  (spurious) %d ms to %d ms.', ...
-        reportlabel, round(artfirst * 1000), round(artlast * 1000) ));
+    if isnan(detectlast)
+      % Nothing detected.
+      done = true;
+    elseif detectlast < minfittime
+      done = true;
+    elseif detectlast < fitlastmin
+      done = true;
+    elseif (fitcount < 1) && (detectlast < fitfirstmin)
+      done = true;
+    elseif detectfirst > (fitconfig.detect_max_start * abs(detectlast))
+      % Late oscillation or double triggering, I think.
+      done = true;
+    end
+
+
+    % Report the initial detected artifact range.
+
+    if isnan(detectlast)
+      [ tattlestr reportstr ] = helper_addMessage( ...
+        tattlestr, reportstr, tattle_all, write_all, ...
+        [ '(' reportlabel ')  No artifact detected.' ] );
+    elseif done
+      [ tattlestr reportstr ] = helper_addMessage( ...
+        tattlestr, reportstr, tattle_all, write_all, ...
+        sprintf( '(%s)  (spurious) %d ms to %d ms.', ...
+          reportlabel, ...
+          round(detectfirst * 1000), round(detectlast * 1000) ));
+    else
+      [ tattlestr reportstr ] = helper_addMessage( ...
+        tattlestr, reportstr, tattle_some, write_some, ...
+        sprintf( '(%s)  (%d) detected %d ms to %d ms.', ...
+          reportlabel, fitcount + 1, ...
+          round(detectfirst * 1000), round(detectlast * 1000) ));
+    end
+
+
+    % Convert this into a search range.
+
+    artdetect = detectlast;
+
+    % Multiply the detection time to get the first and last time.
+
+    artlast = (artdetect - firsttime) * max(fitconfig.fit_range) + firsttime;
+    artlast = min(artlast, lasttime);
+
+    artfirst = (artdetect - firsttime) * min(fitconfig.fit_range) + firsttime;
+    artfirst = max(artfirst, minfittime);
+
+
+    % Use the user-specified fitting method.
+
+    fitmethod = fitconfig.fitmethod;
+
   else
-    [ tattlestr reportstr ] = helper_addMessage( ...
-      tattlestr, reportstr, tattle_some, write_some, ...
-      sprintf( '(%s)  (%d) detected %d ms to %d ms.', ...
-        reportlabel, fitcount + 1, ...
-        round(artfirst * 1000), round(artlast * 1000) ));
+
+    % One final curve fit at the minimum time, by user request.
+    % NOTE - This will often fail to get a good fit.
+
+    % Force set the search window to the minimum time, and the method to
+    % pinmax.
+
+    fitmethod = 'pinmax';
+
+    artfirst = minfittime;
+
+    % Work backwards from the user-specified span to get the detection time.
+    artdetect = (artfirst - firsttime) / min(fitconfig.fit_range) + firsttime;
+
+    % Work forwards to get the ending time.
+    artlast = (artdetect - firsttime) * max(fitconfig.fit_range) + firsttime;
+
+    % Clamp these, in case the user did something peculiar.
+    artdetect = min(artdetect, lasttime);
+    artlast = min(artlast, lasttime);
+
+
+    % We still need to get the DC level and thresholds as if we'd searched.
+    % We don't care if this detects anything, so set the detect region to
+    % be the same as the DC average region.
+
+    scratch = (artdetect - firsttime) * fitconfig.dc_from_detect_span;
+    scratch = scratch + firsttime;
+    postfirst = min(scratch);
+    postlast = max(scratch);
+
+    [ detectfirst detectlast threshlow threshhigh dcafter ] = ...
+      nlProc_getOutlierTimeRange( timeseries, waveseries, ...
+        [ postfirst postlast ], [ postfirst postlast ], ...
+        25, 75, fitconfig.detect_threshold, fitconfig.detect_threshold );
+
   end
 
 
   if ~done
-
-    % Record the detection time.
-
-    artdetect = artlast;
-
-    % Fallback: Multiply the detection time to get the first and last time.
-
-    artlast = artdetect * max(fitconfig.fit_range);
-    artlast = min(artlast, lasttime);
-
-    artfirst = artdetect * min(fitconfig.fit_range);
-    artfirst = max(artfirst, minfittime);
-
 
     % Report the curve fit first/last range.
 
@@ -199,8 +251,6 @@ while ~done
 
 
     % Do the curve fit.
-
-    fitmethod = fitconfig.fitmethod;
 
     thismask = (timeseries >= artfirst) & (timeseries <= artlast);
     timefit = timeseries(thismask);
@@ -337,6 +387,16 @@ while ~done
     postfirst = min(scratch);
     postlast = max(scratch);
 
+  end
+
+
+
+  % Set up for one last curve fit, if we were asked to pin the end of the
+  % curve.
+
+  if done && fitconfig.want_pin_minimum && (~final_curve_now)
+    done = false;
+    final_curve_now = true;
   end
 
 end
