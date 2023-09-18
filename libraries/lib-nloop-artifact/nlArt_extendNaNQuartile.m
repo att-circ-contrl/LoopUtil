@@ -28,57 +28,25 @@ if ~isfinite(threshold)
 end
 
 
-%
-% First pass: Identify non-NaN spans.
+% Identify non-NaN spans.
 
-spanstartlist = [];
-spanendlist = [];
-
-sampcount = length(oldseries);
-
-if sampcount > 1
-  nanmask = isnan(oldseries);
-  startmask = nanmask(1:(sampcount-1)) & (~nanmask(2:sampcount));
-  endmask = (~nanmask(1:(sampcount-1))) & nanmask(2:sampcount);
-
-  % This was NaN followed by non-NaN; we want the non-NaN location.
-  spanstartlist = find(startmask);
-  spanstartlist = spanstartlist + 1;
-
-  % This was non-NaN followed by NaN, so it's fine as-is.
-  spanendlist = find(endmask);
-
-  if ~isrow(spanstartlist)
-    spanstartlist = transpose(spanstartlist);
-  end
-  if ~isrow(spanendlist)
-    spanendlist = transpose(spanendlist);
-  end
-
-  % Handle end cases. We don't want to erode ends, so put ends at +/- Inf.
-  if ~isnan(oldseries(1))
-    spanstartlist = [ -Inf spanstartlist ];
-  end
-  if ~isnan(oldseries(sampcount))
-    spanendlist = [ spanendlist Inf ];
-  end
-
-  % The lists should now be the same length and properly aligned.
-end
+[ spanstartlist spanendlist nanstartlist nanendlist ] = ...
+  nlProc_findNaNSpans(newseries);
 
 
-%
-% Second pass: Walk through non-NaN spans, eroding them.
+% Walk through non-NaN spans, eroding them.
+
+% NOTE - Special-case the first and last samples of the data series, since
+% we don't want to erode those.
+
+sampcount = length(newseries);
 
 for sidx = 1:length(spanstartlist)
   startidx = spanstartlist(sidx);
   endidx = spanendlist(sidx);
 
-  wantstart = isfinite(startidx);
-  wantend = isfinite(endidx);
-
-  startidx = max(1, startidx);
-  endidx = min(sampcount, endidx);
+  wantstart = (startidx > 1);
+  wantend = (endidx < sampcount);
 
   thisdata = newseries(startidx:endidx);
   [ threshlow threshhigh threshmedian ] = nlProc_getOutlierThresholds( ...
