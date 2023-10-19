@@ -15,8 +15,8 @@ function nlPlot_axesPlotSurface2D( thisax, zdata, xvalues, yvalues, ...
 % "yvalues" is a series of Y coordinate values corresponding to each row of
 %   zdata. If there are as many values as rows, they're bin midpoints. If
 %   there's one more value than there are rows, they're bin edges.
-% "xrange" [ min max ] is the range of X values to render.
-% "yrange" [ min max ] is the range of Y values to render.
+% "xrange" [ min max ] is the range of X values to render, or [] for auto.
+% "yrange" [ min max ] is the range of Y values to render, or [] for auto.
 % "xloglin" is 'log' or 'linear', specifying the X axis scale.
 % "yloglin" is 'log' or 'linear', specifying the Y axis scale.
 % "zloglin" is 'log' or 'linear', specifying whether to log-compress zdata.
@@ -44,6 +44,17 @@ if length(xvalues) == xcount
 end
 if length(yvalues) == ycount
   yvalues = nlProc_getBinEdgesFromMidpoints(yvalues, yloglin);
+end
+
+
+% Use the edges to get range limits if these weren't specified.
+
+if isempty(xrange)
+  xrange = [ min(xvalues), max(xvalues) ];
+end
+
+if isempty(yrange)
+  yrange = [ min(yvalues), max(yvalues) ];
 end
 
 
