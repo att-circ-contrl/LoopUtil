@@ -18,6 +18,8 @@ REFBITS=\
 	$(REFBASE)-over.tex
 
 REFAUTO=\
+	$(REFBASE)-artifact.tex		\
+	$(REFBASE)-basis.tex		\
 	$(REFBASE)-ft.tex		\
 	$(REFBASE)-io.tex		\
 	$(REFBASE)-plot.tex		\
@@ -30,7 +32,7 @@ REFAUTO=\
 	$(REFBASE)-sanity.tex		\
 	$(REFBASE)-examples.tex		\
 	$(REFBASE)-notes-core.tex	\
-	$(REFBASE)-notes-vendor.tex	\
+	$(REFBASE)-notes-abstract.tex	\
 	$(REFBASE)-notes-apps.tex
 
 
@@ -64,19 +66,24 @@ $(CHANGUIDE).pdf: $(CHANBITS)
 	make tclean
 
 
-refauto-bits: refauto-corelibs refauto-vendorlibs refauto-applibs \
+refauto-bits: refauto-corelibs refauto-abstractlibs refauto-applibs \
 	refauto-examples refauto-notes
 
 DIRSCORE=\
+	../libraries/lib-nloop-artifact	\
+	../libraries/lib-nloop-basis	\
 	../libraries/lib-nloop-io	\
 	../libraries/lib-nloop-plot	\
 	../libraries/lib-nloop-proc	\
 	../libraries/lib-nloop-util
 
 refauto-corelibs:
-	./copy-code.pl --outfile=$(REFBASE)-ft.tex --matlabdoc \
-		"--chapter=\`\`nlFT'' Functions" --label=sect-ft \
-		../libraries/lib-nloop-ft/*.m
+	./copy-code.pl --outfile=$(REFBASE)-artifact.tex --matlabdoc \
+		"--chapter=\`\`nlArt'' Functions" --label=sect-artifact \
+		../libraries/lib-nloop-artifact/*.m
+	./copy-code.pl --outfile=$(REFBASE)-basis.tex --matlabdoc \
+		"--chapter=\`\`nlBasis'' Functions" --label=sect-basis \
+		../libraries/lib-nloop-basis/*.m
 	./copy-code.pl --outfile=$(REFBASE)-io.tex --matlabdoc \
 		"--chapter=\`\`nlIO'' Functions" --label=sect-io \
 		../libraries/lib-nloop-io/*.m
@@ -90,13 +97,16 @@ refauto-corelibs:
 		"--chapter=\`\`nlUtil'' Functions" --label=sect-util \
 		../libraries/lib-nloop-util/*.m
 
-DIRSVENDOR=\
+DIRSABSTRACT=\
 	../libraries/lib-nloop-ft	\
 	../libraries/lib-nloop-intan	\
 	../libraries/lib-vendor-intan	\
 	../libraries/lib-nloop-openephys
 
-refauto-vendorlibs:
+refauto-abstractlibs:
+	./copy-code.pl --outfile=$(REFBASE)-ft.tex --matlabdoc \
+		"--chapter=\`\`nlFT'' Functions" --label=sect-ft \
+		../libraries/lib-nloop-ft/*.m
 	./copy-code.pl --outfile=$(REFBASE)-intan.tex --matlabdoc \
 		"--chapter=\`\`nlIntan'' Functions" --label=sect-intan \
 		../libraries/lib-nloop-intan/*.m
@@ -127,13 +137,13 @@ refauto-examples:
 refauto-notes:
 	./copy-code.pl --outfile=$(REFBASE)-notes-core.tex --verbatim \
 		"--chapter=Core Library Structures and Additional Notes" \
-		--label=sect-notes `find $(DIRSCORE)|grep txt`
-	./copy-code.pl --outfile=$(REFBASE)-notes-vendor.tex --verbatim \
-		"--chapter=Hardware Library Structures and Additional Notes" \
-		--label=sect-notes `find $(DIRSVENDOR)|grep txt`
+		--label=sect-notes-core `find $(DIRSCORE)|grep txt`
+	./copy-code.pl --outfile=$(REFBASE)-notes-abstract.tex --verbatim \
+	"--chapter=Compatibility Library Structures and Additional Notes" \
+		--label=sect-notes-abstract `find $(DIRSABSTRACT)|grep txt`
 	./copy-code.pl --outfile=$(REFBASE)-notes-apps.tex --verbatim \
 	"--chapter=Application Library Structures and Additional Notes" \
-		--label=sect-notes `find $(DIRSAPPS)|grep txt`
+		--label=sect-notes-apps `find $(DIRSAPPS)|grep txt`
 
 $(REFNAME).pdf: $(REFBITS) refauto-bits
 	pdflatex $(REFNAME).tex

@@ -15,7 +15,7 @@ The NeuroLoop utility library functions are divided into several categories:
 \item \textbf{``Core''} functions (part \ref{sect-core}) are functions
 useful in a wide variety of contexts (not vendor- or application-specific).
 %
-\item \textbf{``Abstraction''} functions (part \ref{sect-vendor}) are
+\item \textbf{``Abstraction''} functions (part \ref{sect-abstract}) are
 functions used to support specific hardware devices or software suites.
 %
 \item \textbf{``Application''} functions (part \ref{sect-apps}) are
@@ -32,12 +32,13 @@ help illustrate the ways these libraries may be used.
 
 \begin{itemize}
 %
-\item \textbf{``Processing''} functions (ch. \ref{sect-proc}) perform signal
-processing operations on data series such as filtering, artifact rejection,
-statistical calculations, and so forth.
+\item \textbf{``Artifact''} functions (ch. \ref{sect-artifact}) perform
+artifact rejection via various methods.
 %
-\item \textbf{``Utility''} functions (ch. \ref{sect-util}) perform
-miscellaneous operations that are not covered by the other categories.
+\item \textbf{``Basis''} functions (ch. \ref{sect-basis}) use various
+methods to express several channels' signals as the sum of a small number
+of basis signals. Among other things this is useful for background
+subtraction.
 %
 \item \textbf{``I/O''} functions (ch. \ref{sect-io}) facilitate operations
 for reading and writing data that aren't vendor-specific.
@@ -46,6 +47,13 @@ for reading and writing data that aren't vendor-specific.
 of various types to files, figures, or axes. These are included as an aid
 to rapid prototyping, and are used by the GUI scripts. The output is
 generally not publication-ready.
+%
+\item \textbf{``Processing''} functions (ch. \ref{sect-proc}) perform signal
+processing operations on data series such as filtering, artifact rejection,
+statistical calculations, and so forth.
+%
+\item \textbf{``Utility''} functions (ch. \ref{sect-util}) perform
+miscellaneous operations that are not covered by the other categories.
 %
 \end{itemize}
 
