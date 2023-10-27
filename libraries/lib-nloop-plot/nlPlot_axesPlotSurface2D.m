@@ -83,6 +83,42 @@ end
 
 
 %
+% FIXME - Handle NaN gap cases.
+
+% All four polygons adjacent to a NaN data point are missing, so we need
+% to propagate valid data in the positive XY directions to let the most
+% positive valid squares get rendered.
+
+% Doing that for NaN gaps that are 1 element wide removes the gap, so only
+% do it for gaps 2x2 elements wide or larger.
+
+% Figure out where we want to fill in.
+isnanorig = isnan(zdata);
+isnan2x2 = ...
+  isnanorig(1:ycount,1:xcount) & isnanorig(2:(ycount+1),1:xcount) ...
+  & isnanorig(1:ycount,2:(xcount+1)) & isnanorig(2:(ycount+1),2:(xcount+1));
+
+% Figure out where to pull data from.
+% Mostly this is from y-1,x-1, but we have to account for edges.
+% Crop this to be the same size as isnan2x2.
+newdata = NaN(ycount,xcount);
+newdata(2:ycount,2:xcount) = zdata(1:(ycount-1),1:(xcount-1));
+newdata(1,2:xcount) = zdata(1,1:(xcount-1));
+newdata(2:ycount,1) = zdata(1:(ycount-1),1);
+
+% Supply new data where it's needed.
+% If we're trying to fill in deep inside a NaN gap, we'll still pull NaN.
+scratch = zdata(1:ycount,1:xcount);
+scratch(isnan2x2) = newdata(isnan2x2);
+zdata(1:ycount,1:xcount) = scratch;
+
+% Re-copy the duplicated rows, as we otherwise wouldn't fill in NaNs there.
+zdata(ycount+1,:) = zdata(ycount,:);
+zdata(:,xcount+1) = zdata(:,xcount);
+
+
+
+%
 % Render the data.
 
 surf( thisax, xvalues, yvalues, zdata, 'EdgeColor', 'none' );
