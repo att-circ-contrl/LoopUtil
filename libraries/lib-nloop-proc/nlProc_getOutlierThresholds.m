@@ -7,7 +7,9 @@ function [ threshlow threshhigh midval ] = nlProc_getOutlierThresholds( ...
 % This function computes low and high thresholds for outliers based on
 % distance from the median.
 %
-% "dataseries" is a vector containing samples to process.
+% This tolerates multidimensional input.
+%
+% "dataseries" is a vector or matrix containing samples to process.
 % "lowperc" is the percentile from which the lower threshold is derived
 %   (e.g. 25 for the lower quartile).
 % "highperc" is the percentile from which the upper threshold is derived
@@ -23,6 +25,8 @@ function [ threshlow threshhigh midval ] = nlProc_getOutlierThresholds( ...
 % "threshhigh" is the high outlier threshold.
 % "midval" is the median.
 
+% Tolerate multidimensional arrays.
+dataseries = reshape( dataseries, [ 1 numel(dataseries) ] );
 
 percvals = prctile( dataseries, [ lowperc, 50, highperc ] );
 lowval = percvals(1);

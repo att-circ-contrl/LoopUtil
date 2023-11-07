@@ -7,7 +7,9 @@ function outliervec = nlProc_getOutliers( ...
 % This function flags outliers in a data series based on their distance from
 % the median.
 %
-% "dataseries" is a vector containing samples to process.
+% This tolerates multidimensional input.
+%
+% "dataseries" is a vector or matrix containing samples to process.
 % "lowperc" is the percentile from which the lower threshold is derived
 %   (e.g. 25 for the lower quartile).
 % "highperc" is the percentile from which the upper threshold is derived
@@ -19,8 +21,9 @@ function outliervec = nlProc_getOutliers( ...
 %   distance from the median to the upper percentile value is multiplied by
 %   this amount.
 %
-% "outliervec" is a boolean vector of the same size as "dataseries" that's
-%   true for data samples past the outlier thresholds and false otherwise.
+% "outliervec" is a boolean vector or matrix of the same size as
+%   "dataseries" that's true for data samples past the outlier thresholds
+%   and false otherwise.
 
 
 [ thresholow threshhigh midval ] = nlProc_getOutlierThresholds( ...
