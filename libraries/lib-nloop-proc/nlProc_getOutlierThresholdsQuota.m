@@ -70,6 +70,12 @@ count_high = sum(dataseries >= threshhigh);
 % If we have too many results from percentile thresholds, get thresholds
 % derived from the quotas.
 
+% NOTE - Perform ad-hoc shenanigans to push both thresholds out if either
+% one is pushed out.
+
+newthreshlow = threshlow;
+newthreshhigh = threshhigh;
+
 if (~isnan(quota_low)) && (count_low > quota_low)
   prc_low = 100 * quota_low / totalcount;
 
@@ -80,7 +86,7 @@ if (~isnan(quota_low)) && (count_low > quota_low)
   end
 
   % This needs one-dimennsional data.
-  threshlow = prctile( dataseries, prc_low );
+  newthreshlow = prctile( dataseries, prc_low );
 end
 
 if (~isnan(quota_high)) && (count_high > quota_high)
@@ -93,7 +99,29 @@ if (~isnan(quota_high)) && (count_high > quota_high)
   end
 
   % This needs one-dimennsional data.
-  threshhigh = prctile( dataseries, prc_high );
+  newthreshhigh = prctile( dataseries, prc_high );
+end
+
+
+% If either of the thresholds changed, figure out the largest change and
+% adjust the other by the same ratio.
+
+if (newthreshlow < threshlow) || (newthreshhigh > threshhigh)
+
+  % FIXME - Blithely assume that the high and low thresholds are above and
+  % below the median. They should be unless the user asked for something
+  % very strange.
+
+  threshlow = threshlow - midval;
+  threshhigh = threshhigh - midval;
+  newthreshlow = newthreshlow - midval;
+  newthreshhigh = newthreshhigh - midval;
+
+  scalefact = max( (newthreshlow/threshlow), (newthreshhigh/threshhigh) );
+
+  threshlow = (threshlow * scalefact) + midval;
+  threshhigh = (threshhigh * scalefact) + midval;
+
 end
 
 
