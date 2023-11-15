@@ -23,8 +23,8 @@ linestyles = {};
 markstyles = {};
 
 for cidx = 1:count
-  linestyles{cidx} = linelut(1 + mod( cidx-1, length(linelut) ));
-  markstyles{cidx} = marklut(1 + mod( cidx-1, length(marklut) ));
+  linestyles(cidx) = linelut(1 + mod( cidx-1, length(linelut) ));
+  markstyles(cidx) = marklut(1 + mod( cidx-1, length(marklut) ));
 end
 
 
