@@ -29,9 +29,24 @@ Neural dynamics parameters (common to all):
 "gamma" is the inverse within-cortex propagation time (1/sec); typically 100.
 
 
-Cortico-thalamic circuit parameters (FIXME - Function):
+Cortico-thalamic circuit parameters (for SimulateHindriksNetwork):
 
 "halfdelay" is half of the round-trip cortex/thalamus loop time (ms). Typ. 40.
+
+
+Additional coupling parameters (for SimulateHindriksNetwork):
+
+"noisecoupling" is the coupling weight of noise into the specific nucleus.
+"mixturecoupling" is the coupling weight of mixed-population cortex
+  excitatory signals into the cortex.
+
+
+Noise generation parameters (for SimulateHindriksNetwork):
+
+"noisemean" is the mean noise signal value; typically 0.5.
+"noisesigma" is the standard deviation of additive noise; typically 0.1-0.5.
+"noisemultfactor" is "chi" in Freyer 2011/Hindriks 2023; the standard
+  deviation of multiplicative noise is chi * noisesigma. Typically 0.64.
 
 
 

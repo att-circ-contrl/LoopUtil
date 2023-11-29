@@ -1,7 +1,7 @@
-function [ modelparams intcouplings noisecouplings ] = ...
+function [ modelparams intcouplings ] = ...
   nlSynth_robinsonGetModelParamsHindriks()
 
-% function [ modelparams intcouplings noisecouplings ] = ...
+% function [ modelparams intcouplings ] = ...
 %   nlSynth_robinsonGetModelParamsHindriks()
 %
 % This returns model and coupling parameters for use with
@@ -21,9 +21,6 @@ function [ modelparams intcouplings noisecouplings ] = ...
 % "intcouplings" is a 4x4 matrix indexed by (destination,source) that
 %   provides the coupling weights (in mV*s) between excitatory, inhibitory,
 %   specific nucleus, and reticular nucleus neurons.
-% "noisecouplings" is a 4x1 matrix indexed by destination that provides the
-%   coupling weights (in mV*s) from the noise signal to excitatory,
-%   inhibitory, specific nucleus, and reticular nucleus neurons.
 
 
 modelparams = struct();
@@ -41,6 +38,12 @@ modelparams.gamma = 100;   % 1/sec
 % Parameters for cortico-thalamic circuit dynamics.
 modelparams.halfdelay = 40;  % ms
 
+% Noise parameters.
+% FIXME - These are poorly documented and were varied during testing.
+modelparams.noisemean = 0.5;
+modelparams.noisesigma = 0.1;
+modelparams.noisemultfactor = 0.64;   % No idea; assuming per Freyer.
+
 
 % Internal coupling parameters.
 
@@ -50,13 +53,13 @@ intcouplings = ...
   1.2  0   0   -0.8 ; ...
   0.4  0   0.2  0 ];
 
-% Noise coupling parameters. Noise only couples to the specific nucleus.
 
-noisecouplings = ...
-[ 0 ;
-  0 ;
-  0.5 ;
-  0 ];
+% Additional coupling parameters.
+% Noise couples to the specific nucleus, population mixtures to excitatory
+% cortical neurons.
+
+modelparams.noisecoupling = 0.5;
+modelparams.mixturecoupling = 0.84;
 
 
 % Done.

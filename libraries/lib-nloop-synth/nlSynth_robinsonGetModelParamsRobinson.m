@@ -1,7 +1,7 @@
-function [ modelparams intcouplings noisecouplings ] = ...
+function [ modelparams intcouplings ] = ...
   nlSynth_robinsonGetModelParamsRobinson()
 
-% function [ modelparams intcouplings noisecouplings ] = ...
+% function [ modelparams intcouplings ] = ...
 %   nlSynth_robinsonGetModelParamsRobinson()
 %
 % This returns model and coupling parameters for use with
@@ -17,9 +17,6 @@ function [ modelparams intcouplings noisecouplings ] = ...
 % "intcouplings" is a 4x4 matrix indexed by (destination,source) that
 %   provides the coupling weights (in mV*s) between excitatory, inhibitory,
 %   specific nucleus, and reticular nucleus neurons.
-% "noisecouplings" is a 4x1 matrix indexed by destination that provides the
-%   coupling weights (in mV*s) from the noise signal to excitatory,
-%   inhibitory, specific nucleus, and reticular nucleus neurons.
 
 
 modelparams = struct();
@@ -37,6 +34,14 @@ modelparams.gamma = 100;   % 1/sec
 % Parameters for cortico-thalamic circuit dynamics.
 modelparams.halfdelay = 40;  % ms
 
+% Noise parameters.
+% NOTE - Robinson didn't specify v_sn; he specified v_sn * phi_n (mean).
+% NOTE - Robinson didn't vary noise; he used a constant background and
+% then performed a perturbation analysis.
+modelparams.noisemean = 1.0;
+modelparams.noisesigma = 0.0;
+modelparams.noisemultfactor = 0.0;  % Introduced by Freyer, so zero here.
+
 
 % Internal coupling parameters.
 % NOTE - Robinson set the inhibitory potential to be equal to the
@@ -50,13 +55,14 @@ intcouplings = ...
   1.2  0   0   -0.8 ; ...
   0.4  0   0.2  0 ];
 
-% Noise coupling parameters. Noise only couples to the specific nucleus.
 
-noisecouplings = ...
-[ 0 ;
-  0 ;
-  1.0 ;
-  0 ];
+% Additional coupling parameters.
+% Noise couples to the specific nucleus, population mixtures to excitatory
+% cortical neurons.
+
+% NOTE - Robinson didn't specify v_sn; he specified v_sn * phi_n.
+modelparams.noisecoupling = 1.0;
+modelparams.mixturecoupling = 0;  % Only Hindriks used population mixing.
 
 
 % Done.
