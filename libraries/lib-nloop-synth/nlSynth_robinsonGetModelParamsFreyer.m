@@ -5,7 +5,7 @@ function [ modelparams intcouplings noisecouplings ] = ...
 %   nlSynth_robinsonGetModelParamsFreyer()
 %
 % This returns model and coupling parameters for use with
-% nlSynth_robinsonStepCortexThalamus().
+% nlSynth_robinsonStepCortexThalamus() and related functions.
 %
 % Values are the ones used in Freyer 2011 (Table 1):
 % https://www.jneurosci.org/content/31/17/6353.short
@@ -16,7 +16,7 @@ function [ modelparams intcouplings noisecouplings ] = ...
 % No arguments.
 %
 % "modelparams" is a model parameter structure with the fields described
-%   in nlSynth_robinsonStepCortexThalamus().
+%   in MODELPARAMSROBINSON.txt.
 % "intcouplings" is a 4x4 matrix indexed by (destination,source) that
 %   provides the coupling weights (in mV*s) between excitatory, inhibitory,
 %   specific nucleus, and reticular nucleus neurons.
@@ -36,6 +36,9 @@ modelparams.threshsigma = 6;    % mV
 modelparams.alpha = 60;    % 1/sec
 modelparams.beta = 240;    % 1/sec
 modelparams.gamma = 100;   % 1/sec
+
+% Parameters for cortico-thalamic circuit dynamics.
+modelparams.halfdelay = 40;  % ms
 
 
 % Internal coupling parameters.

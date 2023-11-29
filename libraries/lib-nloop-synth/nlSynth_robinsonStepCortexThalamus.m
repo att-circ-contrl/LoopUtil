@@ -22,7 +22,8 @@ function statefuture = nlSynth_robinsonStepCortexThalamus( modelparams, ...
 % than the time scales of any system dynamics. Make this much smaller than
 % you think you need to.
 %
-% "modelparams" is a structure with the following fields:
+% "modelparams" is a structure with the following fields (as described in
+%   MODELPARAMSROBINSON.txt):
 %   "qmax" is the maximum firing rate (1/sec); typically 250.
 %   "threshlevel" is the average neuronal threshold (mV); typ. 15.
 %   "threshsigma" is the standard deviation of the neuronal threshold (mV);
@@ -31,7 +32,7 @@ function statefuture = nlSynth_robinsonStepCortexThalamus( modelparams, ...
 %   "beta" is the inverse rise time (1/sec); typically 200.
 %   "gamma" is the inverse within-cortex propagation time (1/sec); typ. 100.
 % "timestep" is the amount of time to advance the simulation by (in seconds).
-%   NOTE - This must be much smaller than system response tyimes!
+%   NOTE - This must be much smaller than system dynamics timescales!
 % "statepresent" is a structure with the following fields:
 %   "potentials" is a 4xN matrix containing Ve_k, Vi_k, Vs_k, and Vr_k from
 %     the Robinson model.

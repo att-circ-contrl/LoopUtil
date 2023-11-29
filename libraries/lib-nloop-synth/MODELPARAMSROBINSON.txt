@@ -1,0 +1,38 @@
+The nlSynth_robinsonXXX functions accept a model parameters structure
+with the fields described below.
+
+
+Relevant references:
+
+(Robinson 2002)
+https://journals.aps.org/pre/abstract/10.1103/PhysRevE.65.041924
+
+(Freyer 2011)
+https://www.jneurosci.org/content/31/17/6353.short
+
+(Hindriks 2023)
+https://www.nature.com/articles/s42003-023-04648-x
+
+
+Sigmoid parameters (common to all):
+
+"qmax" is the maximum firing rate (1/sec); typically 250.
+"threshlevel" is the average neuronal threshold (mV); typically 15.
+"threshsigma" is the standard deviation of the neuronal threshold (mV);
+  typically 6.0.
+
+
+Neural dynamics parameters (common to all):
+
+"alpha" is the inverse decay time (1/sec); typically 50.
+"beta" is the inverse rise time (1/sec); typically 200.
+"gamma" is the inverse within-cortex propagation time (1/sec); typically 100.
+
+
+Cortico-thalamic circuit parameters (FIXME - Function):
+
+"halfdelay" is half of the round-trip cortex/thalamus loop time (ms). Typ. 40.
+
+
+
+(This is the end of the file.)
