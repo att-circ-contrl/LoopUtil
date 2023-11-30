@@ -31,7 +31,8 @@ Neural dynamics parameters (common to all):
 
 Cortico-thalamic circuit parameters (for SimulateHindriksNetwork):
 
-"halfdelay" is half of the round-trip cortex/thalamus loop time (ms). Typ. 40.
+"halfdelay_ms" is half of the round-trip cortex/thalamus loop time (ms);
+  typically 40.
 
 
 Additional coupling parameters (for SimulateHindriksNetwork):

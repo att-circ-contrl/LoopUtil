@@ -32,7 +32,7 @@ modelparams.beta = 200;    % 1/sec
 modelparams.gamma = 100;   % 1/sec
 
 % Parameters for cortico-thalamic circuit dynamics.
-modelparams.halfdelay = 40;  % ms
+modelparams.halfdelay_ms = 40;  % ms
 
 % Noise parameters.
 % NOTE - Robinson didn't specify v_sn; he specified v_sn * phi_n (mean).

@@ -35,7 +35,7 @@ modelparams.beta = 240;    % 1/sec
 modelparams.gamma = 100;   % 1/sec
 
 % Parameters for cortico-thalamic circuit dynamics.
-modelparams.halfdelay = 40;   % ms
+modelparams.halfdelay_ms = 40;   % ms
 
 % Noise parameters.
 % FIXME - Mean isn't documented!
