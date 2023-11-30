@@ -39,10 +39,9 @@ modelparams.gamma = 100;   % 1/sec
 modelparams.halfdelay_ms = 40;  % ms
 
 % Noise parameters.
-% FIXME - These are poorly documented and were varied during testing.
 modelparams.noisemean = 0.5;
 modelparams.noisesigma = 0.1;
-modelparams.noisemultfactor = 0.64;   % No idea; assuming per Freyer.
+modelparams.noisemultfactor = 0.3;   % Effects above 0.2; swept from 0 to 0.4.
 
 
 % Internal coupling parameters.
@@ -59,7 +58,13 @@ intcouplings = ...
 % cortical neurons.
 
 modelparams.noisecoupling = 0.5;
-modelparams.mixturecoupling = 0.84;
+
+% FIXME - This is documented as swept from 0.05 to 0.08 in the paper, but
+% it's ambiguous as to whether that's the weight (used here) or the
+% connectivity (in the mixing matrix).
+% The code has a stubbed-out weight value of 0.84.
+
+modelparams.mixturecoupling = 0.07;  % Effects above 0.06.
 
 
 % Done.
