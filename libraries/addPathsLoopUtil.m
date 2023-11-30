@@ -21,6 +21,7 @@ fullname = which('addPathsLoopUtil');
 addpath([ thisdir filesep 'lib-nloop-proc' ]);
 addpath([ thisdir filesep 'lib-nloop-basis' ]);
 addpath([ thisdir filesep 'lib-nloop-artifact' ]);
+addpath([ thisdir filesep 'lib-nloop-synth' ]);
 
 % Utility libraries.
 addpath([ thisdir filesep 'lib-nloop-util' ]);

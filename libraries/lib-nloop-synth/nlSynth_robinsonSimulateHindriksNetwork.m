@@ -151,8 +151,8 @@ for sampidx = startsamp:(sampcount-1)
 
   thispotential = reshape( potentials(:,:,sampidx), regioncount, popcount );
   thisvelocity = reshape( velocities(:,:,sampidx), regioncount, popcount );
-  thiscortexrate = reshape( cortexrates(:,sampidx), 1, regioncount );
-  thiscortexvel = reshape( cortexvelocities(:,sampidx), 1, regioncount );
+  thiscortexrate = reshape( cortexrates(:,sampidx), 1, popcount );
+  thiscortexvel = reshape( cortexvelocities(:,sampidx), 1, popcount );
 
   statepresent = struct( 'potentials', thispotential, ...
     'velocities', thisvelocity, 'cortexrates', thiscortexrate, ...
@@ -163,9 +163,9 @@ for sampidx = startsamp:(sampcount-1)
   thisvelocity = reshape( velocities(:,:,(sampidx-halfdelay_samp)), ...
     regioncount, popcount );
   thiscortexrate = reshape( cortexrates(:,(sampidx-halfdelay_samp)), ...
-    1, regioncount );
+    1, popcount );
   thiscortexvel = reshape( cortexvelocities(:,(sampidx-halfdelay_samp)), ...
-    1, regioncount );
+    1, popcount );
 
   statepast = struct( 'potentials', thispotential, ...
     'velocities', thisvelocity, 'cortexrates', thiscortexrate, ...
@@ -234,7 +234,7 @@ end
 % Package the results.
 
 % Get firing rates.
-firingrates = nlSynth_robinsonGetSigmoid( potetnials, ...
+firingrates = nlSynth_robinsonGetSigmoid( potentials, ...
   modelparams.qmax, modelparams.threshlevel, modelparams.threshsigma );
 
 % Special-case the gamma-damped excitatory cortex rates.

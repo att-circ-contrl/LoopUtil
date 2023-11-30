@@ -49,7 +49,7 @@ function statefuture = nlSynth_robinsonStepCortexThalamus( modelparams, ...
 %   provides the coupling weights (in mV*s) between excitatory cortex
 %   neurons (1), inhibitory cortex neurons (2), specific nucleus neurons (3),
 %   and reticular nucleus neurons (4). Typical couplings range from -2 to +2.
-% "extrates" is a 1xM matrix containing the firing rates of M external inputs
+% "extrates" is a MxN matrix containing the firing rates of M external inputs
 %   to the system. These may represent noise (as with Freyer 2011) or
 %   cross-coupled activity within the cortex (as with Hindriks 2023).
 %   This may be empty (M = 0).
@@ -101,7 +101,7 @@ pastfiringrates(1,:) = pastcortexrates;
 popcount = length(cortexrates);
 
 % Make note of our external signal count. This may be zero!
-extcount = length(extrates);
+extcount = size(extrates,1);
 
 
 
@@ -159,7 +159,7 @@ end
 for dstidx = 1:4
   for srcidx = 1:extcount
     accelpotentials(dstidx,:) = accelpotentials(dstidx,:) ...
-      + extcouplings(dstidx,srcidx) * firingrates(1,dstidx);
+      + extcouplings(dstidx,srcidx) * extrates(srcidx,:);
   end
 end
 
@@ -173,8 +173,8 @@ accelpotentials = accelpotentials * modelparams.alpha * modelparams.beta ...
 % Finally, get the damped/delayed cortex excitatory firing rates.
 
 accelcortexrates = ...
-  model.gamma * model.gamma * (immedcortexrates - cortexrates) ...
-  - 2 * model.gamma * cortexvelocities;
+  modelparams.gamma * modelparams.gamma * (immedcortexrates - cortexrates) ...
+  - 2 * modelparams.gamma * cortexvelocities;
 
 
 

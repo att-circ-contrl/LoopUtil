@@ -24,7 +24,8 @@ function firingrate = nlSynth_robinsonGetSigmoid( ...
 
 sigmaprime = threshdeviation * sqrt(3) / pi;
 
-firingrate = qmax ./ ( 1 + exp( - (potential - threshlevel) / sigmaprime ) );
+firingrate = ...
+  maxrate ./ ( 1 + exp( - (potential - threshlevel) / sigmaprime ) );
 
 
 % Done.
