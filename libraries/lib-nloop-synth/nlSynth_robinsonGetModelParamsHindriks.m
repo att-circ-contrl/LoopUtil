@@ -39,7 +39,7 @@ modelparams.gamma = 100;   % 1/sec
 modelparams.halfdelay_ms = 40;  % ms
 
 % Noise parameters.
-modelparams.noisemean = 0;
+modelparams.noisemean = 0;   % Paper says 0.5, code says 0. Only 0 works.
 modelparams.noisesigma = 0.1;
 modelparams.noisemultfactor = 0.3;   % Effects above 0.2; swept from 0 to 0.4.
 
