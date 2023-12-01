@@ -1,9 +1,9 @@
 function [ firingrates potentials ] = ...
-  nlSynth_robinsonSimulateHindriksNetwork( duration, timestep, ...
+  nlSynth_robinsonSimulateHindriksNetwork( duration, startup, timestep, ...
     modelparams, intcouplings, popcount, cortexmixing, cortexdelays_ms )
 
 % function [ firingrates potentials ] = ...
-%   nlSynth_robinsonSimulateHindriksNetwork( duration, timestep, ...
+%   nlSynth_robinsonSimulateHindriksNetwork( duration, startup, timestep, ...
 %     modelparams, intcouplings, popcount, cortexmixing, cortexdelays_ms )
 %
 % This simulates cortex and thalamus neural activity, using the model from
@@ -24,6 +24,8 @@ function [ firingrates potentials ] = ...
 % you think you need to.
 %
 % "duration" is the number of seconds to simulate.
+% "startup" is the number of seconds to simulate before the duration to
+%   allow the simulation to settle/converge. This is typically 2-5 seconds.
 % "timestep" is the amount of time to advance the simulation during each
 %   sample, in seconds. NOTE - This must be much smaller than system
 %   dynamics timescales!
@@ -58,8 +60,6 @@ function [ firingrates potentials ] = ...
 %
 % Magic values.
 
-startup_secs = 2.0;
-
 regioncount = 4;
 regionidxexcitatory = 1;
 regionidxinhibitory = 2;
@@ -92,7 +92,7 @@ end
 
 timestep_ms = 1000 * timestep;
 
-padsamps = round(startup_secs / timestep);
+padsamps = round(startup / timestep);
 padsamps = max(1,padsamps);
 
 sampcount = round(duration / timestep);
@@ -111,14 +111,14 @@ halfdelay_samp = round(modelparams.halfdelay_ms / timestep_ms);
 % Run the simulation.
 
 % Per Hindriks 2023, state is initialized to zero. We start simulating
-% late enough that all delayed copies are pulled from valid loations.
+% late enough that all delayed copies are pulled from valid locations.
 % Simulation runs for a while (typically 2 seconds) to stabilize before we
 % treat its contents as valid.
 
 potentials = zeros(regioncount, popcount, sampcount);
 velocities = zeros(regioncount, popcount, sampcount);
-cortexrates = zeros(popcount,sampcount);
-cortexvelocities = zeros(popcount,sampcount);
+cortexrates = zeros(popcount, sampcount);
+cortexvelocities = zeros(popcount, sampcount);
 
 % We don't keep a history for the noise and cortex mixing connections.
 extrates = zeros(extcount, popcount);
@@ -201,17 +201,17 @@ for sampidx = startsamp:(sampcount-1)
   % coefficient ends up being sqrt(timestep) rather than 1/sqrt(timestep).
 
   % This was done in the code used for Hindriks 2023. The idea is that if
-  % each sample is an independent draw, lumping N samples together increases
+  % each sample is an independent draw, adding N samples together increases
   % the standard deviation by sqrt(N). This factor normalizes that, so that
-  % for a fixed time interval (such as 1 second) we'll always compute the
-  % same standard deviation regardless of step size.
+  % for a fixed time interval (such as 1 second) we'll always get the
+  % same standard deviation in the integrated value regardless of step size.
 
   % We're using mean + additive + multiplicative noise, per references.
   % Since this is an input to the thalamus from the cortex, it's delayed.
   thisnoise = noisemean + noiseaddsigma * randn(1,popcount) ...
     + noisemultsigma * randn(1,popcount) .* statepast.cortexrates;
 
-  thisnoise = thisnoise * sqrt(timestep);
+  thisnoise = thisnoise / sqrt(timestep);
 
   extrates(extidxnoise,:) = thisnoise;
 
