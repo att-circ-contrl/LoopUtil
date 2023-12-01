@@ -131,15 +131,12 @@ cortexindices = [ 1 2 ];
 % First, build the term that's inside the square brackets above. This
 % has the present potential and the firing rate contributions.
 
-% Leading -V_A term.
+% Leading -V_a term.
 accelpotentials = - potentials;
 
 % Internal signals.
 
 for dstidx = 1:4
-  % Leading -V_a term.
-  accelpotentials(dstidx,:) = - potentials(dstidx,:);
-
   % Remaining terms for internal phi_b.
   for srcidx = 1:4
     if ismember(dstidx, cortexindices) && ismember(srcidx, cortexindices)
