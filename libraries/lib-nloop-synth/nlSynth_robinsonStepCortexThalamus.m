@@ -2,7 +2,7 @@ function statefuture = nlSynth_robinsonStepCortexThalamus( modelparams, ...
   timestep, statepresent, statepast, intcouplings, extrates, extcouplings )
 
 % function statefuture = nlSynth_robinsonStepCortexThalamus( modelparams, ...
-%   timestep, statepresent, statepast, intcouplings, stateext, extcouplings )
+%   timestep, statepresent, statepast, intcouplings, extrates, extcouplings )
 %
 % This generates the future state of a cortico-thalamic loop given the
 % present state, using the model from Robinson 2002 with augmented input
@@ -139,7 +139,7 @@ accelpotentials = - potentials;
 for dstidx = 1:4
   % Remaining terms for internal phi_b.
   for srcidx = 1:4
-    if ismember(dstidx, cortexindices) && ismember(srcidx, cortexindices)
+    if ismember(dstidx, cortexindices) == ismember(srcidx, cortexindices)
       % Same region. Use the present state.
       accelpotentials(dstidx,:) = accelpotentials(dstidx,:) ...
         + intcouplings(dstidx,srcidx) * firingrates(srcidx,:);
