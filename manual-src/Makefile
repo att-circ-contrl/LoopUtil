@@ -24,6 +24,7 @@ REFAUTO=\
 	$(REFBASE)-io.tex		\
 	$(REFBASE)-plot.tex		\
 	$(REFBASE)-proc.tex		\
+	$(REFBASE)-synth.tex		\
 	$(REFBASE)-util.tex		\
 	$(REFBASE)-intan.tex		\
 	$(REFBASE)-vend-intan.tex	\
@@ -75,6 +76,7 @@ DIRSCORE=\
 	../libraries/lib-nloop-io	\
 	../libraries/lib-nloop-plot	\
 	../libraries/lib-nloop-proc	\
+	../libraries/lib-nloop-synth	\
 	../libraries/lib-nloop-util
 
 refauto-corelibs:
@@ -93,6 +95,9 @@ refauto-corelibs:
 	./copy-code.pl --outfile=$(REFBASE)-proc.tex --matlabdoc \
 		"--chapter=\`\`nlProc'' Functions" --label=sect-proc \
 		../libraries/lib-nloop-proc/*.m
+	./copy-code.pl --outfile=$(REFBASE)-synth.tex --matlabdoc \
+		"--chapter=\`\`nlSynth'' Functions" --label=sect-synth \
+		../libraries/lib-nloop-synth/*.m
 	./copy-code.pl --outfile=$(REFBASE)-util.tex --matlabdoc \
 		"--chapter=\`\`nlUtil'' Functions" --label=sect-util \
 		../libraries/lib-nloop-util/*.m

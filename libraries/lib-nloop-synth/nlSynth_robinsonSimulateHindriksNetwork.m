@@ -41,6 +41,9 @@ function [ firingrates potentials ] = ...
 %   in the cortex. After mixing, these then get weighted by (scalar)
 %   modelparams.mixturecoupling before integration as neural inputs. Set
 %   this to [] to omit internal cortex communication/mixing.
+%   NOTE - The typical mixture coupling weight in MODELPARAMSROBINSON.txt
+%   assumes that the cortex mixing matrix has rows normalized so that the
+%   absolute values of each row's elements sums to 1 (or a value close to 1).
 % "cortexdelays_ms" is a Npop x Npop matrix indexed by (destination,source)
 %   that specifies the internal communication delays of excitatory neurons
 %   in the cortex, in milliseconds. Set this to [] to omit internal cortex
