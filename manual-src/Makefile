@@ -7,11 +7,19 @@ CHANBASE=changuide
 REFNAME=neuroloop-utility-libraries
 REFBASE=nlutilref
 
+MODELGUIDE=model-guide
+MODELBASE=models
+
 
 CHANBITS=\
 	$(CHANGUIDE).tex		\
 	$(CHANBASE)-over.tex		\
 	$(CHANBASE)-howto.tex
+
+MODELBITS=\
+	$(MODELGUIDE).tex		\
+	$(MODELBASE)-over.tex		\
+	$(MODELBASE)-robinson.tex
 
 REFBITS=\
 	$(REFNAME).tex			\
@@ -40,14 +48,16 @@ REFAUTO=\
 default: force
 
 changuide: $(CHANGUIDE).pdf
+modelguide: $(MODELGUIDE).pdf
 libref: $(REFNAME).pdf
 
-force: clean changuide libref install
+force: clean changuide modelguide libref install
 	make autoclean
 
 clean: tclean autoclean
 	rm -f $(CHANGUIDE).pdf
 	rm -f $(REFNAME).pdf
+	rm -f $(MODELGUIDE).pdf
 
 autoclean:
 	rm -f $(REFAUTO)
@@ -55,6 +65,7 @@ autoclean:
 tclean:
 	rm -f $(CHANGUIDE)*.log $(CHANGUIDE)*.aux $(CHANGUIDE)*.toc
 	rm -f $(REFNAME)*.log $(REFNAME)*.aux $(REFNAME)*.toc
+	rm -f $(MODELGUIDE)*.log $(MODELGUIDE)*.aux $(MODELGUIDE)*.toc
 	rm -f texput.*
 
 install:
@@ -64,6 +75,12 @@ install:
 $(CHANGUIDE).pdf: $(CHANBITS)
 	pdflatex $(CHANGUIDE).tex
 	pdflatex $(CHANGUIDE).tex
+	make tclean
+
+
+$(MODELGUIDE).pdf: $(MODELBITS)
+	pdflatex $(MODELGUIDE).tex
+	pdflatex $(MODELGUIDE).tex
 	make tclean
 
 
