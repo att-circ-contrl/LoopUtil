@@ -1,10 +1,10 @@
-function [ firingrates potentials ] = ...
-  nlSynth_robinsonSimulateHindriksNetwork( duration, startup, timestep, ...
-    modelparams, intcouplings, popcount, cortexmixing, cortexdelays_ms )
+function firingrates = nlSynth_robinsonSimulateHindriksNetwork( ...
+  duration, startup, timestep, modelparams, intcouplings, ...
+  popcount, cortexmixing, cortexdelays_ms )
 
-% function [ firingrates potentials ] = ...
-%   nlSynth_robinsonSimulateHindriksNetwork( duration, startup, timestep, ...
-%     modelparams, intcouplings, popcount, cortexmixing, cortexdelays_ms )
+% function firingrates = nlSynth_robinsonSimulateHindriksNetwork( ...
+%   duration, startup, timestep, modelparams, intcouplings, ...
+%   popcount, cortexmixing, cortexdelays_ms )
 %
 % This simulates cortex and thalamus neural activity, using the model from
 % Robinson 2002 with augmented input per Freyer 2011 and Hindriks 2023:
@@ -23,18 +23,28 @@ function [ firingrates potentials ] = ...
 % than the time scales of any system dynamics. Make this much smaller than
 % you think you need to.
 %
-% "duration" is the number of seconds to simulate.
+% NOTE - If multiple durations are specifies, various parameters _may_ be
+% specified for each epoch rather than globally. This is optional; any
+% parameters that are not specified per-epoch are duplicated as needed.
+%
+% "duration" is the number of seconds to simulate. NOTE - This may be a
+%   vector, specifying several successive durations which may have
+%   different simulation parameters.
 % "startup" is the number of seconds to simulate before the duration to
 %   allow the simulation to settle/converge. This is typically 2-5 seconds.
 % "timestep" is the amount of time to advance the simulation during each
 %   sample, in seconds. NOTE - This must be much smaller than system
 %   dynamics timescales!
 % "modelparams" is a structure specifying model tuning parameters, per
-%   MODELPARAMSROBINSON.txt.
+%   MODELPARAMSROBINSON.txt. NOTE - If "duration" is a vector, this may
+%   optionally be a struct array specifying different parameters for each
+%   epoch.
 % "intcouplings" is a 4x4 matrix indexed by (destination,source) that
 %   provides the coupling weights (in mV*s) between excitatory cortex
 %   neurons (1), inhibitory cortex neurons (2), specific nucleus neurons (3),
 %   and reticular neurons (4). Typical coupling range from -2 to +2.
+%   NOTE - If "duration" is a vector, this may optionally be a 4x4xN matrix
+%   specifying different couplings for each epoch.
 % "popcount" is the number of neural populations to simulate (Npop).
 % "cortexmixing" is a Npop x Npop matrix indexed by (destination,source)
 %   that specifies the internal communication mixing of excitatory neurons
@@ -44,20 +54,19 @@ function [ firingrates potentials ] = ...
 %   NOTE - The typical mixture coupling weight in MODELPARAMSROBINSON.txt
 %   assumes that the cortex mixing matrix has rows normalized so that the
 %   absolute values of each row's elements sums to 1 (or a value close to 1).
+%   NOTE - If "duration" is a vector, this may optionally be a Npop x Npop x N
+%   matrix specifying different mixing weights for each epoch.
 % "cortexdelays_ms" is a Npop x Npop matrix indexed by (destination,source)
 %   that specifies the internal communication delays of excitatory neurons
 %   in the cortex, in milliseconds. Set this to [] to omit internal cortex
 %   communication/mixing.
+%   NOTE - If "duration" is a vector, this may optionally be a Npop x Npop x N
+%   matrix specifying different delays for each epoch.
 %
 % "firingrates" is a 4 x Npop x Nsamples matrix containing firing rates
 %   for excitatory cortex neurons (1), inhibitory cortex neurons (2),
 %   specific nucleus neurons (3), and reticular neurons (4). The excitatory
 %   cortex neuron firing rates are gamma-damped, per Robinson 2002.
-% "potentials" is a 4 x Npop x Nsamples matrix containing the cell-body
-%   potentials of each type of neuron. This is primarily intended for
-%   debugging. For all neurons _except_ the excitatory cortex neurons, the
-%   firing rates should be nlSynth_robinsonGetSigmoid( potentials ). The
-%   excitatory cortex neuron rates are gamma-damped, per Robinson 2002.
 
 
 %
@@ -80,11 +89,33 @@ extidxcortex = 2;
 
 want_mixing = (~isempty(cortexmixing)) && (~isempty(cortexdelays_ms));
 
-extcouplings = zeros(regioncount,extcount);
-extcouplings(regionidxspecific,extidxnoise) = modelparams.noisecoupling;
-if want_mixing
-  extcouplings(regionidxexcitatory,extidxcortex) = ...
-    modelparams.mixturecoupling;
+durcount = length(duration);
+
+
+
+%
+% Promote anything to per-epoch that needs promoting.
+
+if length(modelparams) < durcount
+  modelparams(1:durcount) = modelparams(1);
+end
+
+if size(intcouplings,3) < durcount
+  for duridx = 2:durcount
+    intcouplings(:,:,duridx) = intcouplings(:,:,1);
+  end
+end
+
+if size(cortexmixing,3) < durcount
+  for duridx = 2:durcount
+    cortexmixing(:,:,duridx) = cortexmixing(:,:,1);
+  end
+end
+
+if size(cortexdelays_ms,3) < durcount
+  for duridx = 2:durcount
+    cortexdelays_ms(:,:,duridx) = cortexdelays_ms(:,:,1);
+  end
 end
 
 
@@ -99,14 +130,17 @@ padsamps = round(startup / timestep);
 padsamps = max(1,padsamps);
 
 sampcount = round(duration / timestep);
-sampcount = max(1,sampcount) + padsamps;
+sampcount = max(1,sampcount);
+sampcount(1) = sampcount(1) + padsamps;
+
+totalsampcount = sum(sampcount);
 
 cortexdelays_samp = [];
 if want_mixing
   cortexdelays_samp = round(cortexdelays_ms / timestep_ms);
 end
 
-halfdelay_samp = round(modelparams.halfdelay_ms / timestep_ms);
+halfdelay_samp = round( [ modelparams.halfdelay_ms ] / timestep_ms );
 
 
 
@@ -118,134 +152,171 @@ halfdelay_samp = round(modelparams.halfdelay_ms / timestep_ms);
 % Simulation runs for a while (typically 2 seconds) to stabilize before we
 % treat its contents as valid.
 
-potentials = zeros(regioncount, popcount, sampcount);
-velocities = zeros(regioncount, popcount, sampcount);
-cortexrates = zeros(popcount, sampcount);
-cortexvelocities = zeros(popcount, sampcount);
+
+% Initialize state.
+potentials = zeros(regioncount, popcount, totalsampcount);
+velocities = zeros(regioncount, popcount, totalsampcount);
+cortexrates = zeros(popcount, totalsampcount);
+cortexvelocities = zeros(popcount, totalsampcount);
 
 % We don't keep a history for the noise and cortex mixing connections.
 extrates = zeros(extcount, popcount);
+
+% Initialize output here too.
+firingrates = zeros(size(potentials));
+
 
 % Figure out what the maximum internal delay is. This tells us where to
 % start the simulation.
 startsamp = 0;
 if want_mixing
-  startsamp = max(max(cortexdelays_samp));
+  startsamp = max(max( cortexdelays_samp(:,:,1) ));
 end
-startsamp = max(startsamp, halfdelay_samp);
+startsamp = max(startsamp, halfdelay_samp(1));
 % Matlab starts counting samples at 1.
 startsamp = 1 + startsamp;
 
 
-% Fetch various parameters for convenience.
-noisemean = modelparams.noisemean;
-noiseaddsigma = modelparams.noisesigma;
-noisemultsigma = noiseaddsigma * modelparams.noisemultfactor;
+sampidx = 0;
+for duridx = 1:durcount
 
+  % Get model information for this epoch.
 
-% Walk through this sample by sample.
-% This is slow (Matlab can't implement it as vector operations), but is
-% much simpler than setting up and solving finite difference matrices.
+  noisemean = modelparams(duridx).noisemean;
+  noiseaddsigma = modelparams(duridx).noisesigma;
+  noisemultsigma = noiseaddsigma * modelparams(duridx).noisemultfactor;
 
-for sampidx = startsamp:(sampcount-1)
-
-  % Fetch present and loop-delayed state.
-  % Use "reshape" rather than "squeeze" in case popcount is 1.
-
-  thispotential = reshape( potentials(:,:,sampidx), regioncount, popcount );
-  thisvelocity = reshape( velocities(:,:,sampidx), regioncount, popcount );
-  thiscortexrate = reshape( cortexrates(:,sampidx), 1, popcount );
-  thiscortexvel = reshape( cortexvelocities(:,sampidx), 1, popcount );
-
-  statepresent = struct( 'potentials', thispotential, ...
-    'velocities', thisvelocity, 'cortexrates', thiscortexrate, ...
-    'cortexvelocities', thiscortexvel );
-
-  thispotential = reshape( potentials(:,:,(sampidx-halfdelay_samp)), ...
-    regioncount, popcount );
-  thisvelocity = reshape( velocities(:,:,(sampidx-halfdelay_samp)), ...
-    regioncount, popcount );
-  thiscortexrate = reshape( cortexrates(:,(sampidx-halfdelay_samp)), ...
-    1, popcount );
-  thiscortexvel = reshape( cortexvelocities(:,(sampidx-halfdelay_samp)), ...
-    1, popcount );
-
-  statepast = struct( 'potentials', thispotential, ...
-    'velocities', thisvelocity, 'cortexrates', thiscortexrate, ...
-    'cortexvelocities', thiscortexvel );
-
-
-  % Build the delayed mixed cortex inputs.
-
-  extrates(extidxcortex,:) = 0;
-
+  extcouplings = zeros(regioncount,extcount);
+  extcouplings(regionidxspecific,extidxnoise) = ...
+    modelparams(duridx).noisecoupling;
   if want_mixing
-    % We're pulling from different time samples, so we have to iterate this
-    % instead of using a matrix multiplication.
-    for dstidx = 1:popcount
-      thisdestrate = 0;
-
-      for srcidx = 1:popcount
-        thisdelay = cortexdelays_samp(dstidx,srcidx);
-        thisweight = cortexmixing(dstidx,srcidx);
-        thisdestrate = thisdestrate + ...
-          thisweight * cortexrates(srcidx,(sampidx-thisdelay));
-      end
-
-      extrates(extidxcortex,dstidx) = thisdestrate;
-    end
+    extcouplings(regionidxexcitatory,extidxcortex) = ...
+      modelparams(duridx).mixturecoupling;
   end
 
 
-  % Build the noise input.
+  % Walk through this sample by sample.
+  % This is slow (Matlab can't implement it as vector operations), but is
+  % much simpler than setting up and solving finite difference matrices.
 
-  % NOTE - This is scaled by 1/sqrt(timestep).
-  % We're multiplying by (timestep) during integration, so the actual
-  % coefficient ends up being sqrt(timestep) rather than 1/sqrt(timestep).
+  for loopidx = 1:sampcount(duridx)
 
-  % This was done in the code used for Hindriks 2023. The idea is that if
-  % each sample is an independent draw, adding N samples together increases
-  % the standard deviation by sqrt(N). This factor normalizes that, so that
-  % for a fixed time interval (such as 1 second) we'll always get the
-  % same standard deviation in the integrated value regardless of step size.
+    sampidx = sampidx + 1;
 
-  % We're using mean + additive + multiplicative noise, per references.
-  % Since this is an input to the thalamus from the cortex, it's delayed.
-  thisnoise = noisemean + noiseaddsigma * randn(1,popcount) ...
-    + noisemultsigma * randn(1,popcount) .* statepast.cortexrates;
+    % Start late enough that we can read all necessary past data, and
+    % stop before we hit the last sample (since sample N-1 computes it).
 
-  thisnoise = thisnoise / sqrt(timestep);
+    if (sampidx >= startsamp) && (sampidx < totalsampcount)
 
-  extrates(extidxnoise,:) = thisnoise;
+      % Fetch present and loop-delayed state.
+      % Use "reshape" rather than "squeeze" in case popcount is 1.
+
+      thispotential = ...
+        reshape( potentials(:,:,sampidx), regioncount, popcount );
+      thisvelocity = ...
+        reshape( velocities(:,:,sampidx), regioncount, popcount );
+      thiscortexrate = reshape( cortexrates(:,sampidx), 1, popcount );
+      thiscortexvel = reshape( cortexvelocities(:,sampidx), 1, popcount );
+
+      statepresent = struct( 'potentials', thispotential, ...
+        'velocities', thisvelocity, 'cortexrates', thiscortexrate, ...
+        'cortexvelocities', thiscortexvel );
+
+      thispotential = ...
+        reshape( potentials(:,:,(sampidx-halfdelay_samp(duridx))), ...
+          regioncount, popcount );
+      thisvelocity = ...
+        reshape( velocities(:,:,(sampidx-halfdelay_samp(duridx))), ...
+          regioncount, popcount );
+      thiscortexrate = ...
+        reshape( cortexrates(:,(sampidx-halfdelay_samp(duridx))), ...
+          1, popcount );
+      thiscortexvel = ...
+        reshape( cortexvelocities(:,(sampidx-halfdelay_samp(duridx))), ...
+          1, popcount );
+
+      statepast = struct( 'potentials', thispotential, ...
+        'velocities', thisvelocity, 'cortexrates', thiscortexrate, ...
+        'cortexvelocities', thiscortexvel );
 
 
-  % Simulate this time step and save the results.
+      % Build the delayed mixed cortex inputs.
 
-  statefuture = nlSynth_robinsonStepCortexThalamus( modelparams, timestep, ...
-    statepresent, statepast, intcouplings, extrates, extcouplings );
+      extrates(extidxcortex,:) = 0;
 
-  potentials(:,:,sampidx+1) = statefuture.potentials;
-  velocities(:,:,sampidx+1) = statefuture.velocities;
-  cortexrates(:,sampidx+1) = statefuture.cortexrates;
-  cortexvelocities(:,sampidx+1) = statefuture.cortexvelocities;
+      if want_mixing
+        % We're pulling from different time samples, so we have to iterate
+        % this instead of using a matrix multiplication.
+        for dstidx = 1:popcount
+          thisdestrate = 0;
 
-end
+          for srcidx = 1:popcount
+            thisdelay = cortexdelays_samp(dstidx,srcidx,duridx);
+            thisweight = cortexmixing(dstidx,srcidx,duridx);
+            thisdestrate = thisdestrate + ...
+              thisweight * cortexrates(srcidx,(sampidx-thisdelay));
+          end
+
+          extrates(extidxcortex,dstidx) = thisdestrate;
+        end
+      end
+
+
+      % Build the noise input.
+
+      % NOTE - This is scaled by 1/sqrt(timestep).
+      % We're multiplying by (timestep) during integration, so the actual
+      % coefficient ends up being sqrt(timestep) rather than
+      % 1/sqrt(timestep).
+
+      % This was done in the code used for Hindriks 2023. The idea is that
+      % if each sample is an independent draw, adding N samples together
+      % increases the standard deviation by sqrt(N). This factor normalizes
+      % that, so that for a fixed time interval (such as 1 second) we'll
+      % always get the same standard deviation in the integrated value
+      % regardless of step size.
+
+      % We're using mean + additive + multiplicative noise, per references.
+      % Since this is an input to the thalamus from the cortex, it's delayed.
+      thisnoise = noisemean + noiseaddsigma * randn(1,popcount) ...
+        + noisemultsigma * randn(1,popcount) .* statepast.cortexrates;
+
+      thisnoise = thisnoise / sqrt(timestep);
+
+      extrates(extidxnoise,:) = thisnoise;
+
+
+      % Simulate this time step and save the results.
+
+      statefuture = ...
+        nlSynth_robinsonStepCortexThalamus( modelparams(duridx), timestep, ...
+          statepresent, statepast, intcouplings(:,:,duridx), ...
+          extrates, extcouplings );
+
+      potentials(:,:,sampidx+1) = statefuture.potentials;
+      velocities(:,:,sampidx+1) = statefuture.velocities;
+      cortexrates(:,sampidx+1) = statefuture.cortexrates;
+      cortexvelocities(:,sampidx+1) = statefuture.cortexvelocities;
+
+      % Package this sample's output.
+      % Special-case the gamma-damped excitatory cortex rates.
+      firingrates(:,:,sampidx+1) = nlSynth_robinsonGetSigmoid( ...
+        statefuture.potentials, modelparams(duridx).qmax, ...
+        modelparams(duridx).threshlevel, modelparams(duridx).threshsigma );
+      firingrates(regionidxexcitatory,:,sampidx+1) = ...
+        statefuture.cortexrates;
+
+    end  % If this is a sample we should process.
+  end  % For loopidx.
+
+end  % For duridx.
 
 
 
 %
-% Package the results.
-
-% Get firing rates.
-firingrates = nlSynth_robinsonGetSigmoid( potentials, ...
-  modelparams.qmax, modelparams.threshlevel, modelparams.threshsigma );
-
-% Special-case the gamma-damped excitatory cortex rates.
-firingrates(regionidxexcitatory,:,:) = cortexrates;
-
 % Crop to remove the startup region.
-potentials = potentials(:,:,(1+padsamps):sampcount);
-firingrates = firingrates(:,:,(1+padsamps):sampcount);
+
+firingrates = firingrates(:,:,(1+padsamps):totalsampcount);
 
 
 
