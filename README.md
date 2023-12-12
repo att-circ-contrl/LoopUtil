@@ -79,6 +79,8 @@ Sample code scripts are intended to illustrate how the libraries are used.
 These are found in the `code-examples` directory. The following scripts
 are provided:
 
+### `code-example-reading` folder:
+
 * `do_test.m` --
 This is my test script for exercising the "LoopUtil" library. It does the
 same operations as the channel tool, without a GUI. Referencing is performed
