@@ -81,6 +81,8 @@ are provided:
 
 ### `code-example-reading` folder:
 
+This demonstrates how to read and process ephys data.
+
 * `do_test.m` --
 This is my test script for exercising the "LoopUtil" library. It does the
 same operations as the channel tool, without a GUI. Referencing is performed
@@ -93,5 +95,10 @@ points to your data to use it.
 private datasets. See the preamble of `do_test.m` for details on what needs
 to be configured and what optional settings may additionally be configured.
 
+### `code-example-robinson` folder:
 
-This is the end of the file.
+This demonstrates how to generate synthetic data using the extended
+Robinson model functions.
+
+
+_(This is the end of the file.)_
