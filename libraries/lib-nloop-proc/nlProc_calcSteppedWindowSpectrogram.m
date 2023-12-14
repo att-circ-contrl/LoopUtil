@@ -57,9 +57,11 @@ winradsamps = round(0.5 * winsize * samprate);
 
 % Give a little bit of wiggle room for stepping the window, to account for
 % rounding if we're asked for a window that exactly fits.
+% NOTE - Wiggle room should be less than one sample, or else we may ask for
+% data past the end of the array.
 
 timelength = max(timespan) - min(timespan);
-slidelength = timelength - 0.999 * winsize;
+slidelength = timelength - 0.99999 * winsize;
 stepcount = floor(slidelength / winstep);
 stepstart = 0.5 * (timelength - stepcount * winstep);
 
