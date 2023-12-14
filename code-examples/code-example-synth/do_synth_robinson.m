@@ -37,11 +37,12 @@ ft_warning('off');
 
 
 % Number of trials per test configuration.
-trialcount = 3;
+trialcount = 10;
 
 % Trial duration before and after "stimulation".
-trial_secs_before = 2;
-trial_secs_after = 3;
+% Signal perturbations take about 1 second to settle after parameter changes.
+trial_secs_before = 5;
+trial_secs_after = 10;
 
 
 % Sampling rates and filter parameters.
@@ -59,8 +60,9 @@ chancount = 4;
 sim_startup_secs = 2;
 
 % Explicity set this, rather than keeping the Hindriks baseline value.
-% 0.07 gets us power spectrum peaks at harmonics, not just fundamental mode.
-mixture_coupling_coeff = 0.07;
+% 0.07 gets us strong power spectrum peaks at harmonics, not just the
+% fundamental mode, but can also go unstable and stay at the maximum rate.
+mixture_coupling_coeff = 0.06;
 
 % Factor by which to increase v_es when boosting activity. This is very
 % sensitive; raising 1% or decreasing 2% has a very visible effect.
