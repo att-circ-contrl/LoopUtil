@@ -19,7 +19,8 @@ CHANBITS=\
 MODELBITS=\
 	$(MODELGUIDE).tex		\
 	$(MODELBASE)-over.tex		\
-	$(MODELBASE)-robinson.tex
+	$(MODELBASE)-robinson.tex	\
+	$(MODELBASE)-robinson-math.tex
 
 REFBITS=\
 	$(REFNAME).tex			\

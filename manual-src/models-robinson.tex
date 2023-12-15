@@ -192,73 +192,16 @@ $\nu_{ee_{ext}}$ & 0.07 \\
 \end{tabular}
 }{Typical coupling coefficient values for the extended Robinson model.}
 {tab-robinson-couplings}
-%
-% FIXME - Flush floats.
-\clearpage
 
-%
-%
-\section{Discussion}
-\label{sect-robinson-discussion}
+Robinson 2002 describes several oscillating modes: slow-wave/delta-wave
+oscillation, theta/fast~delta oscillation with stable frequency (3~Hz) but
+varying shape, spindle oscillations at about 10~Hz driven by intra-thalamic
+resonance, and alpha oscillations at about 10~Hz. These are parameterized
+in terms of the amplification provided by each population of neurons
+(Equations 13-15 and Figure 3 in that reference).
 
-Applying the Laplace transform to Equation \ref{eq-robinson-potential} shows
-that the effect of $\alpha$ and $\beta$ is to apply a low-pass filter to the
-weighted sum of input firing rates (a second-order exponential smoothing
-filter with poles at $-\alpha$ and $-\beta$).
-
-\begin{equation}
-\left ( \frac{1}{\alpha \beta} \right ) s^2 V_a(s)
-+ \left ( \frac{1}{\alpha} + \frac{1}{\beta} \right ) s V_a(s)
-+ V_a(s) = \sum_b \nu_{ab} \Phi_b(s)
-\end{equation}
-%
-\begin{equation}
-s^2 V_a(s) + (\alpha + \beta) s V_a(s) + \alpha \beta V_a(s)
-= \alpha \beta \sum_b \nu_{ab} \Phi_b(s)
-\end{equation}
-%
-\begin{equation}
-(s + \alpha) (s + \beta) V_a(s) = \alpha \beta \sum_b \nu_{ab} \Phi_b(s)
-\end{equation}
-%
-\begin{equation}
-\frac{V_a(s)}{\sum_b \nu_{ab} \Phi_b(s)}
-= \frac{\alpha \beta}{(s + \alpha) (s + \beta)}
-\end{equation}
-
-Applying the Laplace transform to Equation \ref{eq-robinson-gamma} shows
-that the effect of $\gamma$ is to apply a low-pass filter to the firing rate
-(a second-order exponential smoothing filter with both poles at $-\gamma$).
-
-\begin{equation}
-\left ( \frac{1}{\gamma^2} \right ) s^2 \Phi(s)
-+ \left ( \frac{2}{\gamma} \right ) s \Phi(s) + \Phi(s) = Q(s)
-\end{equation}
-%
-\begin{equation}
-s^2 \Phi(s) + 2 \gamma s \Phi(s) + \gamma^2 \Phi(s) = \gamma^2 Q(s)
-\end{equation}
-%
-\begin{equation}
-(s + \gamma)^2 \Phi(s) = \gamma^2 Q(s)
-\end{equation}
-%
-\begin{equation}
-\frac{\Phi(s)}{Q(s)} = \frac{\gamma^2}{(s + \gamma)^2}
-\end{equation}
-
-The fundamental-mode oscillation is usually supported by resonance in the
-cortico-thalamic loop, with a period near $2 \cdot t_{halfloop}$ (alpha band
-for $t_{halfloop}$ of 40~ms). The first overtone mode can support beta band
-oscillations. If coupling values are chosen such that the system is only
-barely stable near these resonance modes, oscillatory bursts can occur.
-
-Robinson 2002 gives a detailed description of how this stability analysis
-may be performed. For some regions of parameter space, multiple operating
-points exist. With parameter values chosen from these regions, the system
-will switch between several states with different oscillation
-characteristics. The parameter values used in Freyer 2011 and Hindriks 2023
-were chosen to exploit this behavior.
+The parameter values used in Freyer 2011 and Hindriks 2023 were chosen to
+support biologically relevant oscillations when driven by external noise.
 
 %
 %
