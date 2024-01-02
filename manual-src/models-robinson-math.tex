@@ -1,7 +1,7 @@
 % Neuroloop utilities - Synthesis model guide - Robinson model - Analysis
 % Written by Christopher Thomas.
 
-\section{Model Analysis}
+\section{Mathematical Analysis}
 \label{sect-robinson-math}
 
 %
@@ -79,7 +79,7 @@ are two such poles.}
 
 %
 %
-\subsection{Oscillation Modes and Oscillation Criteria}
+\subsection{Oscillation Modes}
 \label{sect-robinson-math-modes}
 
 A simplified diagram of the extended Robinson model is shown in Figure
@@ -133,7 +133,8 @@ $2 \cdot \nu_{se} \cdot \nu_{is} \cdot \nu_{ei}$ \\
 \hline
 \end{tabular}
 }{Extended robinson model oscillation modes. Top two modes: single-cycle.
-Bottom four modes: two-cycle (inverting).}
+Bottom four modes: two-cycle (inverting). Activation function gain is
+not shown.}
 {tab-robinson-loops}
 
 Resonant loops explicitly described in Section IV of Robinson 2002 are the
@@ -153,7 +154,7 @@ gain exceeding unity. As this does not explicitly consider noise excitation,
 all of the loops described in Table \ref{tab-robinson-loops} may be
 analyzed.
 
-\subsection{Operating Points and Parameter Choices}
+\subsection{Operating Points}
 \label{sect-robinson-math-fixed}
 
 As was described in Robinson 2002, the dynamics of the extended Robinson
@@ -176,39 +177,142 @@ For time-independent operating point analysis, Equation
 \ref{eq-robinson-potential} reduces to:
 
 \begin{equation}
-V_a(t) = \sum_b \nu_{ab} \phi_b(t)
+V_a = \sum_b \nu_{ab} \phi_b
 \label{eq-robinson-dc-potential}
 \end{equation}
 
-Equation \ref{eq-robinson-sigmoid} is unchanged, and Equation
-\ref{eq-robinson-gamma} reduces to:
+Equation \ref{eq-robinson-sigmoid} (defining $Q(V)$) is unchanged, and
+Equation \ref{eq-robinson-gamma} reduces to:
 
 \begin{equation}
-\phi_a(t) = Q(V_a(t))
+\phi_a = Q(V_a)
 \label{eq-robinson-dc-nogamma}
 \end{equation}
 
-The gain $G_{ab}$ of any given arc is the derivative of its output firing
-rate with respect to its input firing rate. For oscillations with
-frequencies much lower than the $\alpha$, $\beta$, and $\gamma$ filter
+Combining Equations \ref{eq-robinson-dc-potential} and
+\ref{eq-robinson-dc-nogamma} gives:
+
+\begin{equation}
+V_a = \sum_b \nu_{ab} Q(V_b)
+\label{eq-robinson-dc-scalar}
+\end{equation}
+%
+\begin{equation}
+\vec{V} = \mathbf{N} Q(\vec{V})
+\label{eq-robinson-dc-vector}
+\end{equation}
+
+In Equation \ref{eq-robinson-dc-vector}, vector $\vec{V}$ contains as its
+elements all $V_a$, matrix $\mathbf{N}$ contains as its elements all
+$\nu_{ab}$, and the activation function Q acts separately on each element
+of $\vec{V}$.
+
+The activation function given in \ref{eq-robinson-sigmoid-prime} can be
+rewritten as:
+
+\begin{equation}
+Q(V) = \frac{Q_{max}}{1 +
+e^{\left ( \frac{V_{th}}{\sigma'_{th}} \right )}
+e^{- \left ( \frac{V}{\sigma'_{th}} \right )}
+}
+\label{eq-robinson-sigmoid-shuffle-1}
+\end{equation}
+
+For firing rates that are much less than $Q_{max}$ (such as those plotted
+in Robinson 2002), the exponential term dominates, and the activation
+function can be approximated as:
+
+\begin{equation}
+Q(V) \approx Q_{max} \, e^{- \left ( \frac{V_{th}}{\sigma'_{th}} \right )}
+e^{\left ( \frac{V}{\sigma'_{th}} \right )}
+\label{eq-robinson-sigmoid-approx-full}
+\end{equation}
+%
+\begin{equation}
+Q(V) \approx Q_0 \, e^{\left ( \frac{V}{\sigma'_{th}} \right )}
+\label{eq-robinson-sigmoid-approx}
+\end{equation}
+%
+\begin{equation}
+Q_0 = Q_{max} \, e^{- \left ( \frac{V_{th}}{\sigma'_{th}} \right )}
+\label{eq-robinson-sigmoid-q0}
+\end{equation}
+
+The operating point equation then becomes Equation
+\ref{eq-robinson-dc-vector-approx}, where exponentiation is performed
+separately for each element of $\vec{V}$:
+
+\begin{equation}
+\vec{V} \approx
+\mathbf{N} \, Q_0 \, e^{\left ( \frac{\vec{V}}{\sigma'_{th}} \right )}
+\label{eq-robinson-dc-vector-approx}
+\end{equation}
+
+While this system of equations may be solved numerically (and was solved
+numerically in Robinson 2002), an estimate of the operating point may be
+obtained by assuming that potentials are small compared to $\sigma'_{th}$.
+\textbf{This is not a robust assumption;} it is used as an estimate only.
+With this caveat kept in mind, a linear approximation of the exponential
+function may be used (the first-order Taylor expansion), giving the following
+(where $\vec{1}$ denotes a vector where all elements are unity):
+
+\begin{equation}
+\vec{V} \approx \mathbf{N} \, Q_0 \,
+\left [ \vec{1} + \left ( \frac{1}{\sigma'_{th}} \right ) \vec{V} \right ]
+\end{equation}
+%
+\begin{equation}
+\left ( \frac{1}{Q_0} \right ) \mathbf{N}^{-1} \vec{V}
+\approx \vec{1} + \left ( \frac{1}{\sigma'_{th}} \right ) \vec{V}
+\end{equation}
+%
+\begin{equation}
+\left [ \left ( \frac{1}{Q_0} \right ) \mathbf{N}^{-1}
+- \left ( \frac{1}{\sigma'_{th}} \right ) \mathbf{I} \right ]
+\approx \vec{1}
+\end{equation}
+%
+\begin{equation}
+\vec{V} \approx
+\left [ \left ( \frac{1}{Q_0} \right ) \mathbf{N}^{-1}
+- \left ( \frac{1}{\sigma'_{th}} \right ) \mathbf{I} \right ] ^{-1}
+\vec{1}
+\label{eq-robinson-dc-vector-linear}
+\end{equation}
+
+The operating point estimated using Equation
+\ref{eq-robinson-dc-vector-linear} \textbf{must} be examined to confirm
+that $|V_a| \ll \sigma'_{th}$ for all $V_a$. If this constraint does not
+hold, the estimate is not correct.
+
+%
+%
+\subsection{Small-Signal Gain and Dominant Oscillations}
+\label{sect-robinson-math-gain}
+
+The small-signal gain $G_{ab}$ of any given arc is the derivative of its
+output firing rate with respect to its input firing rate. For oscillations
+with frequencies much lower than the $\alpha$, $\beta$, and $\gamma$ filter
 corner frequencies, this may be estimated by taking the derivative of the
 DC operating point equations (rather than requiring an analysis of the full
 system dynamics):
 
 \begin{equation}
-G_{ab} = \frac{d\phi_a}{d\phi_b} = \frac{d}{d\phi_b} \left [ Q(V_a) \right ]
+G_{ab} = \frac{d\phi_a}{d\phi_b}
+\approx \frac{d}{d\phi_b} \left [ Q(V_a) \right ]
 \end{equation}
-
+%
 \begin{equation}
-G_{ab} = Q'(V_a) \frac{dV_a}{d\phi_b}
+G_{ab} \approx Q'(V_a) \frac{dV_a}{d\phi_b}
 \end{equation}
-
+%
 \begin{equation}
-G_{ab} = Q'(V_a) \frac{d}{d\phi_b} \left [ \sum_c \nu_{ac} \phi_c \right ]
+G_{ab} \approx
+Q'(V_a) \frac{d}{d\phi_b} \left [ \sum_c \nu_{ac} \phi_c \right ]
 \end{equation}
-
+%
 \begin{equation}
-G_{ab} = Q'(V_a) \nu_{ab}
+G_{ab} \approx Q'(V_a) \nu_{ab}
 \label{eq-robinson-gain-qprime}
 \end{equation}
 
@@ -240,25 +344,25 @@ This gives the derivative of the sigmoid response function:
 Q'(V) = Q_{max} L' \left ( \frac{V - V_{th}}{\sigma'_{th}} \right )
 \frac{d}{dV} \left [ \frac{V - V_{th}}{\sigma'_{th}} \right ]
 \end{equation}
-
+%
 \begin{equation}
 Q'(V) = \frac{Q_{max}}{\sigma'_{th}}
 L' \left ( \frac{V - V_{th}}{\sigma'_{th}} \right )
 \end{equation}
-
+%
 \begin{equation}
 Q'(V) = \frac{Q_{max}}{\sigma'_{th}}
 L \left ( \frac{V - V_{th}}{\sigma'_{th}} \right )
 \left ( 1 - L \left ( \frac{V - V_{th}}{\sigma'_{th}} \right ) \right )
 \end{equation}
-
+%
 \begin{equation}
 Q'(V) = \frac{Q_{max}}{\sigma'_{th}}
 L \left ( \frac{V - V_{th}}{\sigma'_{th}} \right )
 \left ( 1 - \frac{Q_{max}}{Q_{max}}
 L \left ( \frac{V - V_{th}}{\sigma'_{th}} \right ) \right )
 \end{equation}
-
+%
 \begin{equation}
 Q'(V) = \frac{1}{\sigma'_{th}} Q(V) \left ( 1 - \frac{Q(V)}{Q_{max}} \right )
 \end{equation}
@@ -266,12 +370,12 @@ Q'(V) = \frac{1}{\sigma'_{th}} Q(V) \left ( 1 - \frac{Q(V)}{Q_{max}} \right )
 Combining this with Equation \ref{eq-robinson-gain-qprime} gives:
 
 \begin{equation}
-G_{ab} = \frac{\nu_{ab}}{\sigma'_{th}}
+G_{ab} \approx \frac{\nu_{ab}}{\sigma'_{th}}
 Q(V_a) \left ( 1 - \frac{Q(V_a)}{Q_{max}} \right )
 \end{equation}
-
+%
 \begin{equation}
-G_{ab} = \frac{\nu_{ab}}{\sigma'_{th}}
+G_{ab} \approx \frac{\nu_{ab}}{\sigma'_{th}}
 \phi_a \left ( 1 - \frac{\phi_a}{Q_{max}} \right )
 \label{eq-robinson-gain}
 \end{equation}
@@ -280,10 +384,17 @@ This is Equation 10 from Robinson 2002. The small-signal gain of a loop at
 low frequencies is the product of $G_{ab}$ for each arc in the loop
 (as with the $S_d$, $S_i$, and $S_r$ values in section IV of Robinson 2002).
 
-\fixme{Show how to find operating points. Pick regions of parameter space
-from Robinson and also note where Hindriks' parameters were in that space.
-Evaluate loop gains at these locations and their sensitivity to weights.
-Add an area sensitive to mixing matrix weights if we don't already have one.}
+
+\fixme{Add code for using the model to generate rates.}
+
+\fixme{Add code for finding operating points, both as estimates and via
+brute force numerical solutions.}
+
+\fixme{Show how to evaluate loop gain and envelope time constants.}
+
+\fixme{Show how to find regions of parameter space where desired loops are
+dominant, including ones where the mixing matrix matters. Show where the
+regions Robinson plotted are. Show where the region Hindriks used is.}
 
 %
 %

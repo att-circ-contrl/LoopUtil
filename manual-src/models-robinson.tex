@@ -67,13 +67,19 @@ many neurons with varying firing thresholds. The mean firing threshold is
 $V_{th}$ and the standard deviation of the threshold is $\sigma_{th}$.
 This follows the convention of Freyer 2011; Robinson 2002 defined a
 related parameter $\sigma'_{th} = \frac{\sqrt{3}}{\pi} \sigma_{th}$ to
-simplify the activation equation.
+simplify the activation equation (Equation \ref{eq-robinson-sigmoid-prime}).
 
 \begin{equation}
 Q(V) = \frac{Q_{max}}
 {1 + e^{- \left ( \frac{\pi}{\sqrt{3}} \right )
 \left ( \frac{ V - V_{th}}{\sigma_{th}} \right )}}
 \label{eq-robinson-sigmoid}
+\end{equation}
+
+\begin{equation}
+Q(V) = \frac{Q_{max}}
+{1 + e^{- \left ( \frac{ V - V_{th}}{\sigma'_{th}} \right )}}
+\label{eq-robinson-sigmoid-prime}
 \end{equation}
 
 Per Equation \ref{eq-robinson-gamma}, the local firing rate $Q$ is
@@ -132,10 +138,10 @@ approximately unity. Cross-coupling propagation delay is typically no more
 than $\frac{1}{\gamma}$.
 
 \begin{equation}
-\phi_{ext_a}(t) = \sum_b w_{ab} \phi_e(t - t_{coupling_{ab}})
+\phi_{ext_a}(t) = \sum_b w_{ab} \phi_{e_b}(t - t_{coupling_{ab}})
 \label{eq-robinson-coupling}
 \end{equation}
-
+%
 \begin{equation}
 \forall a, \sum_b w_{ab} \approx 1
 \label{eq-robinson-coupling-constraint}
