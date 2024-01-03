@@ -21,7 +21,7 @@ function [ firingrates potentials ] = ...
 %   MODELPARAMSROBINSON.txt.
 % "intcouplings" is a 4x4 matrix indexed by (destination,source) that
 %   provides the coupling weights (in mV*s) between excitatory, inhibitory,
-%   specific nucleus, and reticular nucleus neurons.
+%   specific nucleus, and reticular nucleus neural populations.
 %
 % "firingrates" is a vector containing firing rates for the excitatory,
 %   inhibitory, specific nucleus, and reticular nucleus populations.
