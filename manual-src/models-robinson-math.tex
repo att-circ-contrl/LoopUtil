@@ -262,25 +262,20 @@ function may be used (the first-order Taylor expansion), giving the following
 \end{equation}
 %
 \begin{equation}
-\left ( \frac{1}{Q_0} \right ) \mathbf{N}^{-1} \vec{V}
-\approx \vec{1} + \left ( \frac{1}{\sigma'_{th}} \right ) \vec{V}
+\left ( \frac{1}{Q_0} \right ) \vec{V} \approx \mathbf{N} \, \vec{1}
++ \left ( \frac{1}{\sigma'_{th}} \right ) \mathbf{N} \, \vec{V}
 \end{equation}
 %
 \begin{equation}
-\left [ \left ( \frac{1}{Q_0} \right ) \mathbf{N}^{-1}
-- \left ( \frac{1}{\sigma'_{th}} \right ) \mathbf{I} \right ]
-\approx \vec{1}
-\end{equation}
-%
-\begin{equation}
-\vec{V} \approx
-\left [ \left ( \frac{1}{Q_0} \right ) \mathbf{N}^{-1}
-- \left ( \frac{1}{\sigma'_{th}} \right ) \mathbf{I} \right ] ^{-1}
-\vec{1}
+\left [ \left ( \frac{1}{Q_0} \right ) \mathbf{I}
+- \left ( \frac{1}{\sigma'_{th}} \right ) \mathbf{N}
+\right ] \vec{V} \approx \mathbf{N} \, \vec{1}
 \label{eq-robinson-dc-vector-linear}
 \end{equation}
 
-The operating point estimated using Equation
+Equation \ref{eq-robinson-dc-vector-linear} has the form
+$\mathbf{A} \vec{V} = \vec{b}$, and so may be solved as a set of linear
+equations. The operating point estimated using Equation
 \ref{eq-robinson-dc-vector-linear} \textbf{must} be examined to confirm
 that $|V_a| \ll \sigma'_{th}$ for all $V_a$. If this constraint does not
 hold, the estimate is not correct.
