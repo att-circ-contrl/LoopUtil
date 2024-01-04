@@ -1,12 +1,12 @@
 % Neuroloop utilities - Synthesis model guide - Robinson model - Analysis
 % Written by Christopher Thomas.
 
-\section{Mathematical Analysis}
+\chapter{Robinson Model Mathematical Analysis}
 \label{sect-robinson-math}
 
 %
 %
-\subsection{Low-Pass Filter Delays}
+\section{Low-Pass Filter Delays}
 \label{sect-robinson-math-lowpass}
 
 Applying the Laplace transform to Equation \ref{eq-robinson-potential} shows
@@ -79,7 +79,7 @@ are two such poles.}
 
 %
 %
-\subsection{Oscillation Modes}
+\section{Oscillation Modes}
 \label{sect-robinson-math-modes}
 
 A simplified diagram of the extended Robinson model is shown in Figure
@@ -154,8 +154,10 @@ gain exceeding unity. As this does not explicitly consider noise excitation,
 all of the loops described in Table \ref{tab-robinson-loops} may be
 analyzed.
 
-\subsection{Operating Points}
-\label{sect-robinson-math-fixed}
+%
+%
+\section{Operating Points}
+\label{sect-robinson-math-dc}
 
 As was described in Robinson 2002, the dynamics of the extended Robinson
 model can be analyzed by considering unchanging (DC) firing rates, and
@@ -166,9 +168,9 @@ to find the small-signal loop gain (to determine which oscillating modes
 are dominant for given parameter values).
 
 At a given operating point, the sensitivity of the gain of the dominant
-loops to each of the $v_{ab}$ coefficients provides insight into which
+loops to each of the $\nu_{ab}$ coefficients provides insight into which
 network connections are most relevant for influencing dynamcis at that
-operating point. $v_{ee\_ext}$ is particularly of interest, as this
+operating point. $\nu_{ee\_ext}$ is particularly of interest, as this
 may be used as a proxy for the sensitivity of network dynamics to changes
 in the connectivity matrix between different excitatory cortex neuron
 populations.
@@ -280,9 +282,44 @@ equations. The operating point estimated using Equation
 that $|V_a| \ll \sigma'_{th}$ for all $V_a$. If this constraint does not
 hold, the estimate is not correct.
 
+As a representative example, Table \ref{tab-robinson-operating-point} shows
+the operating point corresponding to the model parameters given in Table
+\ref{tab-robinson-params} and the coupling coefficients given in Table
+\ref{tab-robinson-couplings}. A single population was considered (no
+$\nu_{ee\_ext}$ coupling). All of the operating point values satisfy the
+constraint for exponential approximation validity ($\phi \ll 250$), and
+while the constraint for linear approximation is not satisfied
+($V \ll 3.3$), they are sufficiently close to the desired domain that the
+linear approximation result can be used as a seed value for obtaining the
+exponential approximation result via gradient descent.
+
+\tabdef{%
+\begin{tabular}{c|cccc}
+\hline
+ & \textbf{Measured} & \textbf{Exponential} & \textbf{Linear} & \\
+\hline
+$\phi_e$ & 4.2 & 4.1 & 4.8 & /sec \\
+$\phi_i$ & 4.2 & 4.1 & 4.8 & /sec \\
+$\phi_s$ & 3.3 & 3.2 & 4.0 & /sec \\
+$\phi_r$ & 5.3 & 5.3 & 5.6 & /sec \\
+\hline
+$V_e$ & 1.51 & 1.44 & 2.01 & mV \\
+$V_i$ & 1.51 & 1.44 & 2.01 & mV \\
+$V_s$ & 0.75 & 0.66 & 1.41 & mV \\
+$V_r$ & 2.34 & 2.31 & 2.49 & mV \\
+\hline
+\end{tabular}
+}{Measured and estimated operating points for a representative model.
+``Measured'' values were averaged over a 30-second simulation window.
+``Exponential'' and ``linear'' values were estimated using Equations
+\ref{eq-robinson-dc-vector-approx} (using gradient descent) and
+\ref{eq-robinson-dc-vector-linear} (as a system of linear equations),
+respectively.}
+{tab-robinson-operating-point}
+
 %
 %
-\subsection{Small-Signal Gain and Dominant Oscillations}
+\section{Small-Signal Gain and Dominant Oscillations}
 \label{sect-robinson-math-gain}
 
 The small-signal gain $G_{ab}$ of any given arc is the derivative of its
@@ -360,6 +397,7 @@ L \left ( \frac{V - V_{th}}{\sigma'_{th}} \right ) \right )
 %
 \begin{equation}
 Q'(V) = \frac{1}{\sigma'_{th}} Q(V) \left ( 1 - \frac{Q(V)}{Q_{max}} \right )
+\label{eq-robinson-sigmoid-derivative}
 \end{equation}
 
 Combining this with Equation \ref{eq-robinson-gain-qprime} gives:
@@ -379,13 +417,112 @@ This is Equation 10 from Robinson 2002. The small-signal gain of a loop at
 low frequencies is the product of $G_{ab}$ for each arc in the loop
 (as with the $S_d$, $S_i$, and $S_r$ values in section IV of Robinson 2002).
 
+\fixme{Gain of individual loops goes here.}
 
-\fixme{Add code for using the model to generate rates.}
+\fixme{Show how to evaluate envelope time constants.}
 
-\fixme{Add code for finding operating points, both as estimates and via
-brute force numerical solutions.}
+%
+%
+\section{Adjusting Gain by Tuning Coupling Coefficients}
+\label{sect-robinson-math-tuning}
+%
+% FIXME - Convenience macro.
+\newcommand{\deln}{\nabla_{\mathbf{N}}}
 
-\fixme{Show how to evaluate loop gain and envelope time constants.}
+Tuning the behavior of the simulated system is done by adjusting the
+internal coupling coefficients $\nu_{ab}$ (aggregated as matrix
+$\mathbf{N}$). The goal is typically to cause specific oscillation modes
+to become dominant. To facilitate this, the sensitivity of loop gain with
+respect to the coupling coefficients may be performed by computing the
+gradient of gain with respect to $\mathbf{N}$.
+
+The gain across a given network edge may be expressed in terms of the
+edge's coupling coefficient and the derivative of the activation function,
+per Equations \ref{eq-robinson-gain-qprime} and
+\ref{eq-robinson-sigmoid-derivative}:
+
+\begin{equation}
+G_{ab} \approx \nu_{ab} \, Q'(V_a)
+\end{equation}
+%
+\begin{equation}
+Q'(V_a) = \frac{1}{\sigma'_{th}} \phi_a
+\left ( 1 - \frac{\phi_a}{Q_{max}} \right )
+\end{equation}
+
+Taking the gradient with respect to $\mathbf{N}$ gives:
+
+\begin{equation}
+\deln G_{ab} \approx Q'(V_a) \deln \nu_{ab} + \nu_{ab} \deln Q'(V_a)
+\label{eq-robinson-gain-gradient}
+\end{equation}
+
+$\deln \nu_{ab}$ is a matrix whose elements are zero except for a single
+element at row $a$ column $b$, which is unity. The gradient of $Q'(V_a)$ is:
+
+\begin{equation}
+\deln Q'(V_a) = \deln \left [
+\frac{1}{\sigma'_{th}} \phi_a \left ( 1 - \frac{\phi_a}{Q_{max}} \right )
+\right ]
+\end{equation}
+%
+\begin{equation}
+\deln Q'(V_a) =
+\frac{1}{\sigma'_{th}} \left (
+\left ( 1 - \frac{\phi_a}{Q_{max}} \right ) \deln \phi_a
++ \phi_a \deln \left [ 1 - \frac{\phi_a}{Q_{max}} \right ]
+\right )
+\end{equation}
+%
+\begin{equation}
+\deln Q'(V_a) = \frac{1}{\sigma'_{th}}
+\left ( 1 - 2 \frac{\phi_a}{Q_{max}} \right ) \deln \phi_a
+\label{eq-robinson-qprime-gradient}
+\end{equation}
+
+In principle, the gradient of the firing rate $\deln \phi_a$ may be
+evaluated by taking the gradient with respect to $\mathbf{N}$ of Equations
+\ref{eq-robinson-sigmoid-approx} and \ref{eq-robinson-dc-vector-approx}. In
+practice, the firing rate gradients are evaluated numerically by finding an
+operating point and making small perturbations to each $\nu_{ab}$.
+
+The single-loop gain for a two-edge loop can be computed using the product
+rule:
+
+\begin{equation}
+\deln \left [ G_{ab} G_{ba} \right ] =
+G_{ba} \deln G_{ab} + G_{ab} \deln G_{ba}
+\end{equation}
+%
+\begin{equation}
+\deln \left [ G_{ab} G_{ba} \right ] =
+G_{ba} \left [ Q'(V_a) \deln \nu_{ab} + \nu_{ab} \deln Q'(V_a) \right ]
++ G_{ab} \left [ Q'(V_b) \deln \nu_{ba} + \nu_{ba} \deln Q'(V_b) \right ]
+\end{equation}
+%
+\begin{equation}
+\begin{array}{rcl}
+\deln \left [ G_{ab} G_{ba} \right ] & = &
+\nu_{ba} Q'(V_a) Q'(V_b) \deln \nu_{ab}
++ \nu_{ab} Q'(V_a) Q'(V_b) \deln \nu_{ba} \\
+ & + &
+\nu_{ab} \nu_{ba} Q'(V_b) \deln Q'(V_a)
++ \nu_{ab} \nu_{ba} Q'(V_a) \deln Q'(V_b) \\
+\end{array}
+\end{equation}
+%
+\begin{equation}
+\begin{array}{rcl}
+\deln \left [ G_{ab} G_{ba} \right ] & = &
+Q'(V_a) \, Q'(V_b)
+\left [ \, \nu_{ba} \deln \nu_{ab} + \nu_{ab} \deln \nu_{ba} \, \right ] \\
+ & + &
+\nu_{ab} \, \nu_{ba}
+\left [ \, Q'(V_b) \deln Q'(V_a) + Q'(V_a) \deln Q'(V_b) \, \right ] \\
+\end{array}
+\label{eq-robinson-loop2-gain-gradient}
+\end{equation}
+
 
 \fixme{Show how to find regions of parameter space where desired loops are
 dominant, including ones where the mixing matrix matters. Show where the
