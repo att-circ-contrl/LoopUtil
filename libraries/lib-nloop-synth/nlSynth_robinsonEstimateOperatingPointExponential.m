@@ -1,9 +1,9 @@
 function [ firingrates potentials ] = ...
-  nlSynth_robinsonEstimateOperatingPointFsolve( ...
+  nlSynth_robinsonEstimateOperatingPointExponential( ...
     modelparams, intcouplings, startpotentials )
 
 % function [ firingrates potentials ] = ...
-%   nlSynth_robinsonEstimateOperatingPointFsolve( ...
+%   nlSynth_robinsonEstimateOperatingPointExponential( ...
 %     modelparams, intcouplings, startpotentials )
 %
 % This attempts to estimate the DC operating point of a Robinson neural model.
@@ -13,7 +13,7 @@ function [ firingrates potentials ] = ...
 %
 % potentials = intcouplings * Q_0 * exp( potentials / sigmaprime )
 %
-% This function does a brute-force-and-ignorance search for operating
+% This function does a brute-force gradient descent search for operating
 % points using "fsolve". This only finds one point; several points may
 % exist.
 %
@@ -29,7 +29,7 @@ function [ firingrates potentials ] = ...
 % "startpotentials" is a vector containing cell potentials for the excitatory,
 %   inhibitory, specific nucleus, and reticular nucleus populations used as
 %   a starting point for further optimization. Set this to [] to call
-%   nlSynth_robinsonEstimateOperatingPointLinaer() to generate starting
+%   nlSynth_robinsonEstimateOperatingPointLinear() to generate starting
 %   potentials.
 %
 % "firingrates" is a vector containing firing rates for the excitatory,
