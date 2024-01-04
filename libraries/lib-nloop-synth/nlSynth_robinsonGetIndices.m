@@ -23,7 +23,7 @@ indices_lut = struct();
 indices_lut.cortex_excitatory = 1;
 indices_lut.cortex_inhibitory = 2;
 indices_lut.thalamus_specific = 3;
-indicus_lut.thalamus_reticular = 4;
+indices_lut.thalamus_reticular = 4;
 
 
 % Done.
