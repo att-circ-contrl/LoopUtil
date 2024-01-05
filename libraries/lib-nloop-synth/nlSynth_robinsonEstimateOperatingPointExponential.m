@@ -21,7 +21,7 @@ function [ firingrates potentials ] = ...
 % they are much less than modelparams.qmax. If they are not several times
 % smaller, the operating point is not correct.
 %
-% "modelparams" is a model parameter structure with fields described in
+% "modelparams" is a model parameter structure with the fields described in
 %   MODELPARAMSROBINSON.txt.
 % "intcouplings" is a 4x4 matrix indexed by (destination,source) that
 %   provides the coupling weights (in mV*s) between excitatory, inhibitory,

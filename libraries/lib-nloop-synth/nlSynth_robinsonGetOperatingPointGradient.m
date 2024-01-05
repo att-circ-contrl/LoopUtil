@@ -17,7 +17,7 @@ function [ rategradients potentialgradients ] = ...
 % The gradient of this function is evaluated numerically, by perturbing the
 % coupling matrix and finding operating points for each perturbed version.
 %
-% "modelparams" is a model parameter structure with fields described in
+% "modelparams" is a model parameter structure with the fields described in
 %   MODELPARAMSROBINSON.txt.
 % "intcouplings" is a 4x4 matrix indexed by (destination, source) that
 %   provides the coupling weights (in mV*s) between excitatory, inhibitory,

@@ -7,7 +7,7 @@ function edgegains = nlSynth_robinsonGetEdgeGains( ...
 % This function estimates the small-signal gain of each network edge in a
 % Robinson neural model, at a specified operating point.
 %
-% "modelparams" is a model parameter structure with fields described in
+% "modelparams" is a model parameter structure with the fields described in
 %   MODELPARAMSROBINSON.txt.
 % "intcouplings" is a 4x4 matrix indexed by (destination, source) that
 %   provides the coupling weights (in mV*s) between excitatory, inhibitory,

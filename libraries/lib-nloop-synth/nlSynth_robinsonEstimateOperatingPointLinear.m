@@ -17,7 +17,7 @@ function [ firingrates potentials ] = ...
 % confirm that this condition holds. If it doesn't hold, the estimated
 % operating point is not correct.
 %
-% "modelparams" is a model parameter structure with fields described in
+% "modelparams" is a model parameter structure with the fields described in
 %   MODELPARAMSROBINSON.txt.
 % "intcouplings" is a 4x4 matrix indexed by (destination,source) that
 %   provides the coupling weights (in mV*s) between excitatory, inhibitory,
