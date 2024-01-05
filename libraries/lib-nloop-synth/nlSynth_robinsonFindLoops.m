@@ -26,6 +26,8 @@ function loopinfo = ...
 %   "delay" is the propagation time for one cycle around the loop, in seconds.
 %   "isinverting" is true if the product of the loop's edge couplings is
 %     negative, and false if the product is positive.
+%   "frequency" is the loop's fundamental mode frequency in Hz (1/delay if
+%     non-inverting, half that if inverting).
 
 
 %
@@ -63,8 +65,8 @@ edgesvalid = abs(intcouplings) >= minweight;
 %
 % Search for loops.
 
-loopinfo = struct( ...
-  'label', {}, 'regionsvisited', {}, 'delay', {}', 'isinverting', {} );
+loopinfo = struct( 'label', {}, 'regionsvisited', {}, 'delay', {}', ...
+  'isinverting', {}, 'frequency', {} );
 
 % Do this by brute force permutation searching.
 % The number of possible loops is small enough for this to be practical.
@@ -114,8 +116,15 @@ for looplength = 1:regioncount
         end
       end
 
+      thisinverting = (thisproduct < 0);
+      thisfreq = 1 / thisdelay;
+      if thisinverting
+        thisfreq = 0.5 * thisfreq;
+      end
+
       thisrec = struct( 'label', thislabel, 'regionsvisited', thispath, ...
-        'delay', thisdelay, 'isinverting', (thisproduct < 0) );
+        'delay', thisdelay, 'isinverting', thisinverting, ...
+        'frequency', thisfreq );
 
       loopinfo = [ loopinfo thisrec ];
 
