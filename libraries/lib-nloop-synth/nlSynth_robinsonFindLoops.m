@@ -28,6 +28,9 @@ function loopinfo = ...
 %     negative, and false if the product is positive.
 %   "frequency" is the loop's fundamental mode frequency in Hz (1/delay if
 %     non-inverting, half that if inverting).
+%   "attenuation" is the loop's attenuation at its fundamental mode
+%     frequency from the alpha, beta, and gamma model parameters. This will
+%     be between 1 if the signal is passed perfectly and less than 1 if not.
 
 
 %
@@ -40,6 +43,11 @@ delay_gamma = (1 / modelparams.gamma) * 2;
 
 % Convert the cortex/thalamus delay to seconds.
 delay_ct = modelparams.halfdelay_ms * 0.001;
+
+% Convenience copies.
+alpha = modelparams.alpha;
+beta = modelparams.beta;
+gamma = modelparams.gamma;
 
 
 % Be flexible about the number of regions, in case we extend the model.
@@ -66,7 +74,7 @@ edgesvalid = abs(intcouplings) >= minweight;
 % Search for loops.
 
 loopinfo = struct( 'label', {}, 'regionsvisited', {}, 'delay', {}', ...
-  'isinverting', {}, 'frequency', {} );
+  'isinverting', {}, 'frequency', {}, 'attenuation', {} );
 
 % Do this by brute force permutation searching.
 % The number of possible loops is small enough for this to be practical.
@@ -98,6 +106,8 @@ for looplength = 1:regioncount
       thisdelay = 0;
       thisproduct = 1;
 
+      hadgamma = false;
+
       for nidx = 2:length(thispath)
         srcidx = thispath(nidx-1);
         dstidx = thispath(nidx);
@@ -110,6 +120,7 @@ for looplength = 1:regioncount
         thisdelay = thisdelay + delay_albet;
         if isgamma(srcidx)
           thisdelay = thisdelay + delay_gamma;
+          hadgamma = true;
         end
         if iscortex(srcidx) ~= iscortex(dstidx)
           thisdelay = thisdelay + delay_ct;
@@ -122,9 +133,29 @@ for looplength = 1:regioncount
         thisfreq = 0.5 * thisfreq;
       end
 
+
+      % Calculate attenuation due to filter effects.
+      % It's (a b) / (jw + a) (jw + b) for all nodes, and g^2 / (jw + g)^2
+      % if we have gamma.
+
+      thisjomega = i * thisfreq * 2 * pi;
+      thiscount = length(thispath) - 1;
+
+      thisatten = (alpha * beta) ...
+        / ( ( thisjomega + alpha ) * (thisjomega + beta) );
+      thisatten = thisatten ^ thiscount;
+
+      if hadgamma
+        scratch = gamma / ( thisjomega + gamma );
+        thisatten = thisatten * scratch * scratch;
+      end
+
+      thisatten = abs(thisatten);
+
+
       thisrec = struct( 'label', thislabel, 'regionsvisited', thispath, ...
         'delay', thisdelay, 'isinverting', thisinverting, ...
-        'frequency', thisfreq );
+        'frequency', thisfreq, 'attenuation', thisatten );
 
       loopinfo = [ loopinfo thisrec ];
 

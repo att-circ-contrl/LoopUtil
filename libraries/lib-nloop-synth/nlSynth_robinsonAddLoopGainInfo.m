@@ -22,7 +22,10 @@ function newloopinfo = nlSynth_robinsonAddLoopGainInfo( ...
 %
 % "newloopinfo" is a copy of "oldloopinfo" with the following fields added
 %   to each record:
-%   "cyclegain" is the small-signal gain from traversing once around the loop.
+%   "cyclegainraw" is the small-signal gain from traversing once around the
+%     loop, without taking into account filter attenuation.
+%   "cyclegain" is the small-signal gain from traversing once around the
+%     loop with filter attenuation taken into account.
 %   "envelopetau" is the time constant for the growth (positive) or decay
 %     (negative) of the oscillation envelope. The envelope is exp(t/tau).
 %   "cyclegaingradient" is the gradient with respect to "intcouplings" of
@@ -54,6 +57,9 @@ for lidx = 1:loopcount
     thiscyclegain = thiscyclegain * edgegains(dstidx, srcidx);
   end
 
+  newloopinfo(lidx).cyclegainraw = thiscyclegain;
+
+  thiscyclegain = thiscyclegain * oldloopinfo(lidx).attenuation;
   thistau = thisdelay / log(abs(thiscyclegain));
 
   newloopinfo(lidx).cyclegain = thiscyclegain;
@@ -81,6 +87,9 @@ for lidx = 1:loopcount
 
       thiscyclegrad = thiscyclegrad + thisterm;
     end
+
+    % This gets attenuated just like gain did.
+    thiscyclegrad = thiscyclegrad * oldloopinfo(lidx).attenuation;
 
     newloopinfo(lidx).cyclegaingradient = thiscyclegrad;
 
