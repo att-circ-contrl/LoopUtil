@@ -32,6 +32,7 @@ s^2 V_a(s) + (\alpha + \beta) s V_a(s) + \alpha \beta V_a(s)
 \begin{equation}
 \frac{V_a(s)}{\sum_b \nu_{ab} \Phi_b(s)}
 = \frac{\alpha \beta}{(s + \alpha) (s + \beta)}
+\label{eq-robinson-lowpass-albet}
 \end{equation}
 
 Applying the Laplace transform to Equation \ref{eq-robinson-gamma} shows
@@ -53,6 +54,7 @@ s^2 \Phi(s) + 2 \gamma s \Phi(s) + \gamma^2 \Phi(s) = \gamma^2 Q(s)
 %
 \begin{equation}
 \frac{\Phi(s)}{Q(s)} = \frac{\gamma^2}{(s + \gamma)^2}
+\label{eq-robinson-lowpass-gamma}
 \end{equation}
 
 The effect of both of these filters is to suppress high-frequency
@@ -424,30 +426,38 @@ G_{ab} \approx \frac{\nu_{ab}}{\sigma'_{th}}
 \label{eq-robinson-gain}
 \end{equation}
 
-This is Equation 10 from Robinson 2002. The small-signal gain of a loop at
-low frequencies is the product of $G_{ab}$ for each arc in the loop
-(as with the $S_d$, $S_i$, and $S_r$ values in section IV of Robinson 2002).
+This is Equation 10 from Robinson 2002.
+
+The small-signal gain of a loop at low frequencies is the product of
+$G_{ab}$ for each arc in the loop (as with the $S_d$, $S_i$, and $S_r$
+values in section IV of Robinson 2002).
+At frequencies that approach the low-pass filter cutoffs described in
+Section \ref{sect-robinson-math-lowpass}, Equation
+\ref{eq-robinson-lowpass-albet} must be applied to attenuate each edge, and
+Equation \ref{eq-robinson-lowpass-gamma} must be applied to attenuate any
+edge leaving the excitatory cortex population node.
 The small-signal gains for the loops in Table \ref{tab-robinson-loops} are
 shown in Table \ref{tab-robinson-loopgain}. These were evaluated at the
 exponential approximation operating point from
-Table \ref{tab-robinson-operating-point}.
+Table \ref{tab-robinson-operating-point}, with low-pass filter attenuation
+applied.
 
 \tabdef{%
 \begin{tabular}{ccccc} \hline
 \textbf{Label} & \textbf{Frequency} & \textbf{Cycle Time} &
 \textbf{Cycle Gain} & \textbf{Envelope Tau} \\ \hline
 %
-EE & 22 Hz & 45 ms & 1.45 & 120 ms \\
-II & 20 Hz & 25 ms & -2.2 & 32 ms \\ \hline
+EE & 22 Hz & 45 ms & 0.14 & -23 ms \\
+II & 20 Hz & 25 ms & -0.68 & -66 ms \\ \hline
 %
-EI & 7.1 Hz & 70 ms & -3.2 & 61 ms \\
-ES & 6.7 Hz & 150 ms & 1.7 & 290 ms \\
-SR & 10.0 Hz & 50 ms & -0.24 & -35 ms \\ \hline
+EI & 7.1 Hz & 70 ms & -1.39 & \textbf{210 ms} \\
+ES & 6.7 Hz & 150 ms & 0.81 & -690 ms \\
+SR & 10.0 Hz & 50 ms & -0.09 & -20 ms \\ \hline
 %
-ESI & 2.9 Hz & 175 ms & -3.7 & 135 ms \\
-ERS & 2.9 Hz & 175 ms & -0.70 & -490 ms \\ \hline
+ESI & 2.9 Hz & 175 ms & -2.93 & \textbf{163 ms} \\
+ERS & 2.9 Hz & 175 ms & -0.56 & -300 ms \\ \hline
 %
-ERSI & 5.0 Hz & 200 ms & 1.53 & 470 ms \\ \hline
+ERSI & 5.0 Hz & 200 ms & 0.68 & -520 ms \\ \hline
 %
 \end{tabular}
 }{Small-signal gains of extended Robinson model oscillation modes. Positive
@@ -474,12 +484,18 @@ mode grows with time; the smaller the time constant, the faster the growth:
 \end{equation}
 
 The dominant oscillation modes are expected to be those with the shortest
-positive envelope time constant. In practice, this is at best a rough
-guideline, since a) the low-pass filter effects described in Section
-\ref{sect-robinson-math-lowpass} reduce the gain of oscillation modes above
-8~Hz, and b) the $\chi \sigma_n \nu_n$ contribution to $\nu_{se}$ (shown in
-Figure \ref{fig-robinson-loops}) causes the gain of the E to S edge to
-fluctuate.
+positive envelope time constants. Only two such loops are present with the
+parameters from Tables \ref{tab-robinson-params} and
+\ref{tab-robinson-couplings}: The EI loop in the cortex (at 7 Hz) and the
+ESI loop through the thalamus (at 3 Hz). The gain in the ESI loop may
+fluctuate due to the $\chi \sigma_n \nu_n$ contribution to $\nu_{se}$ (shown
+in Figure \ref{fig-robinson-loops}). A power spectrum from a simulation
+using these parameters is shown in Figure \ref{fig-robinson-spectrum},
+showing a clear peak at 8 Hz (near the predicted EI loop resonance).
+
+\figdef{\includegraphics[height=3in]{plots/20240108/spectrum-hindriks}}
+{Power spectrum from a Robinson model simulation.}
+{fig-robinson-spectrum}
 
 %
 %
