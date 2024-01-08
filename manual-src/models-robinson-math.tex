@@ -100,11 +100,11 @@ multiplicative noise significantly contributes to that arc.
 
 A list of potential oscillation loops and their oscillation frequencies is
 given in Table \ref{tab-robinson-loops}. For loops consisting entirely of
-positive coefficients, the oscillation period is the time needed to complete
-a single circuit. For loops with one negative coefficient, the oscillation
-period is the time needed to complete two circuits around the loop (in the
-same manner as a ring oscillator). Harmonics of these oscillation frequencies
-are also supported.
+positive coefficients, or with two negative coefficients, the oscillation
+period is the time needed to complete a single circuit. For loops with one
+negative coefficient, the oscillation period is the time needed to complete
+two circuits around the loop (in the same manner as a ring oscillator).
+Harmonics of these oscillation frequencies are also supported.
 
 The number of arc traversals needed for one oscillation period is noted.
 Per above, this may reflect either one or two cycles around the loop. Each
@@ -118,29 +118,39 @@ applicable.
 \tabdef{%
 \begin{tabular}{ccccccc}\hline
 \textbf{Label} & \textbf{Arcs} & \textbf{Gamma} & \textbf{C-T Loop} &
-\textbf{Period} & \textbf{Frequency} & \textbf{Gain} \\
+\textbf{Period} & \textbf{Frequency} & \textbf{Coupling Gain} \\
 \hline
+%
+EE & 1 & Y & -- & 45 ms & 22 Hz & $(\nu_{ee} + \nu_{ee\_ext})$ \\
 ES & 2 & Y & Y & 150 ms & 6.7 Hz & $\nu_{se} \cdot \nu_{es}$ \\
-EE & 1 & Y & -- & 45 ms & 22 Hz & $\nu_{ee} + \nu_{ee\_ext}$ \\
+%
+ERSI & 4 & Y & Y & 200 ms & 5.0 Hz &
+$\nu_{re} \cdot \nu_{sr} \cdot \nu_{is} \cdot \nu{ei}$ \\
+%
 \hline
+%
+II & 2 & -- & -- & 25 ms & 20 Hz & $\nu_{ii}$ \\
+%
 EI & 4 & Y & -- & 140 ms & 7 Hz & $2 \cdot \nu_{ie} \cdot \nu_{ei}$ \\
 SR & 4 & -- & -- & 100 ms & 10 Hz & $2 \cdot \nu_{rs} \cdot \nu_{sr}$ \\
 %
-ERS & 6 & Y & Y & 350 ms & 2.9 Hz &
-$2 \cdot \nu_{re} \cdot \nu_{sr} \cdot \nu_{es}$ \\
 ESI & 6 & Y & Y & 350 ms & 2.9 Hz &
 $2 \cdot \nu_{se} \cdot \nu_{is} \cdot \nu_{ei}$ \\
+ERS & 6 & Y & Y & 350 ms & 2.9 Hz &
+$2 \cdot \nu_{re} \cdot \nu_{sr} \cdot \nu_{es}$ \\
+%
 \hline
 \end{tabular}
-}{Extended robinson model oscillation modes. Top two modes: single-cycle.
-Bottom four modes: two-cycle (inverting). Activation function gain is
-not shown.}
+}{Extended Robinson model oscillation modes. Top modes: single-cycle
+(non-inverting). Bottom modes: two-cycle (inverting). Activation function
+gain is not shown.}
 {tab-robinson-loops}
 
 Resonant loops explicitly described in Section IV of Robinson 2002 are the
-ones marked ES, ERS, and SR. The oscillation periods described in Section
-V of Robinson 2002 are consistent with the estimated periods of the ERS and
-SR loops in Table \ref{tab-robinson-loops}.
+ones marked ES, ERS, and SR in Table \ref{tab-robinson-loops}. Considering
+only those loops, the oscillation periods described in Section V of
+Robinson 2002 are consistent with the estimated periods of the ERS and
+SR loops.
 
 The authors of Robinson 2002 were primarily concerned with noise-excited
 oscillations, and so only evaluated oscillation loops that included the
@@ -250,9 +260,10 @@ separately for each element of $\vec{V}$:
 \label{eq-robinson-dc-vector-approx}
 \end{equation}
 
-While this system of equations may be solved numerically (and was solved
-numerically in Robinson 2002), an estimate of the operating point may be
-obtained by assuming that potentials are small compared to $\sigma'_{th}$.
+This system of exponential equations may be solved numerically.
+
+Alternatively, a system of linear equations may be obtained by assuming
+that potentials are small compared to $\sigma'_{th}$.
 \textbf{This is not a robust assumption;} it is used as an estimate only.
 With this caveat kept in mind, a linear approximation of the exponential
 function may be used (the first-order Taylor expansion), giving the following
@@ -416,10 +427,59 @@ G_{ab} \approx \frac{\nu_{ab}}{\sigma'_{th}}
 This is Equation 10 from Robinson 2002. The small-signal gain of a loop at
 low frequencies is the product of $G_{ab}$ for each arc in the loop
 (as with the $S_d$, $S_i$, and $S_r$ values in section IV of Robinson 2002).
+The small-signal gains for the loops in Table \ref{tab-robinson-loops} are
+shown in Table \ref{tab-robinson-loopgain}. These were evaluated at the
+exponential approximation operating point from
+Table \ref{tab-robinson-operating-point}.
 
-\fixme{Gain of individual loops goes here.}
+\tabdef{%
+\begin{tabular}{ccccc} \hline
+\textbf{Label} & \textbf{Frequency} & \textbf{Cycle Time} &
+\textbf{Cycle Gain} & \textbf{Envelope Tau} \\ \hline
+%
+EE & 22 Hz & 45 ms & 1.45 & 120 ms \\
+II & 20 Hz & 25 ms & -2.2 & 32 ms \\ \hline
+%
+EI & 7.1 Hz & 70 ms & -3.2 & 61 ms \\
+ES & 6.7 Hz & 150 ms & 1.7 & 290 ms \\
+SR & 10.0 Hz & 50 ms & -0.24 & -35 ms \\ \hline
+%
+ESI & 2.9 Hz & 175 ms & -3.7 & 135 ms \\
+ERS & 2.9 Hz & 175 ms & -0.70 & -490 ms \\ \hline
+%
+ERSI & 5.0 Hz & 200 ms & 1.53 & 470 ms \\ \hline
+%
+\end{tabular}
+}{Small-signal gains of extended Robinson model oscillation modes. Positive
+gains correspond to single-cycle loops; negative gains to two-cycle loops.
+Gains with absolute values smaller than 1 correspond to damped loops; gains
+with absolute values greater than 1 correspond to oscillation modes that
+grow over time with time constant $\tau_{loop}$.}
+{tab-robinson-loopgain}
 
-\fixme{Show how to evaluate envelope time constants.}
+The single-cycle delay and single-cycle gain in a loop together define a time
+constant over which that loop's oscillation's envelope grows or decays,
+per Equations \ref{eq-robinson-gaintau} and \ref{eq-robinson-envtau}.
+An envelope time constant that is positive indicates that an oscillation
+mode grows with time; the smaller the time constant, the faster the growth:
+
+\begin{equation}
+| G_{loop} | = e^{\left ( \frac{t_{loop}}{\tau_{env}} \right )}
+\label{eq-robinson-gaintau}
+\end{equation}
+%
+\begin{equation}
+\tau_{env} = \frac{t_{loop}}{\ln | G_{loop} |}
+\label{eq-robinson-envtau}
+\end{equation}
+
+The dominant oscillation modes are expected to be those with the shortest
+positive envelope time constant. In practice, this is at best a rough
+guideline, since a) the low-pass filter effects described in Section
+\ref{sect-robinson-math-lowpass} reduce the gain of oscillation modes above
+8~Hz, and b) the $\chi \sigma_n \nu_n$ contribution to $\nu_{se}$ (shown in
+Figure \ref{fig-robinson-loops}) causes the gain of the E to S edge to
+fluctuate.
 
 %
 %
@@ -433,7 +493,7 @@ Tuning the behavior of the simulated system is done by adjusting the
 internal coupling coefficients $\nu_{ab}$ (aggregated as matrix
 $\mathbf{N}$). The goal is typically to cause specific oscillation modes
 to become dominant. To facilitate this, the sensitivity of loop gain with
-respect to the coupling coefficients may be performed by computing the
+respect to the coupling coefficients may be evaluated by computing the
 gradient of gain with respect to $\mathbf{N}$.
 
 The gain across a given network edge may be expressed in terms of the
@@ -486,42 +546,40 @@ evaluated by taking the gradient with respect to $\mathbf{N}$ of Equations
 practice, the firing rate gradients are evaluated numerically by finding an
 operating point and making small perturbations to each $\nu_{ab}$.
 
-The single-loop gain for a two-edge loop can be computed using the product
-rule:
+The gradient of the gain along a path consisting of multiple edges can be
+computed using the product rule. For two-, three-, and four-edge loops,
+this gives:
 
 \begin{equation}
-\deln \left [ G_{ab} G_{ba} \right ] =
-G_{ba} \deln G_{ab} + G_{ab} \deln G_{ba}
-\end{equation}
-%
-\begin{equation}
-\deln \left [ G_{ab} G_{ba} \right ] =
-G_{ba} \left [ Q'(V_a) \deln \nu_{ab} + \nu_{ab} \deln Q'(V_a) \right ]
-+ G_{ab} \left [ Q'(V_b) \deln \nu_{ba} + \nu_{ba} \deln Q'(V_b) \right ]
-\end{equation}
-%
-\begin{equation}
-\begin{array}{rcl}
-\deln \left [ G_{ab} G_{ba} \right ] & = &
-\nu_{ba} Q'(V_a) Q'(V_b) \deln \nu_{ab}
-+ \nu_{ab} Q'(V_a) Q'(V_b) \deln \nu_{ba} \\
- & + &
-\nu_{ab} \nu_{ba} Q'(V_b) \deln Q'(V_a)
-+ \nu_{ab} \nu_{ba} Q'(V_a) \deln Q'(V_b) \\
-\end{array}
-\end{equation}
-%
-\begin{equation}
-\begin{array}{rcl}
-\deln \left [ G_{ab} G_{ba} \right ] & = &
-Q'(V_a) \, Q'(V_b)
-\left [ \, \nu_{ba} \deln \nu_{ab} + \nu_{ab} \deln \nu_{ba} \, \right ] \\
- & + &
-\nu_{ab} \, \nu_{ba}
-\left [ \, Q'(V_b) \deln Q'(V_a) + Q'(V_a) \deln Q'(V_b) \, \right ] \\
-\end{array}
+\deln [ G_{ab} G_{ba} ] =
+( \deln [ G_{ab} ] ) G_{ba} + G_{ab} ( \deln [ G_{ba} ] )
 \label{eq-robinson-loop2-gain-gradient}
 \end{equation}
+%
+\begin{equation}
+\deln [ G_{ab} G_{bc} G_{ca} ] =
+( \deln [ G_{ab} ] ) G_{bc} G_{ca} + G_{ab} ( \deln [ G_{bc} ] ) G_{ca}
++ G_{ab} G_{bc} ( \deln [ G_{ca} ] )
+\label{eq-robinson-loop3-gain-gradient}
+\end{equation}
+%
+\begin{equation}
+\begin{array}{c}
+\deln [ G_{ab} G_{bc} G_{cd} G_{da} ] =
+( \deln [ G_{ab} ] ) G_{bc} G_{cd} G_{da}
++ G_{ab} ( \deln [ G_{bc} ] ) G_{cd} G_{da}
+\\
++ G_{ab} G_{bc} ( \deln [ G_{cd} ] ) G_{da}
++ G_{ab} G_{bc} G_{cd} ( \deln [ G_{da} ] )
+\end{array}
+\label{eq-robinson-loop4-gain-gradient}
+\end{equation}
+
+While Equations \ref{eq-robinson-loop2-gain-gradient} through
+\ref{eq-robinson-loop4-gain-gradient} can be expanded and written in terms
+of $\nu_{ab}$, $\phi_{a}$, and $\deln \phi_{a}$, it is not particularly
+useful to do so (since with or without such expansion the gradient will
+have to be evaluated numerically).
 
 
 \fixme{Show how to find regions of parameter space where desired loops are
