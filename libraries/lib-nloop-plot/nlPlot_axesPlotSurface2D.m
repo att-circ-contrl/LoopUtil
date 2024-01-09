@@ -12,9 +12,13 @@ function nlPlot_axesPlotSurface2D( thisax, zdata, xvalues, yvalues, ...
 % "xvalues" is a series of X coordinate values corresponding to each column
 %   of zdata. If there are as many values as columns, they're bin midpoints.
 %   If there's one more value than there are columns, they're bin edges.
+%   If this is empty, bins are numbered. If this is a cell array, bins get
+%   labels. If it's an empty cell array, bins have no axis labels.
 % "yvalues" is a series of Y coordinate values corresponding to each row of
 %   zdata. If there are as many values as rows, they're bin midpoints. If
 %   there's one more value than there are rows, they're bin edges.
+%   If this is empty, bins are numbered. If this is a cell array, bins get
+%   labels. If it's an empty cell array, bins have no axis labels.
 % "xrange" [ min max ] is the range of X values to render, or [] for auto.
 % "yrange" [ min max ] is the range of Y values to render, or [] for auto.
 % "xloglin" is 'log' or 'linear', specifying the X axis scale.
@@ -35,9 +39,54 @@ function nlPlot_axesPlotSurface2D( thisax, zdata, xvalues, yvalues, ...
 % Figure out how many cells on each axis there are, and compute bin edges
 % if we don't already have them.
 
+% Get geometry.
+
 scratch = size(zdata);
 xcount = scratch(2);
 ycount = scratch(1);
+
+% Handle bin labels if we were given cell arrays for bin locations.
+
+wantxbinlabels = false;
+wantybinlabels = false;
+
+xbinlabels = {};
+ybinlabels = {};
+
+if iscell(xvalues)
+  % Passing an empty array suppresses labels, so this handles both cases.
+  xbinlabels = xvalues;
+  wantxbinlabels = true;
+
+  % Auto-generate the X bins.
+  xvalues = [];
+end
+
+if iscell(yvalues)
+  % Passing an empty array suppresses labels, so this handles both cases.
+  ybinlabels = yvalues;
+  wantybinlabels = true;
+
+  % Auto-generate the Y bins.
+  yvalues = [];
+end
+
+% If we don't have bin locations, auto-generate suitable ones.
+
+forcexbinticks = false;
+forceybinticks = false;
+
+if isempty(xvalues)
+  xvalues = 1:xcount;
+  forcexbinticks = true;
+end
+
+if isempty(yvalues)
+  yvalues = 1:ycount;
+  forceybinticks = true;
+end
+
+% Compute bin edges if we only have midpoints.
 
 if length(xvalues) == xcount
   xvalues = nlProc_getBinEdgesFromMidpoints(xvalues, xloglin);
@@ -60,14 +109,6 @@ end
 
 
 %
-% Expand the data matrix, since we care about faces, not vertices.
-
-zdata(ycount+1,:) = zdata(ycount,:);
-zdata(:,xcount+1) = zdata(:,xcount);
-
-
-
-%
 % Convert Z values to log scale if requested.
 
 if strcmp('log', zloglin)
@@ -83,38 +124,21 @@ end
 
 
 %
-% FIXME - Handle NaN gap cases.
+% Deal with NaN holes in the data.
 
-% All four polygons adjacent to a NaN data point are missing, so we need
-% to propagate valid data in the positive XY directions to let the most
-% positive valid squares get rendered.
+[ zdata, xvalues, yvalues ] = nlProc_padHeatmapNaNs( zdata, xvalues, yvalues );
 
-% Doing that for NaN gaps that are 1 element wide removes the gap, so only
-% do it for gaps 2x2 elements wide or larger.
 
-% Figure out where we want to fill in.
-isnanorig = isnan(zdata);
-isnan2x2 = ...
-  isnanorig(1:ycount,1:xcount) & isnanorig(2:(ycount+1),1:xcount) ...
-  & isnanorig(1:ycount,2:(xcount+1)) & isnanorig(2:(ycount+1),2:(xcount+1));
 
-% Figure out where to pull data from.
-% Mostly this is from y-1,x-1, but we have to account for edges.
-% Crop this to be the same size as isnan2x2.
-newdata = NaN(ycount,xcount);
-newdata(2:ycount,2:xcount) = zdata(1:(ycount-1),1:(xcount-1));
-newdata(1,2:xcount) = zdata(1,1:(xcount-1));
-newdata(2:ycount,1) = zdata(1:(ycount-1),1);
+%
+% Duplicate the last row and column in the data matrix, since "surf" wants
+% data for each vertex even if the last row and column aren't coloured.
 
-% Supply new data where it's needed.
-% If we're trying to fill in deep inside a NaN gap, we'll still pull NaN.
-scratch = zdata(1:ycount,1:xcount);
-scratch(isnan2x2) = newdata(isnan2x2);
-zdata(1:ycount,1:xcount) = scratch;
+newxcount = size(zdata,2);
+newycount = size(zdata,1);
 
-% Re-copy the duplicated rows, as we otherwise wouldn't fill in NaNs there.
-zdata(ycount+1,:) = zdata(ycount,:);
-zdata(:,xcount+1) = zdata(:,xcount);
+zdata(newycount+1,:) = zdata(newycount,:);
+zdata(:,newxcount+1) = zdata(:,newxcount);
 
 
 
@@ -133,6 +157,20 @@ thisax.XAxis.TickDirection = 'out';
 thisax.YAxis.TickDirection = 'out';
 thisax.XAxis.LineWidth = 1;
 thisax.YAxis.LineWidth = 1;
+
+% Make custom tick labels if requested. This includes suppressing tick labels.
+% If we asked for labels, the data range is 1:(xy)count.
+% An empty label array suppresses labels.
+if wantxbinlabels
+  set(thisax, 'XTick', 1:xcount, 'XTickLabel', xbinlabels);
+elseif forcexbinticks
+  set(thisax, 'XTick', 1:xcount);
+end
+if wantybinlabels
+  set(thisax, 'YTick', 1:ycount, 'YTickLabel', ybinlabels);
+elseif forceybinticks
+  set(thisax, 'YTick', 1:ycount);
+end
 
 % Set log/linear.
 set(thisax, 'Xscale', xloglin);
