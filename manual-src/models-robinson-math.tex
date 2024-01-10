@@ -597,6 +597,48 @@ of $\nu_{ab}$, $\phi_{a}$, and $\deln \phi_{a}$, it is not particularly
 useful to do so (since with or without such expansion the gradient will
 have to be evaluated numerically).
 
+Plots of the gradients of the loop gains of the EI and ESI loops (from
+Table \ref{tab-robinson-loopgain}) are shown in Figure
+\ref{fig-robinson-loopgrad}. The ``raw'' gradients are the change in loop
+gain with respect to each of the $\nu_{ab}$ coupling weights (i.e.
+$\deln G_{loop}$). The ``normalized'' gradients are divided by $G_{loop}$,
+to show the \textit{relative} change in loop gain resulting from changes
+to $\nu_{ab}$. In particular, this flips the sign of the gradient for
+loop gains that are negative (with a positive normalized gradient indicating
+that the loop gain is getting \textit{larger}, not more positive).
+
+\figdef{%
+\begin{tabular}{cc}
+\includegraphics[height=2in]{plots/20240110/grad-loop-EI-raw} &
+\includegraphics[height=2in]{plots/20240110/grad-loop-ESI-raw} \\
+\includegraphics[height=2in]{plots/20240110/grad-loop-EI-norm} &
+\includegraphics[height=2in]{plots/20240110/grad-loop-ESI-norm} \\
+\end{tabular}
+}{Gradient of loop gain with respect to $\nu_{ab}$, for the EI loop (left)
+and the ESI loop (right). Top row: raw gradient. Bottom row: normalized
+gradient (gradient divided by $G_{loop}$).}
+{fig-robinson-loopgrad}
+
+The gradients may be visually inspected to gain a qualitative understanding
+of which $\nu_{ab}$ coupling weights have substantial impact on which loops.
+In particular, sensitivity to the strength of the $\nu_{ee}$ coupling in this
+analysis indicates sensitivity to the strength of the $\nu_{ee\_ext}$
+coupling between populations, and to the weights in the population mixing
+matrix.
+
+Inspection of the gradient plots may also guide hand-tuning of coupling
+weights. The main qualitative take-away is that while there are typically
+a small number of $\nu_{ab}$ coupling weights that most strongly affect a
+given loop, any given weight affects many loops, so weights must be jointly
+optimized against all loop gains rather than optimized individually against
+a single loop gain.
+
+The gradients may also be used as the basis of gradient-guided searches of
+parameter space. In practice, the gradient may not need to be explicitly
+computed for this, since optimization library functions such as
+\texttt{fsolve} may compute it numerically themselves by sampling the
+loop gain.
+
 
 \fixme{Show how to find regions of parameter space where desired loops are
 dominant, including ones where the mixing matrix matters. Show where the
