@@ -86,7 +86,7 @@ newxedges = [];
 
 addedcount = 0;
 for cidx = 1:colcount
-  newdata(:,cidx + addedcount,:) = olddata(:,cidx);
+  newdata(:,cidx + addedcount) = olddata(:,cidx);
   newxedges(cidx + addedcount) = oldxedges(cidx);
 
   if xneedspadding(cidx)
