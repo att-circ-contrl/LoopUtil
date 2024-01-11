@@ -72,10 +72,10 @@ ypower = real( ysignal .* conj(ysignal) );
 powercorrel = corrcoef( xpower, ypower );
 powercorrel = powercorrel(1,2);
 
-denom = sqrt( (1 + kurtosis(xpower) + p_xconjx * p_xconjx) ...
-  * (1 + kurtosis(ypower) + p_yconjy * p_yconjy) );
+denom = sqrt( (1 + kurtosis(xpower) + abs(p_xconjx) * abs(p_xconjx)) ...
+  * (1 + kurtosis(ypower) + abs(p_yconjy) * abs(p_yconjy)) );
 
-gausscorrel = (p_xy * p_xy + p_xconjy * p_xconjy) / denom;
+gausscorrel = (abs(p_xy) * abs(p_xy) + abs(p_xconjy) * abs(p_xconjy)) / denom;
 
 nongausscorrel = powercorrel - gausscorrel;
 
