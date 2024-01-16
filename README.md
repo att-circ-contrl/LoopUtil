@@ -18,8 +18,10 @@ License.
 
 The following directories contain documentation:
 
-* `manual` -- LaTeX build directory for project documentation.
-Use `make -C manual` to build it.
+* `manual` -- Output directory for project documentation. Documentation
+PDFs are here.
+* `manual-src` -- LaTeX build directory for project documentation.
+Use `make -C manual-src` to build it.
 
 
 ## Applications
