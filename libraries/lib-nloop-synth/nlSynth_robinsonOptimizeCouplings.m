@@ -1,8 +1,8 @@
-function bestcouplings = nlSynth_robinsonOptimizeCouplings( ...
+function [ bestcouplings besterr ] = nlSynth_robinsonOptimizeCouplings( ...
   modelparams, startcouplings, loopinfo, loopgoals, ...
   taulimit, bestfactor, maxprobes )
 
-% function bestcouplings = nlSynth_robinsonOptimizeCouplings( ...
+% function [ bestcouplings besterr ] = nlSynth_robinsonOptimizeCouplings( ...
 %   modelparams, startcouplings, loopinfo, loopgoals, ...
 %   taulimit, bestfactor, maxprobes )
 %
@@ -40,6 +40,8 @@ function bestcouplings = nlSynth_robinsonOptimizeCouplings( ...
 %
 % "bestcouplings" is a perturbed version of "startcouplings" that produces
 %   the desired loop behaviors.
+% "besterr" is the error value associated with "bestcouplings". This is in
+%   the range 0..1, with 0 being perfect and 1 being terrible.
 
 
 % Initialize output.
@@ -93,7 +95,7 @@ else
     'MaxFunctionEvaluations', maxprobes);
 end
 
-reducedparams = fsolve( anonfunc, reducedparams, options );
+[ reducedparams, besterr ] = fsolve( anonfunc, reducedparams, options );
 
 bestcouplings = helper_getCouplingsFromReduced(reducedparams);
 
@@ -139,28 +141,35 @@ function solutionerror = helper_calcSolutionError( ...
 
   % NOTE - To converge, "growness" and "decayness" both have to be defined
   % even when the loop is doing the opposite.
+  % We're mapping correct-sense values to 0.2..1.0, and incorrect to 0..0.2.
 
-  % With fom = taulimit / looptau, minimum acceptance is at +1, good at +5.
-  % With negative values, it's doing the thing we don't want.
+  % This gives long-period at 0, accepted +1, good +5, short-period +inf.
+  % Negative values are the wrong sense.
+
   growness = taulimit ./ looptau;
-
-  % We want "good" to be at 1. This puts "accepted" at 0.2.
-  growness = growness / 5;
-
-  % Use tanh to convert this into -1..+1. +/-1 becomes +/- 0.76.
-  growness = tanh(growness);
-
-  % Since our range is symmetrical, decayness is -growness.
   decayness = -growness;
 
-  % Remap the range to 0..1. Compress but don't elminate the unwanted bit.
-  % This puts "good" at 0.75, "accepted" at 0.36, "bad" at 0.25.
+  % This maps (correct sense) values to 0.2 (0 growness), 0.4 (accepted),
+  % 0.83 (growness +3), 1.0 (inf growness).
 
-  growness = 0.5 * (growness + 1);
-  growness = growness .* growness;
+  correctgrowness = 1 ./ ( 1 + 4 * exp(-growness) );
+  correctdecayness = 1 ./ ( 1 + 4 * exp(-decayness) );
 
-  decayness = 0.5 * (decayness + 1);
-  decayness = decayness .* decayness;
+  % This maps (incorrect sense) values to 0 (inf decayness), 0.1 (accepted
+  % decayness), 0.2 (0 decayness).
+  % It's linear rather than exponential so that we can still get a gradient
+  % even with strong growth/decay in the direction we don't want.
+
+  incorrectgrowness = 0.2 ./ (1 + growness);
+  incorrectdecayness = 0.2 ./ (1 + decayness);
+
+  % Multiplex these two together to get growness/decayness.
+
+  growness = incorrectdecayness;
+  growness(growmask) = correctgrowness(growmask);
+
+  decayness = incorrectgrowness;
+  decayness(decaymask) = correctdecayness(decaymask);
 
 
   % If we only have one growing loop, it's the best.
@@ -207,9 +216,6 @@ function solutionerror = helper_calcSolutionError( ...
 
   loopfoms = [ growness(goalmaskgrow), decayness(goalmaskdecay), ...
     bestness(goalmaskbiggest) ];
-
-% FIXME - Diagnostics.
-disp(loopfoms);
 
 
   % Now, turn the vector of "okay at 0.2, good at 0.8" values into an error.
