@@ -231,49 +231,96 @@ end
 
 function reducedparams = helper_getReducedFromCouplings( intcouplings )
 
-  % FIXME - Magic index values (per nlSynth_robinsonGetRegionInfo).
-  % FIXME - fsolve() wants a vector, not a struct, so more magic indices.
+  % FIXME - Magic matrix index values (per nlSynth_robinsonGetRegionInfo).
+  % FIXME - fsolve() wants a vector, not a struct, so magic vector indices.
 
   reducedparams = [];
 
-  reducedparams(1) = intcouplings(1,1);  % ee
-  reducedparams(2) = intcouplings(1,2);  % ei
-  reducedparams(3) = intcouplings(1,3);  % es
+  reducedparams(1) = intcouplings(1,1);    % ee
+  reducedparams(2) = - intcouplings(1,2);  % ei - negative!
+  reducedparams(3) = intcouplings(1,3);    % es
 
   % ie, ii, and is are equal to ee, ei, and es.
 
-  reducedparams(4) = intcouplings(3,1);  % se
-  reducedparams(5) = intcouplings(3,4);  % sr
+  reducedparams(4) = intcouplings(3,1);    % se
+  reducedparams(5) = - intcouplings(3,4);  % sr - negative!
 
-  reducedparams(6) = intcouplings(4,1);  % re
-  reducedparams(7) = intcouplings(4,3);  % rs
+  reducedparams(6) = intcouplings(4,1);    % re
+  reducedparams(7) = intcouplings(4,3);    % rs
 
   % All other weights are zero.
+
+
+  % Map to -inf..+inf.
+  for ridx = 1:length(reducedparams)
+    reducedparams(ridx) = helper_getUncompressed( reducedparams(ridx) );
+  end
 
 end
 
 
 function intcouplings = helper_getCouplingsFromReduced( reducedparams )
 
-  % FIXME - Magic index values (per nlSynth_robinsonGetRegionInfo).
-  % FIXME - fsolve() wants a vector, not a struct, so more magic indices.
+  % Map -inf..+inf to a biologically plausible range.
+  for ridx = 1:length(reducedparams)
+    reducedparams(ridx) = helper_getCompressed( reducedparams(ridx) );
+  end
+
+
+  % FIXME - Magic matrix index values (per nlSynth_robinsonGetRegionInfo).
+  % FIXME - fsolve() wants a vector, not a struct, so magic vector indices.
 
   intcouplings = zeros(4,4);
 
-  intcouplings(1,1) = reducedparams(1);  % ee
-  intcouplings(1,2) = reducedparams(2);  % ei
-  intcouplings(1,3) = reducedparams(3);  % es
+  intcouplings(1,1) = reducedparams(1);    % ee
+  intcouplings(1,2) = - reducedparams(2);  % ei - negative!
+  intcouplings(1,3) = reducedparams(3);    % es
 
   % ie, ii, and is are equal to ee, ei, and es.
   intcouplings(2,:) = intcouplings(1,:);
 
-  intcouplings(3,1) = reducedparams(4);  % se
-  intcouplings(3,4) = reducedparams(5);  % sr
+  intcouplings(3,1) = reducedparams(4);    % se
+  intcouplings(3,4) = - reducedparams(5);  % sr - negative!
 
-  intcouplings(4,1) = reducedparams(6);  % re
-  intcouplings(4,3) = reducedparams(7);  % rs
+  intcouplings(4,1) = reducedparams(6);    % re
+  intcouplings(4,3) = reducedparams(7);    % rs
 
   % All other weights are zero.
+
+end
+
+
+function comprange = helper_getCompressed( infrange )
+
+  % This turns a -inf..+inf scalar into a biologically plausible coupling
+  % weight (0.05..10.0, per Robinson 2002).
+
+  % Map to 0..1.
+  comprange = 1 / (1 + exp(-infrange));
+
+  % Map _that_ to 0.05..10, on a log scale.
+  % This is about -3..+2.3.
+  comprange = -3 + (5.3 * comprange);
+  comprange = exp(comprange);
+
+end
+
+
+function infrange = helper_getUncompressed( comprange )
+
+  % This turns a biologically plausible coupling weight (0.05..10.0, per
+  % Robinson 2002) back into a -inf..+inf scalar.
+
+  % Convert to log scale. This is about -3..+2.3.
+  comprange = log(comprange);
+
+  % Map to 0..1 and clamp.
+  comprange = (comprange + 3) / 5.3;
+  comprange = max(0.000001,comprange);
+  comprange = min(0.999999,comprange);
+
+  % Map to -inf..inf.
+  infrange = - log( (1 / comprange) - 1 );
 
 end
 
