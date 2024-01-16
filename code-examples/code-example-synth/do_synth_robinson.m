@@ -37,12 +37,12 @@ ft_warning('off');
 
 
 % Number of trials per test configuration.
-trialcount = 10;
+trialcount = 100;
 
 % Trial duration before and after "stimulation".
 % Signal perturbations take about 1 second to settle after parameter changes.
-trial_secs_before = 5;
-trial_secs_after = 10;
+trial_secs_before = 10;
+trial_secs_after = 15;
 
 
 % Sampling rates and filter parameters.
@@ -173,7 +173,7 @@ mixcaselabels = { 'routeA', 'routeB', 'loopup', 'loopdown' };
 mixcasetitles = { 'routing state A', 'routing state B', ...
   'ascending loop', 'descending loop' };
 
-idxlut = nlSynth_robinsonGetIndices();
+[ idxlut namelut ] = nlSynth_robinsonGetRegionInfo();
 
 totaltime = 0;
 
