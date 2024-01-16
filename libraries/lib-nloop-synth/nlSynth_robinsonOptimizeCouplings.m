@@ -173,7 +173,7 @@ function solutionerror = helper_calcSolutionError( ...
 
 
   % If we only have one growing loop, it's the best.
-  % If we have two, find the second-best and compute FOMs.
+  % If we have at least two, find the second-best and compute FOMs.
 
   bestness = zeros(size(looptau));
 
@@ -184,8 +184,8 @@ function solutionerror = helper_calcSolutionError( ...
     sortedvals = sort(looptau(growmask));
     secondbesttau = sortedvals(2);
 
-    % 0 to inf, accepted at 1, goal at bestfactor.
-    bestness = looptau / secondbesttau;
+    % 0 to inf, accepted at 1, goal at bestfactor (greater than 1).
+    bestness = secondbesttau ./ looptau;
 
     % 0 to 1, accepted at 0.2, goal at 0.8.
     powerval = log(16) / log(bestfactor);
@@ -207,6 +207,7 @@ function solutionerror = helper_calcSolutionError( ...
   goalmaskgrow = strcmp('grow', loopgoals);
   goalmaskdecay = strcmp('decay', loopgoals);
   goalmaskbiggest = strcmp('biggest', loopgoals);
+
   % Have "biggest" imply "grow".
   goalmaskgrow = goalmaskgrow | goalmaskbiggest;
 
