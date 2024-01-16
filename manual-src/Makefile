@@ -155,7 +155,7 @@ refauto-applibs:
 refauto-examples:
 	./copy-code.pl --outfile=$(REFBASE)-examples.tex --verbatim \
 		"--chapter=Sample Code" --label=sect-examples \
-		../code-examples/*.m
+		../code-examples/code-example-reading/*.m
 
 refauto-notes:
 	./copy-code.pl --outfile=$(REFBASE)-notes-core.tex --verbatim \
