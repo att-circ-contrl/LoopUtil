@@ -11,7 +11,7 @@ function peakidx = nlProc_findPeakLargest( dataseries )
 % "dataseries" is a vector to search.
 %
 % "peakidx" is the sample number of the sample in "dataseries" with the
-%   largest magnitude.
+%   largest magnitude, or NaN for empty input.
 
 
 % Tolerate the "empty data" case.

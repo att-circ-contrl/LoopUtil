@@ -13,7 +13,8 @@ function peakidx = nlProc_findPeakNearest( datavals, timevals, timetarget )
 %   present in "timevals" (distance to it is minimized).
 %
 % "peakidx" is the sample number of the sample in "datavals" which is the
-%   magnitude local maximum closest to the specified starting time.
+%   magnitude local maximum closest to the specified starting time. If no
+%   peaks are found (ramp input or empty input), "peakidx" is NaN.
 
 
 %
