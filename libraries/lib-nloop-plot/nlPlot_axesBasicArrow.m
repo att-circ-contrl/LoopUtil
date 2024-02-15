@@ -58,21 +58,44 @@ xright = (xend - xhead) + xbase;
 yright = (yend - yhead) + ybase;
 
 
-% Render the arrow.
+% Build the arrow path.
 
 % Default to unfilled triangle.
 
-xseries = [ xstart xend xleft xright xend ];
-yseries = [ ystart yend yleft yright yend ];
+% Draw the last edge twice for consistent rounding.
+xseries = [ xleft xend xright xleft xend ];
+yseries = [ yleft yend yright yleft yend ];
+
+% Don't draw the arrow shaft through the head.
+xline = [ xstart (xend - xhead) ];
+yline = [ ystart (yend - yhead) ];
 
 if strcmp('vee', headtype)
-  % FIXME - Rather than calling "hold on", use a retrace path for the open
-  % vee arrowhead.
-  xseries = [ xstart xend xleft xend xright ];
-  yseries = [ ystart yend yleft yend yright ];
+  xseries = [ xleft xend xright ];
+  yseries = [ yleft yend yright ];
+
+  xline = [ xstart xend ];
+  yline = [ ystart yend ];
 end
 
-plot( thisax, xseries, yseries, '-', 'LineWidth', linewidth, 'Color', color );
+
+% Render the arrow.
+
+% Remember the old hold state.
+oldnextplot = thisax.NextPlot;
+
+% Use the user's hold setting for the first line.
+plot( thisax, xline, yline, 'HandleVisibility', 'off', ...
+  'LineWidth', linewidth, 'Color', color );
+
+% Turn hold on for the arrowhead line.
+hold on;
+
+plot( thisax, xseries, yseries, '-', 'HandleVisibility', 'off', ...
+  'LineWidth', linewidth, 'Color', color );
+
+% Restore the old hold state.
+thisax.NextPlot = oldnextplot;
 
 
 % Done.
