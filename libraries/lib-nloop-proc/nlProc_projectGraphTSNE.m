@@ -257,7 +257,7 @@ function [ newx newy ] = helper_getNewLocations( ...
       if firstidx ~= secondidx
         bidx = basisidxlut(firstidx,secondidx);
         thisvec = thisvec ...
-          + allmatrix(firstidx,secondidx) * basistable(bidx,:);
+          + sqrt( allmatrix(firstidx,secondidx) ) * basistable(bidx,:);
       end
     end
     highvecs(firstidx,:) = thisvec;
