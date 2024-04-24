@@ -1,8 +1,8 @@
 function [ risesamps fallsamps bothsamps highmidsamps lowmidsamps ] = ...
-  nlFT_getBooleanEdges( boolwave )
+  nlProc_getBooleanEdges( boolwave )
 
 % function [ risesamps fallsamps bothsamps highmidsamps lowmidsamps ] = ...
-%   nlFT_getBooleanEdges( boolwave )
+%   nlProc_getBooleanEdges( boolwave )
 %
 % This processes a vector of boolean values, and identifies samples that
 % are rising edges (first high after a low), falling edges (first low
