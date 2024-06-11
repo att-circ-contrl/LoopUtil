@@ -23,7 +23,10 @@ function sigmask = nlProc_getSignificantChanges( ...
 % Use the larger of the two standard deviations to get the threshold.
 maxdev = max(devbefore, devafter);
 absdiff = abs(meanafter - meanbefore);
-sigmask = ( absdiff >= (minsigma * maxdev) );
+
+% NOTE - We're using >, rather than >=, to handle the case where both the
+% difference and the deviation are zero (which should return false).
+sigmask = ( absdiff > (minsigma * maxdev) );
 
 % If any input values were NaN, set the output to "false" for that cell.
 squashmask = isnan(meanbefore) | isnan(meanafter) ...
