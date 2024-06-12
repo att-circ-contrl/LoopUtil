@@ -20,17 +20,17 @@ function peakidx = nlProc_findPeakNearest( datavals, timevals, timetarget )
 %
 % First pass: Identify peaks.
 
-sampcount = length(datavals);
-
+% We're looking at the first difference of the magnitude.
 % This shortens the series by one sample.
 % Tolerate nonuniform time sampling.
-diffvals = diff(datavals) ./ diff(timevals);
+diffvals = diff(abs(datavals)) ./ diff(timevals);
 
-% Look for zero-crossings in the derivative to find extrema.
+% Look for positive-to-negative zero-crossings in the derivative to find
+% maxima.
 % This shortens the series by a second sample.
-diffpositive = diffvals >= 0;
+diffpositive = (diffvals >= 0);
 diffcount = length(diffpositive);
-peakmask = ( diffpositive(1:diffcount-1) ~= diffpositive(2:diffcount) );
+peakmask = diffpositive(1:diffcount-1) & ( ~diffpositive(2:diffcount) );
 
 % Truncate the input series to match the new length.
 datavals = datavals(2:diffcount+1);
