@@ -13,7 +13,7 @@ function [ spectpower tonepower normspect normtone ] = ...
 % "freqedges" is a vector of length (nBands + 1) containing bin edges for
 %   binning frequency.
 %
-% "spectpower" is a nChans x nBands x nTrials matrix containing per-band
+% "spectpower" is a nChans x nBands x nTrials matrix containing in-band
 %   total power for each channel and band (and trial, if multiple trials
 %   were present). Note that Matlab drops trailing dimensions of length 1.
 % "tonepower" is a nChans x nBands x nTrials matrix containing the ratio
