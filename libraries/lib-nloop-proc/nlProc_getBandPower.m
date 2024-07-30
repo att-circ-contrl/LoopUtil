@@ -1,7 +1,7 @@
-function [ spectpower tonepower normspect normtone ] = ...
+function [ spectpower tonepower ] = ...
   nlProc_getBandPower( chandata, samprate, freqedges )
 
-% function [ spectpower tonepower normspect normtone ] = ...
+% function [ spectpower tonepower ] = ...
 %   nlProc_getBandPower( chandata, samprate, freqedges )
 %
 % This processes a matrix of multi-channel waveforms, evaluating spectral
@@ -19,17 +19,10 @@ function [ spectpower tonepower normspect normtone ] = ...
 % "tonepower" is a nChans x nBands x nTrials matrix containing the ratio
 %   of the maximum power to median power of the components within each
 %   band. This is the normalized intensity of any narrow-band spikes.
-% "normspect" is a copy of "spectpower" with each (:,bidx,tidx) slice
-%   normalized so that 0 is the median power across channels and +/- 1 is
-%   approximately one standard deviation from the median (1.5 quartiles).
-% "normtone" is a copy of "tonepower" with each (:,bidx,tidx) slice
-%   converted to log scale and normalized in the same manner as "normspect".
 
 
 spectpower = [];
 tonepower = [];
-normspect = [];
-normtone = [];
 
 
 if iscell(chandata)
@@ -39,19 +32,15 @@ if iscell(chandata)
   ntrials = length(chandata);
 
   for tidx = 1:ntrials
-    [ thisspect thistone thisnormspect thisnormtone ] = ...
+    [ thisspect thistone ] = ...
       nlProc_getBandPower( chandata{tidx}, samprate, freqedges );
 
     if isempty(spectpower)
       spectpower = thisspect;
       tonepower = thistone;
-      normspect = thisnormspect;
-      normtone = thisnormtone;
     else
       spectpower(:,:,tidx) = thisspect;
       tonepower(:,:,tidx) = thistone;
-      normspect(:,:,tidx) = thisnormspect;
-      normtone(:,:,tidx) = thisnormtone;
     end
   end
 
@@ -99,51 +88,6 @@ else
       spectpower(cidx,bidx) = thispower;
       tonepower(cidx,bidx) = thistone;
     end
-  end
-
-
-  % Perform across-channel normalization.
-
-  normspect = nan(size(spectpower));
-  normtone = nan(size(tonepower));
-
-  for bidx = 1:bandcount
-    % Normalize in-band power so that the median is 0.
-    % Scale above and below median independently, so that quartiles are
-    % +/- 0.67 (making 1 standard deviation approximately +/- 1).
-
-    thisspect = spectpower(:,bidx);
-    thisspect = thisspect - median(thisspect);
-
-    posmask = (thisspect >= 0);
-    negmask = ~posmask;
-
-    % These are scale factors, so we want both of them to be positive.
-    posamp = prctile(thisspect, 75);
-    negamp = abs( prctile(thisspect, 25) );
-
-    thisspect(posmask) = 0.67 * thisspect(posmask) / posamp;
-    thisspect(negmask) = 0.67 * thisspect(negmask) / negamp;
-
-    normspect(:,bidx) = thisspect;
-
-
-    % Convert tone power to log scale and normalize it so that the median
-    % is 0. Scale above and below median using a common scale factor (from
-    % the IQR), again scaled so that 1 sigma is approximately +/- 1.
-
-    % We know that the tone power is 1 or higher, so taking log always works.
-    thistone = tonepower(:,bidx);
-    thistone = log(thistone);
-    thistone = thistone - median(thistone);
-
-    tonequarts = prctile(thistone, [ 25 75 ]);
-    toneiqr = max(tonequarts) - min(tonequarts);
-
-    % Half our IQR is our nominal median-to-quartile distance.
-    thistone = 0.67 * thistone / (0.5 * toneiqr);
-
-    normtone(:,bidx) = thistone;
   end
 
 end
