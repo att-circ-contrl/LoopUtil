@@ -27,10 +27,10 @@ function newmatrix = nlProc_normalizeAcrossChannels( oldmatrix, method )
 
 
 % Initialize.
-
 newmatrix = nan(size(oldmatrix));
 
 
+% Get metadata.
 % Names of the second and third dimension are arbitrary.
 % For 2D matrices, "trialcount" reads as 1 and indexing is valid, so always
 % treat these as 3D matrices.
@@ -40,52 +40,19 @@ bandcount = size(oldmatrix,2);
 trialcount = size(oldmatrix,3);
 
 
+% Normalize slices.
+
 for bidx = 1:bandcount
   for tidx = 1:trialcount
 
     thisslice = oldmatrix(:,bidx,tidx);
 
-    if strcmp('median', method)
-
-      % Use the median and inter-quartile range.
-
-      thisslice = thisslice - median(thisslice);
-
-      quartiles = prctile(thisslice, [ 25 75 ]);
-      thisrad = 0.5 * (quartiles(2) - quartiles(1));
-
-      % One quartile is 0.67 standard deviations for normal data.
-      thisslice = 0.67 * thisslice / thisrad;
-
-    elseif strcmp('twosided', method)
-
-      % Use the median and individual quartiles.
-
-      thisslice = thisslice - median(thisslice);
-
-      % We've already subtracted the median.
-      % We want unsigned magnitude, not signed values.
-      posrad = prctile(thisslice, 75);
-      negrad = abs( prctile(thisslice, 25) );
-
-      posmask = (thisslice >= 0);
-      negmask = ~posmask;
-
-      % One quartile is 0.67 standard deviations for normal data.
-      thisslice(posmask) = 0.67 * thisslice(posmask) / posrad;
-      thisslice(negmask) = 0.67 * thisslice(negmask) / negrad;
-
-    else
-      % Default to standard z-score.
-      thisslice = thisslice - mean(thisslice);
-      thisslice = thisslice / std(thisslice);
-    end
-
-    newmatrix(:,bidx,tidx) = thisslice;
+    % Use the entire old slice as the reference region.
+    newmatrix(:,bidx,tidx) = ...
+      nlProc_normalizeSlice( thisslice, thisslice, method );
 
   end
 end
-
 
 
 % Done.

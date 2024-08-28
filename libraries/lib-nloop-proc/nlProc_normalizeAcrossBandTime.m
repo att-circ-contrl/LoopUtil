@@ -26,13 +26,34 @@ function newmatrix = nlProc_normalizeAcrossBandTime( oldmatrix, method )
 % "newmatrix" is a normalized copy of "oldmatrix".
 
 
-% Permute the input and call normalizeAcrossChannels().
+% Initialize.
+newmatrix = nan(size(oldmatrix));
 
-oldmatrix = pagetranspose(oldmatrix);
 
-newmatrix = nlProc_normalizeAcrossChannels( oldmatrix, method );
+% Get metadata.
+% Names of the second and third dimension are arbitrary.
+% For 2D matrices, "trialcount" reads as 1 and indexing is valid, so always
+% treat these as 3D matrices.
 
-newmatrix = pagetranspose(newmatrix);
+chancount = size(oldmatrix,1);
+bandcount = size(oldmatrix,2);
+trialcount = size(oldmatrix,3);
+
+
+% Normalize slices.
+
+for cidx = 1:chancount
+  for tidx = 1:trialcount
+
+    thisslice = oldmatrix(cidx,:,tidx);
+
+    % Use the entire old slice as the reference region.
+    newmatrix(cidx,:,tidx) = ...
+      nlProc_normalizeSlice( thisslice, thisslice, method );
+
+  end
+end
+
 
 
 % Done.
