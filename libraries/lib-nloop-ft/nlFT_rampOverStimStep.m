@@ -20,7 +20,7 @@ function newftdata = ...
 %   to be squashed, or [] to auto-detect existing NaN spans (which may
 %   be different lengths for each trial/channel).
 %
-% "newftdata" is a copy of "oldftdata" with stimation regions in each trial
+% "newftdata" is a copy of "oldftdata" with stimulation regions in each trial
 %   NaNed out and a gradual ramp between pre-stimulation and
 %   post-stimulation DC levels.
 
