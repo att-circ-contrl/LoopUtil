@@ -5,6 +5,9 @@ function pairmask = nlUtil_getPairMask( firstlabels, secondlabels )
 % This builds a mask that's true exactly once for each pair that isn't a
 % self-comparison (removing permutations).
 %
+% This is intended to be used with channel labels, but will work with any
+% list of text labels.
+%
 % "firstlabels" is a cell array containing the first set of channel labels.
 % "secondlabels" is a cell array containing the second set of channel labels.
 %
