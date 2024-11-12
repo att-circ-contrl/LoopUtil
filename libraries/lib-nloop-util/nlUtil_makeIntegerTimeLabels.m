@@ -22,9 +22,13 @@ intseries = round(timevals);
 
 negmask = (intseries < 0);
 
-newlabels = [ ...
-  nlUtil_sprintfCellArray( [ 'n%04d' units ], intseries(negmask) ) ...
-  nlUtil_sprintfCellArray( [ 'p%04d' units ], intseries(~negmask) ) ];
+labelsneg = nlUtil_sprintfCellArray( [ 'n%04d' units ], intseries(negmask) );
+labelspos = nlUtil_sprintfCellArray( [ 'p%04d' units ], intseries(~negmask) );
+
+% Tolerate time values that aren't sorted.
+newlabels = cell(size(intseries));
+newlabels(negmask) = labelsneg;
+newlabels(~negmask) = labelspos;
 
 newtitles = nlUtil_sprintfCellArray( [ '%+d ' units ], intseries );
 
